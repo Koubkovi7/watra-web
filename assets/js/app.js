@@ -126,6 +126,7 @@ preloadFrames();
 renderFrame(0);
 
 attachScrollHandlers();
+setupMobileCompareSnap();
 brandLinks.forEach((link) => {
   link.addEventListener("pointerdown", handleBrandPress);
   link.addEventListener("pointerup", handleBrandRelease);
@@ -398,6 +399,73 @@ function attachScrollHandlers() {
   window.addEventListener("wheel", handleWheel, { passive: false });
   window.addEventListener("touchstart", handleTouchStart, { passive: false });
   window.addEventListener("touchmove", handleTouchMove, { passive: false });
+}
+
+function setupMobileCompareSnap() {
+  if (!compareBlock || !contactBlock) return;
+
+  const mediaQuery = window.matchMedia("(max-width: 640px)");
+  const SNAP_OFFSET = 40;
+  const MIN_SWIPE_DELTA = 50;
+  let snapTouchStart = null;
+  let snapCooldown = false;
+
+  const shouldSnap = () => !body.classList.contains("locked") && mediaQuery.matches && compareBlock.offsetHeight > 0;
+
+  const handleSnapTouchStart = (event) => {
+    if (!shouldSnap() || event.touches.length !== 1 || snapCooldown) return;
+    snapTouchStart = event.touches[0].clientY;
+  };
+
+  const handleSnapTouchEnd = (event) => {
+    if (!shouldSnap() || snapTouchStart === null || snapCooldown || !event.changedTouches.length) {
+      snapTouchStart = null;
+      return;
+    }
+
+    const delta = snapTouchStart - event.changedTouches[0].clientY;
+    snapTouchStart = null;
+
+    if (Math.abs(delta) < MIN_SWIPE_DELTA) return;
+
+    const direction = delta > 0 ? 1 : -1;
+    const snapped = attemptSnap(direction, SNAP_OFFSET);
+
+    if (snapped) {
+      snapCooldown = true;
+      setTimeout(() => {
+        snapCooldown = false;
+      }, 600);
+    }
+  };
+
+  const attemptSnap = (direction, offset) => {
+    const compareTop = compareBlock.getBoundingClientRect().top + window.scrollY;
+    const contactTop = contactBlock.getBoundingClientRect().top + window.scrollY;
+    const midpoint = window.scrollY + window.innerHeight / 2;
+
+    const aboveCompare = midpoint < compareTop - offset;
+    const betweenSections = midpoint >= compareTop - offset && midpoint < contactTop - offset;
+    const beyondContact = midpoint >= contactTop - offset;
+
+    if (direction > 0) {
+      if (aboveCompare) return snapTo(compareBlock);
+      if (betweenSections) return snapTo(contactBlock);
+    } else if (direction < 0) {
+      if (beyondContact) return snapTo(compareBlock);
+    }
+
+    return false;
+  };
+
+  const snapTo = (target) => {
+    if (!target) return false;
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+    return true;
+  };
+
+  window.addEventListener("touchstart", handleSnapTouchStart, { passive: true });
+  window.addEventListener("touchend", handleSnapTouchEnd, { passive: true });
 }
 
 function detachScrollHandlers() {
