@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WATRA – Saunová kamna</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body class="locked">
+  <header class="topbar">
+    <a class="brand" href="#stage" aria-label="Zpět na úvod">
+      <img class="brand__logo brand__logo--default" src="assets/img/logo.svg" alt="Logo WATRA" loading="lazy" />
+      <img class="brand__logo brand__logo--hover" src="assets/img/LOGO_hover.svg" alt="" aria-hidden="true" loading="lazy" />
+    </a>
+  </header>
+
+  <main class="stage" id="stage">
+    <div class="stage__panel stage__panel--text">
+      <div class="textBlock" id="textBlock">
+        <p class="eyebrow sans" id="stageLabel">INTRO</p>
+        <h1 class="title serif" id="stageTitle">Úvodní sekce</h1>
+        <p class="subtitle sans" id="stageDesc">
+          Seznam se s vizí saunových kamen WATRA a vstup do příběhu, který se odvíjí scrollováním.
+        </p>
+      </div>
+
+      <div class="compareBlock" id="compareBlock">
+        <h2 class="title serif compareHeading compareHeading--desktop">Rychlý přehled rozdílů</h2>
+        <h2 class="title serif compareHeading compareHeading--mobile">Porovnání</h2>
+
+        <div class="tableWrap">
+          <table class="compare">
+            <thead>
+              <tr>
+                <th class="sans">Vlastnost</th>
+                <th class="sans">Elektrická kamna<br>9 kW</th>
+                <th class="sans">Kamna na dřevo<br>13 kW</th>
+                <th class="sans">
+                  <span class="compareDesktopOnly">Hybridní WATRA<br>22 kW</span>
+                  <span class="compareMobileOnly">Hybridní<br>kamna<br>22 kW</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="sans">Rychlost vytápění</td>
+                <td class="sans">90 min</td>
+                <td class="sans">60 min</td>
+                <td class="sans">
+                  <span class="compareDesktopOnly">30 min (BOOST)</span>
+                  <span class="compareMobileOnly">30 min<br>(BOOST)</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="sans">Komfort obsluhy</td>
+                <td class="sans">Vysoký</td>
+                <td class="sans">Nižší</td>
+                <td class="sans">
+                  <span class="compareDesktopOnly">Vysoký + flexibilní</span>
+                  <span class="compareMobileOnly">Vysoký</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="sans">Autentický oheň</td>
+                <td class="sans">Ne</td>
+                <td class="sans">Ano</td>
+                <td class="sans">Ano</td>
+              </tr>
+              <tr>
+                <td class="sans">Spotřeba elektřiny</td>
+                <td class="sans">Stálá</td>
+                <td class="sans">Žádná</td>
+                <td class="sans">
+                  <span class="compareDesktopOnly">Optimalizovaná</span>
+                  <span class="compareMobileOnly">Optimal</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="sans">Závislost na elektřině</td>
+                <td class="sans">Vysoká</td>
+                <td class="sans">Žádná</td>
+                <td class="sans">Žádná</td>
+              </tr>
+              <tr>
+                <td class="sans">Potřeba silnějšího jističe</td>
+                <td class="sans">Často ano</td>
+                <td class="sans">Ne</td>
+                <td class="sans">Ne</td>
+              </tr>
+              <tr>
+                <td class="sans">
+                  <span class="compareDesktopOnly">Univerzálnost použití</span>
+                  <span class="compareMobileOnly">Univerzální</span>
+                </td>
+                <td class="sans">Spíše ano</td>
+                <td class="sans">Spíše ne</td>
+                <td class="sans">
+                  <span class="compareDesktopOnly">Ano-bez omezení</span>
+                  <span class="compareMobileOnly">Ano<br>bez<br>omezení</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="contactBlock" id="contactBlock">
+        <h2 class="title serif">Domluvme si konzultaci</h2>
+
+        <form class="form" action="#" method="post">
+          <label class="label sans">
+            Jméno
+            <input class="input" type="text" name="name" placeholder="Vaše jméno" required>
+          </label>
+
+          <label class="label sans">
+            Email
+            <input class="input" type="email" name="email" placeholder="studio@watra.cz" required>
+          </label>
+
+          <label class="label sans">
+            Zpráva
+            <textarea class="input textarea" name="message" rows="5" placeholder="Potřebuji kamna do..." required></textarea>
+          </label>
+
+          <button class="btn sans" type="submit">Odeslat</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="stage__panel stage__panel--visual">
+      <div class="frame">
+        <img id="stageImage" alt="Sekvenční animace saunových kamen" />
+      </div>
+    </div>
+
+  </main>
+
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
