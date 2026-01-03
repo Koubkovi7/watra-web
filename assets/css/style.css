@@ -136,7 +136,12 @@ body.locked{overflow:hidden}
 .stage__panel--visual{justify-content:flex-start;width:100%;margin-left:-24px;position:relative;z-index:1}
 .stage__panel--visual .frame{margin-left:0}
 
-.textBlock{max-width:520px;transition:opacity .35s ease}
+.textBlock{
+  max-width:520px;
+  transition:opacity .35s ease;
+  border:0;
+  border-radius:0;
+}
 .textBlock.is-hidden{opacity:0}
 .textBlock.is-collapsed{display:none}
 
@@ -378,8 +383,8 @@ body.locked{overflow:hidden}
     z-index:2;
     padding:22px 20px 28px;
     background:linear-gradient(160deg,rgba(0,0,0,.85),rgba(0,0,0,.45));
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:22px;
+    border:0;
+    border-radius:0;
     box-shadow:0 24px 60px rgba(0,0,0,.55);
     margin:0;
   }
