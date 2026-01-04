@@ -1,6 +1,5 @@
 const DEFAULT_FRAME_HOLD = 3;
 const TEXT_COLLAPSE_DELAY = 260;
-const SCROLL_STEP = 120;
 
 const introReverseList = Array.from({ length: 18 }, (_, index) => 18 - index);
 
@@ -19,7 +18,7 @@ const copyTrack = [
     start: 0,
     end: 17,
     label: "HYBRID",
-    anchorFrame: 14,
+    anchorAsset: "assets/img/intro/intro_0015.webp",
     title: "Hybridní saunová kamna, která spojují elektřinu a dřevo",
     desc: "Rychlé nahřátí. Skutečný oheň. Bez kompromisů."
   },
@@ -50,6 +49,7 @@ const copyTrack = [
     start: 52,
     end: 62,
     label: "HYBRID+",
+    anchorFrame: 52,
     title: "Hybridní saunová kamna.\nKdyž chcete víc.",
     desc: "Elektřina pro rychlost. Dřevo pro sílu."
   },
@@ -82,9 +82,9 @@ const contactBlock = document.getElementById("contactBlock");
 const brandLinks = document.querySelectorAll(".brand");
 const body = document.body;
 const brandTapTimers = new WeakMap();
-const scrollModeQuery = window.matchMedia("(max-width: 840px)");
+const progressOnlyQuery = window.matchMedia("(max-width: 840px)");
+let isProgressOnly = progressOnlyQuery.matches;
 const progressRail = document.getElementById("progressRail");
-const scrollSpacer = document.getElementById("timelineSpacer");
 
 const frameCatalog = [];
 const holdPerFrame = [];
@@ -130,37 +130,24 @@ let timelineComplete = false;
 let touchStartY = null;
 let scrollAccumulator = 0;
 let pointerHandlersAttached = false;
-let isScrollMode = false;
 let frameTweenId = null;
-let scrollTimelineAttached = false;
-let suppressScrollSync = false;
 
 preloadFrames();
 renderFrame(0);
 
 buildProgressRail();
+applyInteractionMode();
 
-const handleModeSwitch = (event) => {
-  if (event.matches) {
-    activateScrollMode();
-  } else {
-    deactivateScrollMode();
-  }
+const handleProgressModeChange = (event) => {
+  isProgressOnly = event.matches;
+  applyInteractionMode();
 };
 
-handleModeSwitch(scrollModeQuery);
-
-if (scrollModeQuery.addEventListener) {
-  scrollModeQuery.addEventListener("change", handleModeSwitch);
-} else if (scrollModeQuery.addListener) {
-  scrollModeQuery.addListener(handleModeSwitch);
+if (progressOnlyQuery.addEventListener) {
+  progressOnlyQuery.addEventListener("change", handleProgressModeChange);
+} else if (progressOnlyQuery.addListener) {
+  progressOnlyQuery.addListener(handleProgressModeChange);
 }
-
-window.addEventListener("resize", () => {
-  if (isScrollMode) {
-    updateScrollSpacer();
-  }
-});
 
 setupMobileCompareSnap();
 brandLinks.forEach((link) => {
@@ -402,11 +389,7 @@ function clearBrandPressed(target) {
 
 function resetTimeline() {
   cancelFrameTween();
-  suppressScrollSync = true;
-  if (!isScrollMode) {
-    detachScrollHandlers();
-    body.classList.add("locked");
-  }
+  detachScrollHandlers();
   body.classList.remove("timeline-complete");
   timelineComplete = false;
   scrollAccumulator = 0;
@@ -429,18 +412,13 @@ function resetTimeline() {
   }
 
   renderFrame(0);
-  if (isScrollMode) {
-    const { start } = getScrollMetrics();
-    window.scrollTo({ top: start, behavior: "auto" });
-    handleScrollTimeline();
-    suppressScrollSync = false;
-  } else {
-    attachScrollHandlers();
-  }
+  applyInteractionMode();
 
   window.history.replaceState(null, "", window.location.pathname);
-  if (!isScrollMode) {
+  if (!isProgressOnly) {
     window.scrollTo({ top: 0, behavior: "smooth" });
+  } else {
+    window.scrollTo({ top: 0, behavior: "auto" });
   }
 }
 
@@ -484,11 +462,6 @@ function handleSegmentClick(entry) {
   if (!entry) return;
   const targetFrame = getEntryTargetFrame(entry);
   if (typeof targetFrame !== "number") return;
-
-  if (isScrollMode) {
-    scrollToFrame(targetFrame);
-    return;
-  }
   animateToFrame(targetFrame);
 }
 
@@ -524,125 +497,27 @@ function cancelFrameTween() {
   frameTweenId = null;
 }
 
-function scrollToFrame(targetFrame) {
-  const clampedTarget = clamp(targetFrame, 0, maxFrame);
-  const progress = maxFrame ? clampedTarget / maxFrame : 0;
-  const { track, start } = getScrollMetrics();
-  const target = start + progress * track;
-
-  suppressScrollSync = true;
-  window.scrollTo({ top: target, behavior: "auto" });
-
-  animateToFrame(clampedTarget, {
-    onComplete: () => finalizeScrollSync()
-  });
-}
-
 function getEntryTargetFrame(entry) {
   if (!entry) return null;
+  if (entry.anchorAsset) {
+    const anchorName = entry.anchorAsset.split("/").pop();
+    const matchingIndex = frameCatalog.findIndex((frame) => {
+      if (!frame || !frame.src) return false;
+      const frameName = frame.src.split("/").pop();
+      return frame.src === entry.anchorAsset || frameName === anchorName;
+    });
+    if (matchingIndex !== -1) {
+      return clamp(matchingIndex, entry.start, entry.end);
+    }
+  }
   if (typeof entry.anchorFrame === "number") {
     return clamp(entry.anchorFrame, entry.start, entry.end);
   }
   return Math.round((entry.start + entry.end) / 2);
 }
 
-function finalizeScrollSync() {
-  const { track, start } = getScrollMetrics();
-  const refreshedProgress = maxFrame ? currentFrame / maxFrame : 0;
-  const adjustedTarget = start + refreshedProgress * track;
-  window.scrollTo({ top: adjustedTarget, behavior: "auto" });
-  suppressScrollSync = false;
-  handleScrollTimeline();
-}
-
-function activateScrollMode() {
-  if (isScrollMode) {
-    updateScrollSpacer();
-    return;
-  }
-
-  isScrollMode = true;
-  detachScrollHandlers();
-  body.classList.remove("locked");
-  body.classList.add("scrollTimeline");
-  updateScrollSpacer();
-
-  const { track, start } = getScrollMetrics();
-  if (track > 0 && maxFrame > 0) {
-    const progress = currentFrame / maxFrame;
-    window.scrollTo({ top: start + progress * track, behavior: "auto" });
-  }
-
-  if (!scrollTimelineAttached) {
-    window.addEventListener("scroll", handleScrollTimeline, { passive: true });
-    scrollTimelineAttached = true;
-  }
-
-  handleScrollTimeline();
-}
-
-function deactivateScrollMode() {
-  if (scrollTimelineAttached) {
-    window.removeEventListener("scroll", handleScrollTimeline);
-    scrollTimelineAttached = false;
-  }
-
-  isScrollMode = false;
-  body.classList.remove("scrollTimeline");
-  body.classList.add("locked");
-
-  if (scrollSpacer) {
-    scrollSpacer.style.height = "0px";
-  }
-
-  attachScrollHandlers();
-  window.scrollTo({ top: 0, behavior: "auto" });
-}
-
-function updateScrollSpacer() {
-  if (!scrollSpacer) return;
-  const spacerHeight = Math.max((maxFrame + 1) * SCROLL_STEP, window.innerHeight * 2);
-  scrollSpacer.style.height = `${Math.round(spacerHeight)}px`;
-}
-
-function handleScrollTimeline() {
-  if (!isScrollMode || suppressScrollSync) return;
-  const { track, start } = getScrollMetrics();
-  if (track <= 0) return;
-
-  const relativeScroll = clamp(window.scrollY - start, 0, track);
-  const progress = track ? relativeScroll / track : 0;
-  const targetFrame = Math.round(progress * maxFrame);
-
-  if (targetFrame === currentFrame) return;
-
-  cancelFrameTween();
-  currentFrame = targetFrame;
-  renderFrame(currentFrame);
-
-  if (targetFrame >= maxFrame) {
-    completeTimeline();
-  } else if (timelineComplete) {
-    body.classList.remove("timeline-complete");
-    timelineComplete = false;
-  }
-}
-
-function getScrollMetrics() {
-  if (scrollSpacer) {
-    const start = scrollSpacer.offsetTop || 0;
-    const track = Math.max((scrollSpacer.offsetHeight || 0) - window.innerHeight, 1);
-    return { start, track };
-  }
-  const doc = document.documentElement;
-  return {
-    start: 0,
-    track: Math.max(doc.scrollHeight - doc.clientHeight, 1)
-  };
-}
-
 function attachScrollHandlers() {
-  if (pointerHandlersAttached || isScrollMode) return;
+  if (pointerHandlersAttached || isProgressOnly) return;
   window.addEventListener("wheel", handleWheel, { passive: false });
   window.addEventListener("touchstart", handleTouchStart, { passive: false });
   window.addEventListener("touchmove", handleTouchMove, { passive: false });
@@ -666,7 +541,7 @@ function setupMobileCompareSnap() {
   let snapTouchStart = null;
   let snapCooldown = false;
 
-  const shouldSnap = () => !body.classList.contains("locked") && mediaQuery.matches && compareBlock.offsetHeight > 0;
+  const shouldSnap = () => !isProgressOnly && !body.classList.contains("locked") && mediaQuery.matches && compareBlock.offsetHeight > 0;
 
   const handleSnapTouchStart = (event) => {
     if (!shouldSnap() || event.touches.length !== 1 || snapCooldown) return;
@@ -722,5 +597,17 @@ function setupMobileCompareSnap() {
 
   window.addEventListener("touchstart", handleSnapTouchStart, { passive: true });
   window.addEventListener("touchend", handleSnapTouchEnd, { passive: true });
+}
+
+function applyInteractionMode() {
+  if (isProgressOnly) {
+    detachScrollHandlers();
+    body.classList.remove("locked");
+    body.classList.add("progressOnly");
+  } else {
+    body.classList.remove("progressOnly");
+    body.classList.add("locked");
+    attachScrollHandlers();
+  }
 }
 
