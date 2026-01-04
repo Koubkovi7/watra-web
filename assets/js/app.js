@@ -429,7 +429,8 @@ function resetTimeline() {
 
   renderFrame(0);
   if (isScrollMode) {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    const { start } = getScrollMetrics();
+    window.scrollTo({ top: start, behavior: "auto" });
     handleScrollTimeline();
   } else {
     attachScrollHandlers();
@@ -524,17 +525,17 @@ function cancelFrameTween() {
 function scrollToFrame(targetFrame) {
   const clampedTarget = clamp(targetFrame, 0, maxFrame);
   const progress = maxFrame ? clampedTarget / maxFrame : 0;
-  const track = getScrollMetrics();
-  const target = progress * track;
+  const { track, start } = getScrollMetrics();
+  const target = start + progress * track;
 
   suppressScrollSync = true;
   window.scrollTo({ top: target, behavior: "auto" });
 
   animateToFrame(clampedTarget, {
     onComplete: () => {
-      const refreshedTrack = getScrollMetrics();
+      const { track: refreshedTrack, start: refreshedStart } = getScrollMetrics();
       const refreshedProgress = maxFrame ? currentFrame / maxFrame : 0;
-      const adjustedTarget = refreshedProgress * refreshedTrack;
+      const adjustedTarget = refreshedStart + refreshedProgress * refreshedTrack;
       window.scrollTo({ top: adjustedTarget, behavior: "auto" });
       suppressScrollSync = false;
       handleScrollTimeline();
@@ -562,10 +563,10 @@ function activateScrollMode() {
   body.classList.add("scrollTimeline");
   updateScrollSpacer();
 
-  const track = getScrollMetrics();
+  const { track, start } = getScrollMetrics();
   if (track > 0 && maxFrame > 0) {
     const progress = currentFrame / maxFrame;
-    window.scrollTo({ top: progress * track, behavior: "auto" });
+    window.scrollTo({ top: start + progress * track, behavior: "auto" });
   }
 
   if (!scrollTimelineAttached) {
@@ -602,10 +603,10 @@ function updateScrollSpacer() {
 
 function handleScrollTimeline() {
   if (!isScrollMode || suppressScrollSync) return;
-  const track = getScrollMetrics();
+  const { track, start } = getScrollMetrics();
   if (track <= 0) return;
 
-  const relativeScroll = clamp(window.scrollY, 0, track);
+  const relativeScroll = clamp(window.scrollY - start, 0, track);
   const progress = track ? relativeScroll / track : 0;
   const targetFrame = Math.round(progress * maxFrame);
 
@@ -624,8 +625,16 @@ function handleScrollTimeline() {
 }
 
 function getScrollMetrics() {
+  if (scrollSpacer) {
+    const start = scrollSpacer.offsetTop || 0;
+    const track = Math.max((scrollSpacer.offsetHeight || 0) - window.innerHeight, 1);
+    return { start, track };
+  }
   const doc = document.documentElement;
-  return Math.max(doc.scrollHeight - doc.clientHeight, 1);
+  return {
+    start: 0,
+    track: Math.max(doc.scrollHeight - doc.clientHeight, 1)
+  };
 }
 
 function attachScrollHandlers() {

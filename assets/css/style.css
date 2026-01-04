@@ -501,6 +501,16 @@ body.scrollTimeline #timelineSpacer{display:block}
     width:100%;
   }
   .compareBlock{order:3;margin-top:-150px}
+  .compareBlock.is-visible{
+    max-height:min(560px, 82vh);
+    overflow-y:auto;
+    padding-bottom:10px;
+  }
+  .compareBlock.is-visible .tableWrap{
+    max-height:min(420px, 65vh);
+    overflow:auto;
+    padding-right:18px;
+  }
   .compareDesktopOnly{display:none}
   .compareMobileOnly{display:inline}
   .compare th,.compare td{font-size:14px}
