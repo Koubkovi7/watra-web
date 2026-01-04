@@ -19,6 +19,7 @@ const copyTrack = [
     start: 0,
     end: 17,
     label: "HYBRID",
+    anchorFrame: 14,
     title: "Hybridní saunová kamna, která spojují elektřinu a dřevo",
     desc: "Rychlé nahřátí. Skutečný oheň. Bez kompromisů."
   },
@@ -26,6 +27,7 @@ const copyTrack = [
     start: 18,
     end: 30,
     label: "ELEKTŘINA",
+    anchorFrame: 21,
     title: "Elektrická saunová kamna pro okamžitý komfort",
     desc: "Teplo na povel. Stabilní výkon. Bez čekání."
   },
@@ -33,6 +35,7 @@ const copyTrack = [
     start: 31,
     end: 41,
     label: "DŘEVO",
+    anchorFrame: 34,
     title: "Saunová kamna\nna dřevo\npro autentický zážitek",
     desc: "Plameny, vůně dřeva a absolutní soběstačnost."
   },
@@ -476,11 +479,14 @@ function updateProgressRail(frameIndex) {
 
 function handleSegmentClick(entry) {
   if (!entry) return;
+  const targetFrame = getEntryTargetFrame(entry);
+  if (typeof targetFrame !== "number") return;
+
   if (isScrollMode) {
-    scrollToEntry(entry);
+    scrollToFrame(targetFrame);
     return;
   }
-  animateToFrame(entry.start);
+  animateToFrame(targetFrame);
 }
 
 function animateToFrame(targetFrame, options = {}) {
@@ -515,16 +521,16 @@ function cancelFrameTween() {
   frameTweenId = null;
 }
 
-function scrollToEntry(entry) {
-  const midpoint = Math.round((entry.start + entry.end) / 2);
-  const progress = maxFrame ? midpoint / maxFrame : 0;
+function scrollToFrame(targetFrame) {
+  const clampedTarget = clamp(targetFrame, 0, maxFrame);
+  const progress = maxFrame ? clampedTarget / maxFrame : 0;
   const track = getScrollMetrics();
   const target = progress * track;
 
   suppressScrollSync = true;
   window.scrollTo({ top: target, behavior: "auto" });
 
-  animateToFrame(midpoint, {
+  animateToFrame(clampedTarget, {
     onComplete: () => {
       const refreshedTrack = getScrollMetrics();
       const refreshedProgress = maxFrame ? currentFrame / maxFrame : 0;
@@ -534,6 +540,14 @@ function scrollToEntry(entry) {
       handleScrollTimeline();
     }
   });
+}
+
+function getEntryTargetFrame(entry) {
+  if (!entry) return null;
+  if (typeof entry.anchorFrame === "number") {
+    return clamp(entry.anchorFrame, entry.start, entry.end);
+  }
+  return Math.round((entry.start + entry.end) / 2);
 }
 
 function activateScrollMode() {
