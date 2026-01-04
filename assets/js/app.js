@@ -1,6 +1,6 @@
 const DEFAULT_FRAME_HOLD = 3;
 const TEXT_COLLAPSE_DELAY = 260;
-const SCROLL_STEP = 48;
+const SCROLL_STEP = 120;
 
 const introReverseList = Array.from({ length: 18 }, (_, index) => 18 - index);
 
