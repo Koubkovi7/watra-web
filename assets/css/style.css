@@ -17,26 +17,82 @@ body{
   min-height:100vh;
 }
 
-body.locked{
-  overflow-x:hidden;
-  overflow-y:auto;
-  overscroll-behavior-y:contain;
-}
+body.locked{overflow:hidden}
 
-body.locked::after{
-  content:"";
-  display:block;
-  height:140px;
-  pointer-events:none;
-}
+body.scrollTimeline{overflow-x:hidden;overflow-y:auto}
+body.scrollTimeline .stage{position:sticky;top:0}
 
-body.locked .stage{
-  position:sticky;
-  top:0;
-}
+#timelineSpacer{display:none;width:100%;height:0}
+body.scrollTimeline #timelineSpacer{display:block}
 
 .serif{font-family:"Playfair Display",serif}
 .sans{font-family:"Open Sans",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+
+.progressRail{
+  position:fixed;
+  right:clamp(12px,4vw,48px);
+  top:50%;
+  transform:translateY(-50%);
+  z-index:20;
+  display:flex;
+  pointer-events:auto;
+}
+
+.progressRail__track{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:22px;
+  padding:20px 0;
+}
+
+.progressRail__track::before{
+  content:"";
+  position:absolute;
+  top:12px;
+  bottom:12px;
+  width:2px;
+  background:var(--line);
+}
+
+.progressRail__segment{
+  position:relative;
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,.35);
+  background:var(--bg);
+  cursor:pointer;
+  transition:transform .22s ease,border-color .22s ease,background .22s ease;
+}
+
+.progressRail__segment::after{
+  content:"";
+  position:absolute;
+  inset:4px;
+  border-radius:50%;
+  background:rgba(255,255,255,.22);
+  opacity:0;
+  transform:scale(.6);
+  transition:opacity .22s ease,transform .22s ease,background .22s ease;
+}
+
+.progressRail__segment.is-active{
+  border-color:var(--fg);
+  transform:scale(1.18);
+}
+
+.progressRail__segment.is-active::after{
+  opacity:1;
+  transform:scale(.95);
+  background:var(--fg);
+}
+
+.progressRail__segment:focus-visible{
+  outline:2px solid rgba(255,255,255,.6);
+  outline-offset:4px;
+}
 
 .topbar{
   position:fixed;
@@ -135,6 +191,9 @@ body.locked .stage{
 .stage.is-contact .stage__panel--text > *{width:100%;max-width:520px}
 .stage.is-contact .stage__panel--visual{display:none}
 .stage.is-contact .contactBlock{text-align:left;margin:-100px auto 0}
+@media (max-width: 840px){
+  .stage.is-compare .stage__panel--visual{display:none}
+}
 
 .stage__panel{position:relative;display:flex;align-items:center}
 .stage__panel--text{
@@ -181,7 +240,11 @@ body.locked .stage{
   pointer-events:auto;
   max-height:1000px;
 }
-.compareBlock h2{margin:6px 0 18px;font-size:40px}
+.compareBlock h2{
+  margin:6px auto 18px;
+  font-size:40px;
+  text-align:center;
+}
 .compareDesktopOnly{display:inline}
 .compareMobileOnly{display:none}
 .compareHeading--mobile{display:none}
@@ -266,6 +329,14 @@ body.locked .stage{
 .tableWrap::-webkit-scrollbar{height:4px}
 .tableWrap::-webkit-scrollbar-thumb{background:rgba(255,255,255,.28);border-radius:99px}
 
+.comparePlaceholder{
+  display:none;
+  margin-top:24px;
+  font-size:18px;
+  color:var(--muted);
+  text-align:left;
+}
+
 .compare{
   width:100%;
   min-width:680px;
@@ -281,7 +352,7 @@ body.locked .stage{
   border-right:1px solid var(--line);
   text-align:center;
   font-weight:300;
-  font-size:16px;
+  font-size:15px;
   line-height:1.08;
   width:22%;
 }
@@ -332,6 +403,24 @@ body.locked .stage{
   }
   .frame{width:100%;max-width:520px}
   .subtitle{font-size:17px}
+}
+
+@media (max-width: 720px){
+  .progressRail{
+    top:auto;
+    bottom:20px;
+    left:50%;
+    right:auto;
+    transform:translate(-50%,0);
+    width:min(360px, 90vw);
+  }
+  .progressRail__track{
+    flex-direction:row;
+    justify-content:space-between;
+    gap:12px;
+    padding:0 20px;
+  }
+  .progressRail__track::before{display:none}
 }
 
 @media (max-width: 840px){
@@ -402,19 +491,20 @@ body.locked .stage{
     margin:0;
   }
   .compareBlock,
-  .contactBlock{
+    .contactBlock{
     width:100%;
   }
   .compareBlock{order:3;margin-top:-150px}
   .compareDesktopOnly{display:none}
   .compareMobileOnly{display:inline}
-  .compare th,.compare td{font-size:15px}
+  .compare th,.compare td{font-size:14px}
   .compareHeading--mobile{display:block}
   .compareHeading--desktop{display:none}
   .contactBlock{order:4;margin-top:200px}
   .stage.is-contact .contactBlock{margin:200px auto 0}
   .stage__panel--text .subtitle{max-width:100%}
-  .tableWrap{margin-top:10px;margin-right:-16px;padding-right:16px}
+  .tableWrap{margin-top:10px;margin-right:-16px;padding-right:16px;display:block}
+  .comparePlaceholder{display:none}
   .compare{min-width:360px}
   .compare th:last-child,
   .compare td:last-child{
@@ -423,6 +513,35 @@ body.locked .stage{
   }
   .form{gap:12px;width:100%}
   .btn{width:100%}
+
+  .stage.is-compare .textBlock,
+  .stage.is-contact .textBlock{
+    position:relative;
+    top:auto;
+    left:auto;
+    right:auto;
+    padding:0;
+    background:none;
+    box-shadow:none;
+    margin:0;
+  }
+
+  .stage.is-compare .compareBlock{
+    order:2;
+    margin-top:24px;
+  }
+
+  .stage.is-contact .compareBlock{margin-top:0}
+
+  .stage.is-contact .contactBlock{
+    order:2;
+    margin:32px auto 0;
+  }
+
+  .stage.is-contact .stage__panel--text,
+  .stage.is-compare .stage__panel--text{
+    gap:20px;
+  }
 }
 
 @media (max-width: 480px){
@@ -440,6 +559,8 @@ body.locked .stage{
   .form{gap:10px}
   .input{font-size:15px;padding:11px 12px}
   .btn{font-size:15px;padding:12px}
+  .progressRail{bottom:14px;width:calc(100% - 24px)}
+  .progressRail__segment{width:14px;height:14px}
 }
 
 @media (min-width: 1600px){
