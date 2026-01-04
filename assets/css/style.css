@@ -408,17 +408,23 @@ body.scrollTimeline #timelineSpacer{display:block}
 @media (max-width: 720px){
   .progressRail{
     top:auto;
-    bottom:20px;
+    bottom:calc(env(safe-area-inset-bottom, 0px) + 28px);
     left:50%;
     right:auto;
     transform:translate(-50%,0);
-    width:min(360px, 90vw);
+    width:100%;
+    display:flex;
+    justify-content:center;
+    padding-bottom:env(safe-area-inset-bottom, 0px);
+    pointer-events:none;
   }
   .progressRail__track{
     flex-direction:row;
-    justify-content:space-between;
+    justify-content:center;
     gap:12px;
     padding:0 20px;
+    max-width:min(420px,92vw);
+    pointer-events:auto;
   }
   .progressRail__track::before{display:none}
 }
@@ -451,7 +457,7 @@ body.scrollTimeline #timelineSpacer{display:block}
   .brand{padding:4px 10px}
   .brand__logo{height:clamp(30px, 10vh, 48px)}
   .stage{
-    padding:calc(72px + 52px) clamp(16px,6vw,32px) 56px;
+    padding:calc(72px + 52px) clamp(16px,6vw,32px) calc(120px + env(safe-area-inset-bottom, 0px));
     gap:18px;
     display:flex;
     flex-direction:column;
@@ -559,7 +565,7 @@ body.scrollTimeline #timelineSpacer{display:block}
   .form{gap:10px}
   .input{font-size:15px;padding:11px 12px}
   .btn{font-size:15px;padding:12px}
-  .progressRail{bottom:14px;width:calc(100% - 24px)}
+  .progressRail{bottom:calc(env(safe-area-inset-bottom, 0px) + 18px);width:calc(100% - 24px);left:50%;transform:translateX(-50%)}
   .progressRail__segment{width:14px;height:14px}
 }
 
