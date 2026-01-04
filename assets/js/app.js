@@ -44,7 +44,7 @@ const copyTrack = [
     end: 50,
     label: "A NEBO",
     title: "A nebo...",
-    desc: "chcete jenom co nejrychleji do sauny."
+    desc: "chcete jenom co nejrychleji do sauny?"
   },
   {
     start: 52,
