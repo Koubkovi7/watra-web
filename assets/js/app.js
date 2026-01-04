@@ -18,40 +18,41 @@ const copyTrack = [
     start: 0,
     end: 17,
     label: "HYBRID",
-    anchorAsset: "assets/img/intro/intro_0015.webp",
-    title: "Hybridní saunová kamna, která spojují elektřinu a dřevo",
-    desc: "Rychlé nahřátí. Skutečný oheň. Bez kompromisů."
+    anchorAsset: "assets/img/intro/intro_0001.webp",
+    progressAnchorAsset: "assets/img/intro/intro_0015.webp",
+    title: "Saunová kamna\nna dřevo nebo elektřinu?\nWATRA umí obojí.",
+    desc: "Unikátní kamna WATRA kombinují to nejlepší z obou světů."
   },
   {
     start: 18,
     end: 30,
     label: "ELEKTŘINA",
     anchorFrame: 21,
-    title: "Elektrická saunová kamna pro okamžitý komfort",
-    desc: "Teplo na povel. Stabilní výkon. Bez čekání."
+    title: "Vracíte se domů po náročném dni?\nStačí vzdáleně sepnout.",
+    desc: "Saunová kamna s výkonem 9kW pro rychlou relaxaci."
   },
   {
     start: 31,
     end: 41,
     label: "DŘEVO",
     anchorFrame: 34,
-    title: "Saunová kamna\nna dřevo\npro autentický zážitek",
-    desc: "Plameny, vůně dřeva a absolutní soběstačnost."
+    title: "Saunová kamna\nna dřevo\npro autentický zážitek.",
+    desc: "Bez spotřeby elektřiny, s plameny a vůní dřeva."
   },
   {
     start: 42,
     end: 50,
     label: "A NEBO",
     title: "A nebo...",
-    desc: "...chcete jenom co nejrychleji do sauny."
+    desc: "chcete jenom co nejrychleji do sauny."
   },
   {
     start: 52,
     end: 62,
     label: "HYBRID+",
     anchorFrame: 52,
-    title: "Hybridní saunová kamna.\nKdyž chcete víc.",
-    desc: "Elektřina pro rychlost. Dřevo pro sílu."
+    title: "Hybridní saunová kamna WATRA.",
+    desc: "Unikátní kombinace elektřiny a dřeva pro maximální flexibilitu."
   },
   {
     start: 63,
@@ -460,7 +461,7 @@ function updateProgressRail(frameIndex) {
 
 function handleSegmentClick(entry) {
   if (!entry) return;
-  const targetFrame = getEntryTargetFrame(entry);
+  const targetFrame = getEntryTargetFrame(entry, "progress");
   if (typeof targetFrame !== "number") return;
   animateToFrame(targetFrame);
 }
@@ -497,14 +498,25 @@ function cancelFrameTween() {
   frameTweenId = null;
 }
 
-function getEntryTargetFrame(entry) {
+function getEntryTargetFrame(entry, context = "default") {
   if (!entry) return null;
+  const assetPreferences = [];
+
+  if (context === "progress" && entry.progressAnchorAsset) {
+    assetPreferences.push(entry.progressAnchorAsset);
+  }
+
   if (entry.anchorAsset) {
-    const anchorName = entry.anchorAsset.split("/").pop();
+    assetPreferences.push(entry.anchorAsset);
+  }
+
+  for (const assetPath of assetPreferences) {
+    if (!assetPath) continue;
+    const anchorName = assetPath.split("/").pop();
     const matchingIndex = frameCatalog.findIndex((frame) => {
       if (!frame || !frame.src) return false;
       const frameName = frame.src.split("/").pop();
-      return frame.src === entry.anchorAsset || frameName === anchorName;
+      return frame.src === assetPath || frameName === anchorName;
     });
     if (matchingIndex !== -1) {
       return clamp(matchingIndex, entry.start, entry.end);
