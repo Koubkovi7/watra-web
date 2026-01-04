@@ -17,7 +17,7 @@ const copyTrack = [
   {
     start: 0,
     end: 17,
-    label: "HYBRID",
++    label: "HYBRID",
     title: "Hybridní saunová kamna, která spojují elektřinu a dřevo",
     desc: "Rychlé nahřátí. Skutečný oheň. Bez kompromisů."
   },
