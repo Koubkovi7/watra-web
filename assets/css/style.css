@@ -53,7 +53,7 @@ body.scrollTimeline #timelineSpacer{display:block}
   top:12px;
   bottom:12px;
   width:2px;
-  background:var(--line);
+  background:rgba(255,255,255,.18);
 }
 
 .progressRail__segment{
@@ -61,32 +61,33 @@ body.scrollTimeline #timelineSpacer{display:block}
   width:18px;
   height:18px;
   border-radius:50%;
-  border:2px solid rgba(255,255,255,.35);
+  border:2px solid rgba(255,255,255,.4);
   background:var(--bg);
   cursor:pointer;
-  transition:transform .22s ease,border-color .22s ease,background .22s ease;
+  transition:transform .22s ease,border-color .22s ease;
 }
 
 .progressRail__segment::after{
   content:"";
   position:absolute;
-  inset:4px;
-  border-radius:50%;
-  background:rgba(255,255,255,.22);
+  top:50%;
+  left:50%;
+  width:30px;
+  height:30px;
+  background:url("../img/icon_progress.svg") center/contain no-repeat;
+  transform:translate(-50%,-50%) scale(.75);
   opacity:0;
-  transform:scale(.6);
-  transition:opacity .22s ease,transform .22s ease,background .22s ease;
+  transition:opacity .22s ease,transform .22s ease;
 }
 
 .progressRail__segment.is-active{
   border-color:var(--fg);
-  transform:scale(1.18);
+  transform:scale(1.05);
 }
 
 .progressRail__segment.is-active::after{
   opacity:1;
-  transform:scale(.95);
-  background:var(--fg);
+  transform:translate(-50%,-50%) scale(1);
 }
 
 .progressRail__segment:focus-visible{
@@ -420,6 +421,7 @@ body.scrollTimeline #timelineSpacer{display:block}
   }
   .progressRail__track{
     flex-direction:row;
+    align-items:center;
     justify-content:center;
     gap:12px;
     padding:0 20px;
@@ -427,6 +429,10 @@ body.scrollTimeline #timelineSpacer{display:block}
     pointer-events:auto;
   }
   .progressRail__track::before{display:none}
+  .progressRail__segment{
+    width:16px;
+    height:16px;
+  }
 }
 
 @media (max-width: 840px){
@@ -436,7 +442,11 @@ body.scrollTimeline #timelineSpacer{display:block}
     padding:calc(92px + 56px) clamp(20px,6vw,48px) 72px;
   }
   .stage__panel{width:100%}
-  .stage__panel--visual{order:2;justify-content:center;margin-left:0}
+  .stage__panel--visual{
+    order:2;
+    justify-content:center;
+    margin-left:0;
+  }
   .stage__panel--text{
     order:1;
     justify-content:flex-start;
@@ -575,7 +585,8 @@ body.scrollTimeline #timelineSpacer{display:block}
   .form{gap:10px}
   .input{font-size:15px;padding:11px 12px}
   .btn{font-size:15px;padding:12px}
-  .progressRail{bottom:calc(env(safe-area-inset-bottom, 0px) + 18px);width:calc(100% - 24px);left:50%;transform:translateX(-50%)}
+  .progressRail{bottom:calc(env(safe-area-inset-bottom, 0px) + 18px);width:calc(100% - 24px)}
+  .progressRail__track{gap:10px;padding:0 12px}
   .progressRail__segment{width:14px;height:14px}
 }
 
