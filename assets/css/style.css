@@ -275,7 +275,7 @@ body.scrollTimeline #timelineSpacer{display:block}
   pointer-events:auto;
   max-height:1200px;
 }
-
+  .compareBlock{order:3;margin-top:-40px}
 .contactBlock .form{margin-top:24px;width:100%}
 .contactBlock .btn{width:100%}
 

@@ -402,6 +402,7 @@ function clearBrandPressed(target) {
 
 function resetTimeline() {
   cancelFrameTween();
+  suppressScrollSync = true;
   if (!isScrollMode) {
     detachScrollHandlers();
     body.classList.add("locked");
@@ -432,6 +433,7 @@ function resetTimeline() {
     const { start } = getScrollMetrics();
     window.scrollTo({ top: start, behavior: "auto" });
     handleScrollTimeline();
+    suppressScrollSync = false;
   } else {
     attachScrollHandlers();
   }
@@ -532,14 +534,7 @@ function scrollToFrame(targetFrame) {
   window.scrollTo({ top: target, behavior: "auto" });
 
   animateToFrame(clampedTarget, {
-    onComplete: () => {
-      const { track: refreshedTrack, start: refreshedStart } = getScrollMetrics();
-      const refreshedProgress = maxFrame ? currentFrame / maxFrame : 0;
-      const adjustedTarget = refreshedStart + refreshedProgress * refreshedTrack;
-      window.scrollTo({ top: adjustedTarget, behavior: "auto" });
-      suppressScrollSync = false;
-      handleScrollTimeline();
-    }
+    onComplete: () => finalizeScrollSync()
   });
 }
 
@@ -549,6 +544,15 @@ function getEntryTargetFrame(entry) {
     return clamp(entry.anchorFrame, entry.start, entry.end);
   }
   return Math.round((entry.start + entry.end) / 2);
+}
+
+function finalizeScrollSync() {
+  const { track, start } = getScrollMetrics();
+  const refreshedProgress = maxFrame ? currentFrame / maxFrame : 0;
+  const adjustedTarget = start + refreshedProgress * track;
+  window.scrollTo({ top: adjustedTarget, behavior: "auto" });
+  suppressScrollSync = false;
+  handleScrollTimeline();
 }
 
 function activateScrollMode() {
