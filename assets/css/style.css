@@ -50,6 +50,52 @@ body.scrollTimeline #timelineSpacer{display:block}
   pointer-events:auto;
 }
 
+.progressRail__arrow{
+  display:none;
+  width:40px;
+  height:40px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.28);
+  background:rgba(0,0,0,.35);
+  color:var(--fg);
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:background .25s ease,border-color .25s ease,transform .25s ease,opacity .25s ease;
+  pointer-events:auto;
+  margin:0 10px;
+}
+
+body.progressOnly .progressRail__arrow{display:inline-flex}
+
+.progressRail__arrow:focus-visible{
+  outline:2px solid rgba(255,255,255,.7);
+  outline-offset:4px;
+}
+
+.progressRail__arrow:not(.is-disabled):hover{
+  background:rgba(255,255,255,.08);
+  border-color:rgba(255,255,255,.45);
+  transform:translateY(-2px);
+}
+
+.progressRail__arrow.is-disabled{
+  opacity:.32;
+  cursor:default;
+  pointer-events:none;
+}
+
+.progressRail__arrowIcon{
+  width:12px;
+  height:12px;
+  border:solid rgba(255,255,255,.9);
+  border-width:0 2px 2px 0;
+  display:block;
+}
+
+.progressRail__arrow--prev .progressRail__arrowIcon{transform:rotate(135deg)}
+.progressRail__arrow--next .progressRail__arrowIcon{transform:rotate(-45deg)}
+
 .progressRail__track{
   position:relative;
   display:flex;
@@ -445,6 +491,7 @@ body.scrollTimeline #timelineSpacer{display:block}
     width:16px;
     height:16px;
   }
+  body.progressOnly .progressRail__arrow{margin:0 4px}
 }
 
 @media (max-width: 840px){
@@ -480,7 +527,7 @@ body.scrollTimeline #timelineSpacer{display:block}
   .brand{padding:4px 10px}
   .brand__logo{height:clamp(30px, 10vh, 48px)}
   .stage{
-    padding:calc(72px + 52px - 50px) clamp(16px,6vw,32px) calc(120px + env(safe-area-inset-bottom, 0px));
+    padding:calc(52px + 12px) clamp(16px,6vw,32px) calc(96px + env(safe-area-inset-bottom, 0px));
     gap:12px;
     display:flex;
     flex-direction:column;
@@ -586,7 +633,7 @@ body.scrollTimeline #timelineSpacer{display:block}
 
 @media (max-width: 480px){
   .stage{
-    padding:calc(64px + 48px) 16px 48px;
+    padding:calc(64px + 10px) 16px 48px;
     gap:16px;
   }
   .title{font-size:30px}

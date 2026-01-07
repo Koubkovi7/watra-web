@@ -17,9 +17,9 @@ const copyTrack = [
   {
     start: 0,
     end: 17,
-    label: "HYBRID",
+    label: "INTRO",
     anchorAsset: "assets/img/intro/intro_0001.webp",
-    progressAnchorAsset: "assets/img/intro/intro_0015.webp",
+    progressAnchorAsset: "assets/img/intro/intro_0001.webp",
     title: "Saunová kamna\nna dřevo nebo elektřinu?\nWATRA umí obojí.",
     desc: "Unikátní kamna WATRA kombinují to nejlepší z obou světů."
   },
@@ -90,6 +90,12 @@ const progressRail = document.getElementById("progressRail");
 const frameCatalog = [];
 const holdPerFrame = [];
 const progressSegments = [];
+let progressArrowPrev = null;
+let progressArrowNext = null;
+let swipeStartX = null;
+let swipeStartY = null;
+const MIN_SWIPE_DISTANCE = 50;
+let swipeHandlersAttached = false;
 
 sequences.forEach((seq) => {
   const holdValue = seq.hold || DEFAULT_FRAME_HOLD;
@@ -433,8 +439,28 @@ function buildProgressRail() {
   progressRail.innerHTML = "";
   progressSegments.length = 0;
 
+  const makeArrowButton = (direction) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = `progressRail__arrow progressRail__arrow--${direction}`;
+    button.setAttribute(
+      "aria-label",
+      direction === "prev" ? "Předchozí sekce" : "Další sekce"
+    );
+    button.addEventListener("click", () => handleArrow(direction === "prev" ? -1 : 1));
+
+    const icon = document.createElement("span");
+    icon.className = "progressRail__arrowIcon";
+    icon.setAttribute("aria-hidden", "true");
+    button.appendChild(icon);
+    return button;
+  };
+
   const track = document.createElement("div");
   track.className = "progressRail__track";
+
+  progressArrowPrev = makeArrowButton("prev");
+  progressArrowNext = makeArrowButton("next");
 
   copyTrack.forEach((entry) => {
     const segment = document.createElement("button");
@@ -446,7 +472,9 @@ function buildProgressRail() {
     progressSegments.push({ button: segment, entry });
   });
 
+  progressRail.appendChild(progressArrowPrev);
   progressRail.appendChild(track);
+  progressRail.appendChild(progressArrowNext);
   updateProgressRail(currentFrame);
 }
 
@@ -457,11 +485,23 @@ function updateProgressRail(frameIndex) {
     button.classList.toggle("is-active", isActive);
     button.setAttribute("aria-pressed", isActive ? "true" : "false");
   });
+  updateProgressArrows(frameIndex);
 }
 
 function handleSegmentClick(entry) {
   if (!entry) return;
   const targetFrame = getEntryTargetFrame(entry, "progress");
+  if (typeof targetFrame !== "number") return;
+  animateToFrame(targetFrame);
+}
+
+function handleArrow(direction) {
+  const activeIndex = getClosestEntryIndex(currentFrame);
+  const targetIndex = clamp(activeIndex + direction, 0, copyTrack.length - 1);
+  if (targetIndex === activeIndex) return;
+  const targetEntry = copyTrack[targetIndex];
+  if (!targetEntry) return;
+  const targetFrame = getEntryTargetFrame(targetEntry, "arrow");
   if (typeof targetFrame !== "number") return;
   animateToFrame(targetFrame);
 }
@@ -528,6 +568,43 @@ function getEntryTargetFrame(entry, context = "default") {
   return Math.round((entry.start + entry.end) / 2);
 }
 
+function getClosestEntryIndex(frameIndex) {
+  if (!copyTrack.length) return 0;
+  let closestIndex = 0;
+  let smallestDistance = Infinity;
+
+  copyTrack.forEach((entry, index) => {
+    let distance = 0;
+    if (frameIndex < entry.start) {
+      distance = entry.start - frameIndex;
+    } else if (frameIndex > entry.end) {
+      distance = frameIndex - entry.end;
+    }
+
+    if (distance < smallestDistance) {
+      smallestDistance = distance;
+      closestIndex = index;
+    }
+  });
+
+  return closestIndex;
+}
+
+function updateProgressArrows(frameIndex) {
+  if (!progressArrowPrev || !progressArrowNext) return;
+  const activeIndex = getClosestEntryIndex(frameIndex);
+  const hasPrev = activeIndex > 0;
+  const hasNext = activeIndex < copyTrack.length - 1;
+
+  progressArrowPrev.disabled = !hasPrev;
+  progressArrowPrev.setAttribute("aria-disabled", hasPrev ? "false" : "true");
+  progressArrowPrev.classList.toggle("is-disabled", !hasPrev);
+
+  progressArrowNext.disabled = !hasNext;
+  progressArrowNext.setAttribute("aria-disabled", hasNext ? "false" : "true");
+  progressArrowNext.classList.toggle("is-disabled", !hasNext);
+}
+
 function attachScrollHandlers() {
   if (pointerHandlersAttached || isProgressOnly) return;
   window.addEventListener("wheel", handleWheel, { passive: false });
@@ -542,6 +619,50 @@ function detachScrollHandlers() {
   window.removeEventListener("touchstart", handleTouchStart);
   window.removeEventListener("touchmove", handleTouchMove);
   pointerHandlersAttached = false;
+}
+
+function attachProgressSwipeHandlers() {
+  if (!stageEl || swipeHandlersAttached) return;
+  stageEl.addEventListener("touchstart", handleSwipeStart, { passive: true });
+  stageEl.addEventListener("touchend", handleSwipeEnd, { passive: true });
+  swipeHandlersAttached = true;
+}
+
+function detachProgressSwipeHandlers() {
+  if (!stageEl || !swipeHandlersAttached) return;
+  stageEl.removeEventListener("touchstart", handleSwipeStart);
+  stageEl.removeEventListener("touchend", handleSwipeEnd);
+  swipeStartX = null;
+  swipeStartY = null;
+  swipeHandlersAttached = false;
+}
+
+function handleSwipeStart(event) {
+  if (!isProgressOnly || event.touches.length !== 1) return;
+  const touch = event.touches[0];
+  swipeStartX = touch.clientX;
+  swipeStartY = touch.clientY;
+}
+
+function handleSwipeEnd(event) {
+  if (!isProgressOnly || swipeStartX === null || swipeStartY === null) return;
+  if (!event.changedTouches.length) {
+    swipeStartX = null;
+    swipeStartY = null;
+    return;
+  }
+
+  const touch = event.changedTouches[0];
+  const deltaX = touch.clientX - swipeStartX;
+  const deltaY = touch.clientY - swipeStartY;
+  swipeStartX = null;
+  swipeStartY = null;
+
+  if (Math.abs(deltaX) < MIN_SWIPE_DISTANCE || Math.abs(deltaX) <= Math.abs(deltaY)) {
+    return;
+  }
+
+  handleArrow(deltaX < 0 ? 1 : -1);
 }
 
 function setupMobileCompareSnap() {
@@ -616,9 +737,11 @@ function applyInteractionMode() {
     detachScrollHandlers();
     body.classList.remove("locked");
     body.classList.add("progressOnly");
+    attachProgressSwipeHandlers();
   } else {
     body.classList.remove("progressOnly");
     body.classList.add("locked");
+    detachProgressSwipeHandlers();
     attachScrollHandlers();
   }
 }
