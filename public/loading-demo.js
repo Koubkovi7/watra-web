@@ -1,6 +1,6 @@
 (() => {
   const stage=document.querySelector('#demo-stage'),button=document.querySelector('#demo-start'),result=document.querySelector('#demo-result'),message=document.querySelector('#demo-message');
-  let variant='wg';
+  let variant='gg';
   document.querySelectorAll('[data-variant]').forEach(option=>option.addEventListener('click',()=>{
     variant=option.dataset.variant;stage.innerHTML=window.WatraLoading.mark(variant);
     stage.setAttribute('aria-label',({wg:'Zlatý plamen nad pevným bílým W',gg:'Zlatý plamen nad pevným zlatým W',w:'Bílý plamen nad pevným bílým W'})[option.dataset.variant]);

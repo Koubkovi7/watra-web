@@ -2,7 +2,8 @@
 .brand.brand-image{display:block;flex:0 0 auto;width:128px;height:auto;line-height:0;letter-spacing:0}
 .brand-image img{display:block;width:100%;height:auto;aspect-ratio:356/208}
 .footer .brand-image{width:156px}
-.watra-mark{--mark-size:44px;--watra-symbol:url('/brand/symbol-wg.png');display:inline-block;position:relative;flex:0 0 auto;width:var(--mark-size);aspect-ratio:141/208;vertical-align:middle;isolation:isolate}
+.watra-mark{--mark-size:44px;--watra-symbol:url('/brand/symbol-gg.png');display:inline-block;position:relative;flex:0 0 auto;width:var(--mark-size);aspect-ratio:141/208;vertical-align:middle;isolation:isolate}
+.watra-mark--wg{--watra-symbol:url('/brand/symbol-wg.png')}
 .watra-mark--gg{--watra-symbol:url('/brand/symbol-gg.png')}
 .watra-mark--w{--watra-symbol:url('/brand/symbol-w.png')}
 .watra-mark__base,.watra-mark__flame{position:absolute;inset:0;background-image:var(--watra-symbol);background-size:100% 100%;background-repeat:no-repeat}

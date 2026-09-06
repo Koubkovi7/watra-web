@@ -35,6 +35,8 @@ Dodané PNG jsou v public/brand: logo, symbol-wg (zlatý plamen, bílé W), symb
 
 Ukázka /ukazka-animace/ je mimo sitemap a má noindex. Umožňuje přepnout barvu a vyzkoušet třísekundové čekání bez síťového odeslání.
 
+Vybraná výchozí varianta načítacího symbolu je celá zlatá (symbol-gg): zlatý plamen i W. Platí pro galerii, odesílání poptávky i ukázku.
+
 Animaci zajišťuje public/brand.css, indikátor public/loading.js. CSS odděluje plamen a W přímo z původního průhledného PNG; W zůstává pevné. Při prefers-reduced-motion je symbol statický.
 
 WatraLoading.start(container, {label, overlay, variant}) vrací funkci pro ukončení čekání. Indikátor se objeví až po 180 ms a zmizí okamžitě po dokončení. Více souběžných operací v jednom kontejneru sdílí indikátor. WatraLoading.image obsluhuje načítání galerie včetně chyby a změny fotografie před dokončením předchozího načítání. Odesílání poptávky používá stejný indikátor; integrační účty zůstávají nenastavené.

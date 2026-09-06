@@ -2,8 +2,8 @@
   'use strict';
   const active = new WeakMap();
   const photos = new WeakMap();
-  const mark = (variant='wg') => '<span class="watra-mark watra-mark--'+(['wg','gg','w'].includes(variant)?variant:'wg')+'" aria-hidden="true"><span class="watra-mark__base"></span><span class="watra-mark__heat"><span class="watra-mark__flame"></span></span></span>';
-  function start(container,{label='Načítáme…',delay=180,overlay=false,variant='wg'}={}) {
+  const mark = (variant='gg') => '<span class="watra-mark watra-mark--'+(['wg','gg','w'].includes(variant)?variant:'gg')+'" aria-hidden="true"><span class="watra-mark__base"></span><span class="watra-mark__heat"><span class="watra-mark__flame"></span></span></span>';
+  function start(container,{label='Načítáme…',delay=180,overlay=false,variant='gg'}={}) {
     if(!container) return () => {};
     let job=active.get(container);
     if(!job) {
