@@ -1,6 +1,6 @@
 # WATRA
 
-Statická dvoujazyčná prezentace WATRA IRIKON a IRIKON e pro Cloudflare Pages.
+Statická dvoujazyčná prezentace WATRA IRIKON a IRIKON +e pro Cloudflare Pages.
 
 ## Místní spuštění
 

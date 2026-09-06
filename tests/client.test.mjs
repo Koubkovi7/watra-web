@@ -9,12 +9,12 @@ function element(extra={}) {
     focus(){this.focused=true;},showModal(){this.open=true;},close(){this.open=false;},...extra};
 }
 const tick=()=>new Promise(r=>setImmediate(r));
-async function client({host='watra.cz',stored,ids={},formReady,reply={ok:true},httpOK=true}={}) {
+async function client({host='watra.cz',stored,ids={},formReady,reply={ok:true},httpOK=true,search='',modelValue='IRIKON +e'}={}) {
   const scripts=[],storage=new Map(stored?[['watra_consent',JSON.stringify({...stored,version:1,at:Date.now()})]]:[]);
   const analytics=element(),marketing=element(),dialog=element({querySelector:s=>s.includes('analytics')?analytics:marketing});
   const buttons=['reject','all','save'].map(consent=>element({dataset:{consent}})),settings=element();
   let sent=0,reloaded=0;
-  const fields={lead_type:element({value:'manufacturer'}),model:element({value:'IRIKON e'}),_gotcha:element(),submit:element(),status:element(),company:element({querySelectorAll:()=>[]})};
+  const fields={lead_type:element({value:'manufacturer'}),model:element({value:modelValue}),_gotcha:element(),submit:element(),status:element(),company:element({querySelectorAll:()=>[]})};
   const form=formReady===undefined?null:element({
     dataset:{ready:String(formReady)},action:'https://formspree.io/f/abcdefgh',checkValidity:()=>true,reset(){this.didReset=true;},
     querySelector:s=>s.includes('lead_type')?fields.lead_type:s.includes('model')?fields.model:s.includes('company-fields')?fields.company:s.includes('_gotcha')?fields._gotcha:s.includes('submit')?fields.submit:null
@@ -26,7 +26,7 @@ async function client({host='watra.cz',stored,ids={},formReady,reply={ok:true},h
     querySelectorAll:s=>s==='[data-cookie-settings]'?[settings]:s==='[data-consent]'?buttons:[],
   };
   const context={document,URL,URLSearchParams,Date,JSON,Object,String,Number,RegExp,Promise,
-    location:{hostname:host,origin:'https://'+host,pathname:'/cs/',protocol:'https:',search:'',reload:()=>reloaded++},
+    location:{hostname:host,origin:'https://'+host,pathname:'/cs/',protocol:'https:',search,reload:()=>reloaded++},
     localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},
     sessionStorage:{getItem:()=>null,setItem(){},removeItem(){}},setTimeout,clearTimeout,AbortController,
     FormData:class{constructor(){this.values={};}set(k,v){this.values[k]=v;}},
@@ -58,10 +58,18 @@ test('Clarity does not record the contact form',async()=>{
 test('disabled form cannot submit, including an attempted keyboard submission',async()=>{
   const c=await client({formReady:false});await c.submit();assert.equal(c.sent(),0);
 });
+
+test('current and legacy product links select the renamed hybrid model',async()=>{
+  for(const search of ['?model=IRIKON%20%2Be','?model=IRIKON%20e','?model=IRIKON+e']) {
+    const c=await client({formReady:false,search,modelValue:'undecided'});
+    assert.equal(c.fields.model.value,'IRIKON +e',search);
+  }
+});
 test('a confirmed success generates one lead without form contents; repeat submission is blocked',async()=>{
   const c=await client({formReady:true,ids:{gtmId:'GTM-ABC123'},stored:{analytics:true,marketing:true}});
   await c.submit();await c.submit();assert.equal(c.sent(),1);
   const leads=c.context.dataLayer.filter(v=>v.event==='generate_lead');assert.equal(leads.length,1);
+  assert.equal(leads[0].item_id,'irikon-e');
   assert.deepEqual(Object.keys(leads[0]).sort(),['event','item_id','language','lead_type','page_location','page_path'].sort());
   assert.equal(c.form.didReset,true);assert.equal(c.fields.submit.disabled,true);
 });

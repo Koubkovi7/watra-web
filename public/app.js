@@ -137,9 +137,10 @@
   const form=$('#interest-form');
   if(!form) return;
   const type=$('[name=lead_type]',form), model=$('[name=model]',form), company=$('.company-fields',form);
-  const selectedType=incoming.get('type'), selectedModel=incoming.get('model');
+  const selectedType=incoming.get('type'), incomingModel=incoming.get('model');
+  const selectedModel=incomingModel==='IRIKON e'?'IRIKON +e':incomingModel;
   if(['customer','manufacturer','business','technical'].includes(selectedType)) type.value=selectedType;
-  if(['IRIKON','IRIKON e','undecided'].includes(selectedModel)) model.value=selectedModel;
+  if(['IRIKON','IRIKON +e','undecided'].includes(selectedModel)) model.value=selectedModel;
   const updateCompany=()=>{company.hidden=!['manufacturer','business'].includes(type.value);$$('input',company).forEach(i=>i.disabled=company.hidden);};
   updateCompany();type.addEventListener('change',updateCompany);
   let started=false, busy=false, complete=false;
@@ -163,7 +164,7 @@
       const r=await fetch(endpoint,{method:'POST',body:data,headers:{Accept:'application/json'},signal:controller.signal});
       if(!r.ok) throw Error('response');
       const result=await r.json();if(result.errors || result.ok===false) throw Error('response');
-      complete=true;event('generate_lead',{lead_type:type.value,item_id:model.value==='IRIKON e'?'irikon-e':model.value==='IRIKON'?'irikon':'undecided'});
+      complete=true;event('generate_lead',{lead_type:type.value,item_id:model.value==='IRIKON +e'?'irikon-e':model.value==='IRIKON'?'irikon':'undecided'});
       button.textContent=say('Odesláno','Sent');
       status.textContent=say('Děkujeme. Váš nezávazný zájem jsme přijali. Ozveme se na uvedený e-mail.','Thank you. We received your non-binding enquiry and will respond to the email address you provided.');
       form.reset();status.focus();
