@@ -1,0 +1,49 @@
+/* The two clips separate the original PNG's flame and W without redrawing them. */
+.brand.brand-image{display:block;flex:0 0 auto;width:128px;height:auto;line-height:0;letter-spacing:0}
+.brand-image img{display:block;width:100%;height:auto;aspect-ratio:356/208}
+.footer .brand-image{width:156px}
+.watra-mark{--mark-size:44px;--watra-symbol:url('/brand/symbol-wg.png');display:inline-block;position:relative;flex:0 0 auto;width:var(--mark-size);aspect-ratio:141/208;vertical-align:middle;isolation:isolate}
+.watra-mark--gg{--watra-symbol:url('/brand/symbol-gg.png')}
+.watra-mark--w{--watra-symbol:url('/brand/symbol-w.png')}
+.watra-mark__base,.watra-mark__flame{position:absolute;inset:0;background-image:var(--watra-symbol);background-size:100% 100%;background-repeat:no-repeat}
+.watra-mark__base{clip-path:polygon(0 61%,14% 61%,24% 70.7%,68% 70.7%,75% 62.5%,100% 62.5%,100% 100%,0 100%)}
+.watra-mark__flame{clip-path:polygon(0 0,100% 0,100% 62.5%,75% 62.5%,68% 70.7%,24% 70.7%,14% 61%,0 61%);transform-origin:49% 66%;animation:watra-flame 2.1s ease-in-out infinite}
+.watra-mark__heat{position:absolute;inset:0;filter:drop-shadow(0 -2px 4px #d7ad5c44);animation:watra-heat 3.4s ease-in-out infinite}
+@keyframes watra-flame{
+  0%,100%{transform:scale(1,.99) skewX(-1deg);opacity:.9}
+  17%{transform:scale(.97,1.035) skewX(1.8deg);opacity:1}
+  38%{transform:scale(1.02,.975) skewX(-1.5deg);opacity:.89}
+  57%{transform:scale(.965,1.045) skewX(2.2deg);opacity:1}
+  78%{transform:scale(1.015,1.005) skewX(-1deg);opacity:.94}
+}
+@keyframes watra-heat{
+  0%,100%{filter:drop-shadow(0 -1px 3px #d7ad5c33)}
+  42%{filter:drop-shadow(0 -3px 6px #e8b65466)}
+  71%{filter:drop-shadow(0 -1px 4px #d7ad5c44)}
+}
+.watra-loading{display:flex;align-items:center;justify-content:center;gap:18px;color:var(--text);padding:18px 0;font-size:14px;line-height:1.5}
+.watra-loading--overlay{position:absolute;inset:0;z-index:3;flex-direction:column;background:#121413f2;gap:22px;margin:0;padding:20px;pointer-events:none}
+.watra-loading--overlay .watra-mark{--mark-size:62px}
+.gallery-main{position:relative}.watra-loading__label{margin:0;color:inherit}
+.watra-loading-host{position:relative}
+.watra-demo{min-height:100vh;background:radial-gradient(ellipse at 50% 34%,#24261d 0,transparent 50%),#121413}
+.demo-header{display:flex;justify-content:space-between;align-items:center;padding:24px 0;gap:24px}
+.demo-header>a:last-child{font-size:13px;color:var(--muted)}
+.demo-main{text-align:center;padding:48px 0 80px}
+.demo-main h1{font-size:clamp(36px,5vw,66px);margin:18px 0 26px}
+.demo-main>.lead{margin:0 auto;max-width:480px;font-size:16px}
+.demo-stage{display:flex;justify-content:center;align-items:center;height:285px;margin:26px auto 6px}
+.demo-stage .watra-mark{--mark-size:125px}
+.demo-options{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.demo-options button{padding:10px 16px;border:1px solid #555b4e;background:transparent;color:var(--muted);font-size:13px;min-height:44px}
+.demo-options button[aria-pressed=true]{border-color:var(--gold);color:var(--gold);background:#d4ae6c0b}
+.demo-note{font-size:13px;margin:24px 0 0}
+.demo-example{max-width:540px;margin:64px auto 0;padding:32px;border:1px solid var(--line);background:#191d18}
+.demo-example h2{font-size:26px;letter-spacing:-.5px}.demo-example p{font-size:14px}
+.demo-example .button{justify-content:center}
+.demo-example__result{min-height:108px;display:flex;align-items:center;justify-content:center;position:relative;margin-top:20px;border-top:1px solid var(--line)}
+.demo-example__result>p{margin:0;font-size:13px;max-width:300px}
+.demo-example__result .watra-loading{position:absolute;inset:0;background:#191d18}
+.demo-demo-only{font-size:12px!important;color:#8e9586;margin:18px 0 0!important}
+@media(max-width:760px){.header .brand-image{width:106px}.footer .brand-image{width:138px}.demo-header{padding:16px 0}.demo-header .brand-image{width:108px}.demo-main{padding-top:34px}.demo-stage{height:250px}.demo-stage .watra-mark{--mark-size:112px}.demo-example{padding:26px 20px;margin-top:48px}.demo-main h1{letter-spacing:-1.5px}.demo-main>.eyebrow{font-size:10px}.demo-options{gap:8px}.demo-options button{font-size:12px;padding:10px 12px}}
+@media(prefers-reduced-motion:reduce){.watra-mark__flame,.watra-mark__heat{animation:none!important;transform:none;opacity:1;filter:none}}

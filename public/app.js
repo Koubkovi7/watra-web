@@ -4,6 +4,10 @@
   const say = (cs, en) => lang === 'cs' ? cs : en;
   const $ = (s, root = document) => root.querySelector(s);
   const $$ = (s, root = document) => [...root.querySelectorAll(s)];
+  const showPhoto=(photo,src,srcset,container)=>{
+    if(window.WatraLoading) window.WatraLoading.image(photo,src,{srcset,container,label:say('Načítáme fotografii…','Loading photograph…')});
+    else {photo.srcset=srcset;photo.src=src;}
+  };
   const cookie = (key, value, age) => { document.cookie = key + '=' + encodeURIComponent(value) + '; Path=/; Max-Age=' + age + '; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : ''); };
   const menu = $('#mobile-menu'), toggle = $('.menu-toggle');
   toggle?.addEventListener('click', () => {
@@ -31,14 +35,13 @@
     const name = button.dataset.photo;
     if(!['portraitStove','front','side','rear'].includes(name)) return;
     const main = $('.gallery-main'), photo = $('img',main);
-    photo.src = '/media/' + name + '-960.webp';
-    photo.srcset = '/media/' + name + '-480.webp 480w, /media/' + name + '-960.webp 960w, /media/' + name + '-1600.webp 1600w';
+    showPhoto(photo,'/media/' + name + '-960.webp','/media/' + name + '-480.webp 480w, /media/' + name + '-960.webp 960w, /media/' + name + '-1600.webp 1600w',main);
     photo.alt = $('img',button).alt; main.href = '/media/' + name + '-1600.webp';
     $$('[data-photo]').forEach(b => b.setAttribute('aria-pressed',String(b === button)));
   }));
   $$('[data-gallery]').forEach(a => a.addEventListener('click', e => {
     if(!box?.showModal) return; e.preventDefault();
-    $('img',box).src = a.href; $('img',box).alt = $('img',a).alt;
+    showPhoto($('img',box),a.href,'',box); $('img',box).alt = $('img',a).alt;
     $('p',box).textContent = $('img',a).alt; box.showModal();
   }));
   $('.lightbox-close')?.addEventListener('click',() => box.close());
@@ -151,6 +154,7 @@
     const button=$('[type=submit]',form), status=$('#form-status'), original=button.innerHTML;
     button.disabled=true;button.textContent=say('Odesíláme…','Sending…');status.textContent='';
     const data=new FormData(form);
+    const finishLoading=window.WatraLoading?.start(form,{label:say('Odesíláme váš zájem…','Sending your enquiry…')}) || (()=>{});
     if(consent.analytics) {
       try {const saved=JSON.parse(sessionStorage.getItem('watra_campaign')||'{}');for(const k of campaignKeys) if((k.startsWith('utm_')||consent.marketing)&&safeValue(saved[k])) data.set(k,saved[k]);} catch {}
     }
@@ -167,6 +171,6 @@
       button.disabled=false;button.innerHTML=original;
       status.textContent=say('Odeslání se nepodařilo potvrdit. Vyplněné údaje zůstaly zachované. Zkuste to za chvíli znovu nebo využijte uvedený e-mail. Pokud byl požadavek doručen navzdory chybě spojení, opakování může vytvořit druhou poptávku.','We could not confirm delivery. Your entries have been kept. Please try again shortly or use the email listed on this page. If delivery succeeded despite a connection error, retrying may create a second enquiry.');
       status.focus();
-    } finally {clearTimeout(timer);busy=false;}
+    } finally {clearTimeout(timer);finishLoading();busy=false;}
   });
 })();

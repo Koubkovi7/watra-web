@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#121413">
+  <title>Plamen WATRA — ukázka animace</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/brand/icon-32.png">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/brand.css">
+  <script defer src="/loading.js"></script>
+  <script defer src="/loading-demo.js"></script>
+</head>
+<body class="watra-demo">
+  <header class="wrap demo-header">
+    <a class="brand brand-image" href="/cs/" aria-label="WATRA — úvod"><img src="/brand/logo.png" width="356" height="208" alt="WATRA"></a>
+    <a href="/cs/">Zpět na web ↗</a>
+  </header>
+  <main class="wrap demo-main">
+    <p class="eyebrow">WATRA / MALÝ DETAIL. VLASTNÍ CHARAKTER.</p>
+    <h1>Chvíle čekání.<br><em>S naším plamenem.</em></h1>
+    <p class="lead">Jemný pohyb ohně a teplá záře. Původní symbol WATRA, který ožívá při načítání.</p>
+    <div class="demo-stage" id="demo-stage" role="img" aria-label="Zlatý plamen se jemně pohybuje nad pevným bílým W">
+      <span class="watra-mark watra-mark--wg" aria-hidden="true"><span class="watra-mark__base"></span><span class="watra-mark__heat"><span class="watra-mark__flame"></span></span></span>
+    </div>
+    <div class="demo-options" role="group" aria-label="Barevná varianta symbolu">
+      <button type="button" data-variant="wg" aria-pressed="true">Zlatá / bílá</button>
+      <button type="button" data-variant="gg" aria-pressed="false">Zlatá</button>
+      <button type="button" data-variant="w" aria-pressed="false">Bílá</button>
+    </div>
+    <p class="demo-note">Stejný plamen může provázet odesílání zprávy i načtení fotografie.</p>
+    <section class="demo-example" aria-labelledby="demo-heading">
+      <h2 id="demo-heading">Vyzkoušejte chvíli čekání.</h2>
+      <p>Indikátor se objeví jen při delším načítání. Po dokončení ihned zhasne.</p>
+      <button type="button" class="button" id="demo-start">Spustit ukázku ↗</button>
+      <div class="demo-example__result" id="demo-result"><p id="demo-message" role="status">Připraveno k vyzkoušení.</p></div>
+      <p class="demo-demo-only">Třísekundová ukázka. Žádná data se neodesílají.</p>
+    </section>
+  </main>
+</body>
+</html>

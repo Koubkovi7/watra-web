@@ -28,3 +28,13 @@ Všechny běžné podstránky jsou statické. Soubor _routes.json omezuje spušt
 Fotografie jsou pracovní náhledy. Pro jejich nové zpracování slouží scripts/prepare-assets.cjs, který vyžaduje místně dostupný Sharp a původní soubory mimo repozitář. Běžné nasazení tento krok nepotřebuje.
 
 Testy ověřují lokalizované cesty a odkazy, metadata, přesměrování, ochranu náhledů, podmíněné měření, odvolání souhlasu a chybové i úspěšné odeslání formuláře pomocí simulované služby. Neodesílají skutečné poptávky.
+
+## Logo a plamen při načítání
+
+Dodané PNG jsou v public/brand: logo, symbol-wg (zlatý plamen, bílé W), symbol-gg (zlatá), symbol-w (bílá). Originály byly zkopírovány beze změny. Favicony 32/48 px a ikona 180 px vycházejí ze zlatého symbolu.
+
+Ukázka /ukazka-animace/ je mimo sitemap a má noindex. Umožňuje přepnout barvu a vyzkoušet třísekundové čekání bez síťového odeslání.
+
+Animaci zajišťuje public/brand.css, indikátor public/loading.js. CSS odděluje plamen a W přímo z původního průhledného PNG; W zůstává pevné. Při prefers-reduced-motion je symbol statický.
+
+WatraLoading.start(container, {label, overlay, variant}) vrací funkci pro ukončení čekání. Indikátor se objeví až po 180 ms a zmizí okamžitě po dokončení. Více souběžných operací v jednom kontejneru sdílí indikátor. WatraLoading.image obsluhuje načítání galerie včetně chyby a změny fotografie před dokončením předchozího načítání. Odesílání poptávky používá stejný indikátor; integrační účty zůstávají nenastavené.
