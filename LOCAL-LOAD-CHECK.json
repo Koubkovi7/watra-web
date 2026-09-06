@@ -1,0 +1,9 @@
+{
+  "scope": "Local static server only; not a test of concurrent visitors or external services",
+  "requests": 1000,
+  "parallel": 50,
+  "failed": 0,
+  "elapsedMs": 2244,
+  "p95Ms": 177,
+  "bytes": 13980433
+}
