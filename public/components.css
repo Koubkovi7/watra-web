@@ -8,4 +8,9 @@
 
 .model-name{color:var(--text);white-space:nowrap;text-transform:none}.model-suffix{color:var(--gold)}
 
-@media(max-width:700px){.hero-media{mask-image:none}.hero-media::after{background:var(--rounded-photo-gradient);pointer-events:none}}
+.hero-media{border-radius:64px;overflow:hidden}
+.hero-media::after{pointer-events:none;background:radial-gradient(ellipse at 54% 50%,transparent 28%,rgba(18,20,19,.25) 48%,rgba(18,20,19,.85) 70%,var(--bg) 88%)}
+@media(max-width:700px){
+ .hero-media{border-radius:56px;-webkit-mask-image:none;mask-image:none}
+ .hero-media::after{background:radial-gradient(ellipse at 50% 49%,transparent 30%,rgba(18,20,19,.18) 45%,rgba(18,20,19,.8) 65%,var(--bg) 82%)}
+}
