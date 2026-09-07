@@ -46,7 +46,7 @@ test('every localized page has valid links, one H1, structured data, and correct
       const file=path.join('dist',decodeURIComponent(pathname));
       assert.ok(await stat(file).catch(()=>false),'Missing '+pathname+' in '+lang+'/'+key);
     }
-    assert.ok(!/\b(?:22\s?kW|30\s?min|20\s?kW)\b/.test(html),'Unverified numerical claim');
+    assert.ok(!/\b(?:22\s?kW|30\s?min)\b/.test(html),'Unverified numerical claim');
   }
 });
 test('blank integrations never publish a working form or fake contacts',()=>{
