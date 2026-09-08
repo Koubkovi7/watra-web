@@ -6,7 +6,7 @@
   const label = cs ? 'Napište nám' : 'Chat with us';
   let loaded = false;
   button.addEventListener('click', () => {
-    if (loaded) { window.$crisp.push(['do', 'chat:open']); return; }
+    if (loaded) { window.$crisp.push(['do', 'chat:show']); window.$crisp.push(['do', 'chat:open']); return; }
     loaded = true;
     button.disabled = true;
     button.textContent = cs ? 'Otevíráme chat…' : 'Opening chat…';
