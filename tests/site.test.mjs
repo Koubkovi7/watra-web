@@ -50,7 +50,7 @@ test('every localized page has valid links, one H1, structured data, and correct
   }
 });
 test('blank integrations never publish a working form or fake contacts',()=>{
-  const html=render('cs','contact',config);
+  const html=render('cs','contact',{...config,email:'',phone:'',whatsapp:'',formspreeId:'',privacyApproved:false});
   assert.match(html,/data-ready="false"/);assert.match(html,/type="submit" disabled/);
   assert.ok(!html.includes('action="https://formspree.io'));
   assert.ok(!html.includes('mailto:'));assert.ok(!html.includes('wa.me/'));
