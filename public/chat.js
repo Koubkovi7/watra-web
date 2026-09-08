@@ -15,7 +15,8 @@
     window.CRISP_RUNTIME_CONFIG = {locale: cs ? 'cs' : 'en'};
     const restore = () => { button.hidden = false; button.disabled = false; button.textContent = label; };
     window.$crisp.push(['on', 'chat:opened', () => { button.hidden = true; }]);
-    window.$crisp.push(['on', 'chat:closed', () => { window.$crisp.push(['do', 'chat:hide']); restore(); }]);
+    // After opening, Crisp owns the accessible close/reopen launcher.
+    window.$crisp.push(['on', 'session:loaded', () => { button.hidden = true; }]);
     window.$crisp.push(['do', 'chat:open']);
     const script = document.createElement('script');
     script.src = 'https://client.crisp.chat/l.js';
