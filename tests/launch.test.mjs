@@ -83,3 +83,9 @@ test('multiple clicks during one pending request cannot create duplicate submiss
   const first=c.submit();await c.submit();assert.equal(c.requests.length,1);
   resolve({ok:true,json:async()=>({ok:true})});await first;assert.equal(c.events.length,1);
 });
+
+test('popup rate limits keep the email and direct visitors to an alternative contact',async()=>{
+  const c=client({response:{ok:false,status:429}});await c.submit();
+  assert.match(c.status.textContent,/limitu příjmu/);assert.match(c.status.textContent,/přímý e-mail/);
+  assert.equal(c.fields.email.value,'private@example.test');assert.equal(c.events.length,0);assert.equal(c.button.disabled,false);
+});

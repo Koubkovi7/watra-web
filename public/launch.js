@@ -37,6 +37,7 @@
     const finishLoading=window.WatraLoading?.start(form,{label:say('Odesíláme váš zájem…','Sending your interest…')})||(()=>{});
     try{
       const response=await fetch(endpoint,{method:'POST',headers:{Accept:'application/json'},body:data,signal:controller.signal});
+      if(response.status===429) throw Error('rate-limit');
       if(!response.ok) throw Error('delivery');
       const result=await response.json();
       if(result?.ok!==true||result.errors) throw Error('delivery');
@@ -47,9 +48,10 @@
       dialog.setAttribute('aria-describedby','launch-success-description');
       document.dispatchEvent(new CustomEvent('watra:launch-interest'));
       if(dialog.open) dialog.querySelector('.launch-success button').focus();
-    }catch{
+    }catch(error){
       button.disabled=false;button.textContent=original;
       status.textContent=say('Odeslání se nepodařilo potvrdit. Údaje zůstaly vyplněné. Zkuste to za chvíli znovu nebo nám napište přímo. Pokud zpráva přesto dorazila, opakování může vytvořit druhý záznam.','We could not confirm delivery. Your entries have been kept. Please try again shortly or contact us directly. If the message arrived despite the connection error, retrying may create a duplicate.');
+      if(error.message==='rate-limit') status.textContent=say('Formulář právě dosáhl limitu příjmu. Údaje zůstaly vyplněné. Zkuste odeslání později nebo využijte přímý e-mail uvedený výše.','The form has reached its submission limit. Your entries have been kept. Please try again later or use the direct email address above.');
       if(dialog.open) status.focus();
     }finally{clearTimeout(timer);finishLoading();form.setAttribute('aria-busy','false');busy=false;}
   });

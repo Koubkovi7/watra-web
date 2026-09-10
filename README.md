@@ -51,3 +51,10 @@ Vybraná výchozí varianta načítacího symbolu je celá zlatá (symbol-gg): z
 Animaci zajišťuje public/brand.css, indikátor public/loading.js. CSS odděluje plamen a W přímo z původního průhledného PNG; W zůstává pevné. Při prefers-reduced-motion je symbol statický.
 
 WatraLoading.start(container, {label, overlay, variant}) vrací funkci pro ukončení čekání. Indikátor se objeví až po 180 ms a zmizí okamžitě po dokončení. Více souběžných operací v jednom kontejneru sdílí indikátor. WatraLoading.image obsluhuje načítání galerie včetně chyby a změny fotografie před dokončením předchozího načítání. Odesílání poptávky používá stejný indikátor; integrační účty zůstávají nenastavené.
+
+
+## Zapojený příjem formulářů
+
+Formspree: projekt WATRA, veřejné ID mppzbljw, cílový e-mail richard@watra.cz. Stejný formulář přijímá kontaktní poptávky a launch_notification z homepage. Formspree omezuje příjem na watra.cz a subdomény; app.js podle data-domain na jiných hostitelích vypne odesílání a ukáže odkaz na produkci. Lokální testy neobcházejí toto omezení.
+
+src/privacy.mjs obsahuje CS/EN informace o skutečném zpracování; retention a retentionEn v site.config.json obsahují odsouhlasených nejvýše 12 měsíců od poslední komunikace. Tato informace sama nemaže externí e-maily ani exporty. Provozní kroky a limity jsou v SLUZBY-A-SPUSTENI.md.

@@ -6,7 +6,8 @@ if(!/^https:\/\/[a-z0-9.-]+$/.test(config.origin)) throw Error('Use a valid HTTP
 if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(config.certificationExpected)) throw Error('Certification estimate must use YYYY-MM');
 if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(config.launchExpected)) throw Error('Sales launch estimate must use YYYY-MM');
 for(const [key,pattern] of [['formspreeId',/^[a-z0-9]+$/i],['gtmId',/^GTM-[A-Z0-9]+$/],['clarityId',/^[a-z0-9]+$/i]]) if(config[key]&&!pattern.test(config[key])) throw Error('Invalid '+key);
-if(config.privacyApproved && (!config.operator || !config.address || !config.email || !config.retention)) throw Error('Complete operator, address, email and retention before enabling enquiries');
+if(config.privacyApproved && (!config.operator || !config.address || !config.email || !config.retention || !config.retentionEn)) throw Error('Complete operator, address, email and bilingual retention before enabling enquiries');
+if(config.formDomain && !/^[a-z0-9]+(?:[.-][a-z0-9]+)*\.[a-z]{2,}$/i.test(config.formDomain)) throw Error('Invalid form domain');
 const output=path.resolve('dist');
 if(output!==path.join(process.cwd(),'dist')) throw Error('Invalid output');
 await rm(output,{recursive:true,force:true});

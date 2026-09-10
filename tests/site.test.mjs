@@ -71,3 +71,13 @@ test('preview hosts cannot be indexed and security headers exist',async()=>{
   assert.equal((sitemap.match(/<url>/g)||[]).length,28);
   assert.ok(!sitemap.includes('dekujeme'));assert.ok(!sitemap.includes('404'));
 });
+
+test('active forms publish localized retention and identify their processor and withdrawal contact',()=>{
+  for(const [lang,retention] of [['cs','12 měsíců'],['en','12 months']]){
+    const html=render(lang,'privacy',{...config,privacyApproved:true});
+    assert.ok(html.includes(retention));assert.match(html,/Formspree, Inc\./);
+    assert.match(html,/mailto:richard@watra.cz/);assert.match(html,/https:\/\/uoou.gov.cz\//);
+    assert.doesNotMatch(html,/class="form-notice"/);
+    if(lang==='en')assert.ok(!html.includes('Kontakty na zájemce'));
+  }
+});

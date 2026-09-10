@@ -3,7 +3,7 @@
   "email": "richard@watra.cz",
   "phone": "",
   "whatsapp": "",
-  "formspreeId": "",
+  "formspreeId": "mppzbljw",
   "gtmId": "GTM-5RKGC3RM",
   "clarityId": "",
   "analyticsHosts": [
@@ -15,7 +15,9 @@
   "operator": "Ing. Richard Koubek",
   "address": "Kokonínská 971, 468 02 Rychnov u Jablonce nad Nisou, Česká republika",
   "companyId": "21069611",
-  "retention": "",
-  "privacyApproved": false,
-  "crispWebsiteId": "5e9c1294-73b7-47e5-bfdd-44e0d7ab1fb1"
+  "retention": "Kontakty na zájemce, kteří se nestanou zákazníky, uchováváme pouze po dobu potřebnou k vyřízení zájmu, nejdéle 12 měsíců od poslední komunikace.",
+  "privacyApproved": true,
+  "crispWebsiteId": "5e9c1294-73b7-47e5-bfdd-44e0d7ab1fb1",
+  "retentionEn": "We keep contact details of enquirers who do not become customers only as long as needed to handle their interest, and for no longer than 12 months after the last communication.",
+  "formDomain": "watra.cz"
 }

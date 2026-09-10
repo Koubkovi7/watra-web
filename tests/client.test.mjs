@@ -9,29 +9,30 @@ function element(extra={}) {
     focus(){this.focused=true;},showModal(){this.open=true;},close(){this.open=false;},...extra};
 }
 const tick=()=>new Promise(r=>setImmediate(r));
-async function client({host='watra.cz',stored,ids={},formReady,reply={ok:true},httpOK=true,search='',modelValue='IRIKON +e',launchForm=false}={}) {
+async function client({host='watra.cz',stored,ids={},formReady,reply={ok:true},httpOK=true,httpStatus=200,search='',modelValue='IRIKON +e',launchForm=false,formDomain=''}={}) {
   const scripts=[],storage=new Map(stored?[['watra_consent',JSON.stringify({...stored,version:1,at:Date.now()})]]:[]);
   const analytics=element(),marketing=element(),dialog=element({querySelector:s=>s.includes('analytics')?analytics:marketing});
   const buttons=['reject','all','save'].map(consent=>element({dataset:{consent}})),settings=element();
   let sent=0,reloaded=0;
-  const fields={lead_type:element({value:'manufacturer'}),model:element({value:modelValue}),_gotcha:element(),submit:element(),status:element(),company:element({querySelectorAll:()=>[]})};
+  const fields={lead_type:element({value:'manufacturer'}),model:element({value:modelValue}),_gotcha:element(),submit:element(),status:element(),notice:element(),company:element({querySelectorAll:()=>[]})};
   const form=formReady===undefined?null:element({
-    dataset:{ready:String(formReady)},action:'https://formspree.io/f/abcdefgh',checkValidity:()=>true,reset(){this.didReset=true;},
-    querySelector:s=>s.includes('lead_type')?fields.lead_type:s.includes('model')?fields.model:s.includes('company-fields')?fields.company:s.includes('_gotcha')?fields._gotcha:s.includes('submit')?fields.submit:null
+    dataset:{ready:String(formReady),domain:formDomain},action:'https://formspree.io/f/abcdefgh',checkValidity:()=>true,reset(){this.didReset=true;},
+    querySelector:s=>s.includes('lead_type')?fields.lead_type:s.includes('model')?fields.model:s.includes('company-fields')?fields.company:s.includes('_gotcha')?fields._gotcha:s.includes('submit')?fields.submit:s.includes('data-form-domain-note')?fields.notice:null,
+    querySelectorAll:()=>[fields.lead_type,fields.model,fields._gotcha,fields.submit]
   });
   const documentEvents={};
   const document={
     documentElement:{lang:'cs'},body:{dataset:{page:form?'contact':'home'}},cookie:'',referrer:'',
     head:{append:s=>scripts.push(s)},createElement:()=>({}),addEventListener(n,f){documentEvents[n]=f;},
     querySelector:s=>s==='#cookie-dialog'?dialog:s==='#interest-form'?form:s==='#form-status'?fields.status:s==='#launch-form'&&launchForm?element():null,
-    querySelectorAll:s=>s==='[data-cookie-settings]'?[settings]:s==='[data-consent]'?buttons:[],
+    querySelectorAll:s=>s==='[data-cookie-settings]'?[settings]:s==='[data-consent]'?buttons:s==='form[data-domain]'&&form&&formDomain?[form]:[],
   };
   const context={document,URL,URLSearchParams,Date,JSON,Object,String,Number,RegExp,Promise,
     location:{hostname:host,origin:'https://'+host,pathname:'/cs/',protocol:'https:',search,reload:()=>reloaded++},
     localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},
     sessionStorage:{getItem:()=>null,setItem(){},removeItem(){}},setTimeout,clearTimeout,AbortController,
     FormData:class{constructor(){this.values={};}set(k,v){this.values[k]=v;}},
-    fetch:async url=>url==='/site-config.json'?{ok:true,json:async()=>({analyticsHosts:['watra.cz'],...ids})}:(sent++,{ok:httpOK,json:async()=>reply})
+    fetch:async url=>url==='/site-config.json'?{ok:true,json:async()=>({analyticsHosts:['watra.cz'],...ids})}:(sent++,{ok:httpOK,status:httpStatus,json:async()=>reply})
   };
   context.window=context;vm.runInNewContext(code,context);await tick();
   return {context,scripts,dialog,buttons,settings,analytics,marketing,form,fields,storage,documentEvents,sent:()=>sent,reloaded:()=>reloaded,
@@ -69,6 +70,25 @@ test('launch form excludes Clarity while lead analytics respects consent and omi
 });
 test('disabled form cannot submit, including an attempted keyboard submission',async()=>{
   const c=await client({formReady:false});await c.submit();assert.equal(c.sent(),0);
+});
+
+test('restricted form accepts the live domain and subdomains but blocks previews with an explanation',async()=>{
+  for(const [host,allowed] of [['watra.cz',true],['www.watra.cz',true],['watra-web.pages.dev',false],['watra.cz.example.test',false]]){
+    const c=await client({host,formDomain:'watra.cz',formReady:true});await c.submit();
+    assert.equal(c.sent(),allowed?1:0,host);assert.equal(c.fields.notice.hidden,allowed,host);
+    if(!allowed)assert.equal(c.fields.submit.disabled,true);
+  }
+});
+
+test('a rate limit is reported without clearing entries or generating a lead',async()=>{
+  const c=await client({formReady:true,httpOK:false,httpStatus:429,ids:{gtmId:'GTM-ABC123'},stored:{analytics:true}});
+  await c.submit();assert.match(c.fields.status.textContent,/limitu příjmu/);assert.ok(!c.form.didReset);assert.equal(c.fields.submit.disabled,false);
+  assert.equal(c.context.dataLayer.filter(v=>v.event==='generate_lead').length,0);
+});
+
+test('an unacknowledged success response cannot create a contact lead',async()=>{
+  const c=await client({formReady:true,reply:{},ids:{gtmId:'GTM-ABC123'},stored:{analytics:true}});
+  await c.submit();assert.ok(!c.form.didReset);assert.equal(c.context.dataLayer.filter(v=>v.event==='generate_lead').length,0);
 });
 
 test('current and legacy product links select the renamed hybrid model',async()=>{

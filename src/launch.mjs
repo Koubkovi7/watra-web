@@ -1,3 +1,4 @@
+import {formDomainAttribute,formDomainNotice} from './form-domain.mjs';
 const pick=(l,cs,en)=>l==='cs'?cs:en;
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const launchDate=c=>c.launchExpected||'2026-11';
@@ -26,7 +27,8 @@ export function launchDialog(l,c){
           <p class="launch-sale-date">${pick(l,'Plánovaný prodej:','Planned sales launch:')} ${launchMonth(l,c)}</p>
           <p class="launch-cert-note">${pick(l,'Certifikace právě probíhá. Prodej zahájíme po jejím úspěšném dokončení. Termín se může změnit.','Certification is in progress. Sales will begin after successful certification. The planned date may change.')}</p>
           ${!ready?`<div class="launch-unavailable" role="note">${pick(l,'Automatické přihlášení připravujeme. Zájem nám zatím můžete napsat přímo:','Email signup is coming soon. For now, tell us about your interest directly:')} ${mail||`<a href="${contact(l)}">${pick(l,'Kontakt','Contact')}</a>`}</div>`:''}
-          <form id="launch-form" data-ready="${ready}" ${ready?`action="https://formspree.io/f/${escape(c.formspreeId)}" method="post"`:''}>
+          <form id="launch-form" data-ready="${ready}" ${ready?`action="https://formspree.io/f/${escape(c.formspreeId)}" method="post"`:''}${formDomainAttribute(c)}>
+            ${formDomainNotice(l,c,'home')}
             <fieldset ${!ready?'disabled':''}>
               <label for="launch-email">${pick(l,'Váš e-mail','Your email')}</label>
               <input id="launch-email" name="email" type="email" autocomplete="email" inputmode="email" maxlength="254" placeholder="${pick(l,'vas@email.cz','you@example.com')}" required>
@@ -39,7 +41,7 @@ export function launchDialog(l,c){
               <div class="honey" aria-hidden="true"><label>Leave empty<input name="_gotcha" tabindex="-1" autocomplete="off"></label></div>
               <button type="submit" class="button" ${!ready?'disabled':''}>${pick(l,'Dejte mi vědět','Keep me informed')}</button>
             </fieldset>
-            <p class="launch-privacy">${pick(l,'Bez platby a závazku. Souhlas můžete kdykoli odvolat.','No payment or commitment. You can withdraw your consent at any time.')}<br><a href="${privacy(l)}">${pick(l,'Jak použijeme váš e-mail','How we use your email')}</a></p>
+            <p class="launch-privacy">${pick(l,'Bez platby a závazku. Souhlas můžete kdykoli odvolat.','No payment or commitment. You can withdraw your consent at any time.')}<br><a href="${privacy(l)}">${pick(l,'Jak použijeme váš e-mail','How we use your email')}</a>${ready?`<br>${mail}`:''}</p>
             <p id="launch-status" role="status" aria-live="polite" tabindex="-1"></p>
           </form>
           <button class="launch-later" type="button" data-launch-close>${pick(l,'Zatím si chci prohlédnout kamna','I’d like to explore the heaters first')}</button>

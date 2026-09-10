@@ -1,12 +1,12 @@
 # WATRA — služby a údaje k doplnění
 
-Aktualizace 10. 9. 2026: homepage má informaci o probíhající certifikaci, plánovaném prodeji v listopadu 2026 a okno pro upozornění e-mailem. Otevírá se kliknutím. Kontaktní e-mail richard@watra.cz a údaje OSVČ jsou doplněné; příjem formulářů čeká na veřejné ID Formspree a dokončení informací o zpracování údajů včetně doby uchování. Do té doby okno nabízí přímý e-mail. GTM a Crisp mají v nastavení vlastní ID; nastavení jejich účtů ověřujeme samostatně.
+Aktualizace 10. 9. 2026: Formspree účet richard@watra.cz je ověřený. Projekt WATRA obsahuje formulář „WATRA - nezávazný zájem a zahájení prodeje“, veřejné ID mppzbljw, s doručováním na richard@watra.cz a ukládáním do soukromého přehledu. CS/EN kontaktní formulář a okno na homepage používají toto ID. Informace o zpracování zahrnují dobu potřebnou k vyřízení zájmu, nejvýše 12 měsíců od poslední komunikace, kterou provozovatel potvrdil. GTM a Crisp mají vlastní ID; nastavení jejich účtů se ověřuje samostatně.
 
 Provozovatel: Ing. Richard Koubek, IČO 21069611, Kokonínská 971, 468 02 Rychnov u Jablonce nad Nisou. Údaje ověřeny v [ARES](https://ares.gov.cz/ekonomicke-subjekty/res/21069611) dne 10. 9. 2026.
 
-Web je připravený jako tmavá prezentace v češtině a angličtině. Nyní jde o náhled: formulář ještě nepřijímá poptávky, WhatsApp a měření čekají na doplnění údajů.
+Web běží v češtině a angličtině na watra.cz. Níže je přehled služeb a provozních kroků; u již propojených služeb není potřeba zakládat další účet.
 
-## Co založit
+## Přehled služeb
 
 | Služba | K čemu bude | Co potom dodat |
 |---|---|---|
@@ -27,9 +27,9 @@ Hesla, přístupové tokeny ani tajné klíče neposílat do chatu. Pro veřejn�
 
 ## Co ještě dodat od WATRA
 
-- Veřejný e-mail, telefon a případně jiné číslo pro WhatsApp.
-- Identifikaci provozovatele: celé obchodní jméno, sídlo, IČO a kontaktní údaj pro ochranu osobních údajů.
-- Potvrzené informace pro zpracování poptávek, dobu uchování a finální text ochrany osobních údajů. Současná stránka je označená jako příprava; do jejího dokončení zůstává formulář vypnutý.
+- E-mail je doplněný. Telefon a WhatsApp jsou volitelné a zatím chybějí.
+- Identifikace provozovatele, sídlo, IČO a e-mail pro ochranu údajů jsou doplněné.
+- Informace o formulářích jsou doplněné v CS/EN. Při změně služeb, účelu nebo doby uchování upravit stránku ochrany osobních údajů.
 - Potvrzení cílového měsíce a roku certifikace. V náhledu je **listopad 2026**, jako odhad, nikoli příslib dodání. Mění se na jednom místě v nastavení.
 - Ověřené technické listy, konfigurace dodávky a instalační požadavky, které smějí být zveřejněny. Číselné parametry nebyly odhadovány z fotografií.
 - Datum reportáže a očekávanou adresu uvedenou v televizi. Připravena je krátká adresa /tv, která vede na český úvod a označí zdroj návštěvy.
@@ -48,11 +48,11 @@ Hesla, přístupové tokeny ani tajné klíče neposílat do chatu. Pro veřejn�
 
 Před souhlasem se nenahrává GTM ani Clarity. Na náhledových adresách pages.dev je měření vypnuté bez ohledu na souhlas. Při odvolání se stránka obnoví, aby v ní nezůstaly spuštěné nástroje. Změna souhlasu je dostupná v patičce.
 
-## Otevření příjmu poptávek
+## Správa příjmu poptávek
 
-1. Založit Formspree, ověřit cílový e-mail a v jeho nastavení zapnout dostupnou ochranu proti spamu. Zkontrolovat měsíční limit a chování po vyčerpání. Web má navíc skryté pole proti jednoduchým robotům.
-2. Doplnit kontakty, provozovatele a dokončené informace o zpracování osobních údajů.
-3. Doplnit formspreeId a teprve potom nastavit privacyApproved na true. Sestavení se zastaví, pokud chybí provozovatel, adresa, e-mail nebo doba uchování.
+1. Formspree je založené a e-mail ověřený. Form Enabled, Submission Archive a Formshield jsou zapnuté. CAPTCHA je v novém formuláři standardně vypnutá. Web používá navíc honeypot. Žádný placený tarif nebyl aktivován.
+2. Informace o provozovateli, účelech, příjemcích, odvolání souhlasu a právech jsou na /cs/ochrana-udaju/ a /en/privacy/.
+3. Nastavené formspreeId=mppzbljw a privacyApproved=true. Sestavení kontroluje provozovatele, adresu, e-mail a dobu uchování v obou jazycích.
 4. Odeslat jeden domluvený test, ověřit jeho přijetí ve Formspree i e-mailu a při použití tabulky také v Google Sheets.
 5. Teprve po ověření zapnout konverzní měření. Zkontrolovat chybovou odpověď služby a zachování rozepsané zprávy.
 
@@ -80,3 +80,13 @@ Každá podstránka má vlastní URL, titulek, popis, canonical a jazykové alte
 - [Microsoft: Clarity Consent V2](https://learn.microsoft.com/en-us/clarity/setup-and-installation/clarity-consent-api-v2)
 - [Google: AI funkce a web](https://developers.google.com/search/docs/appearance/ai-features)
 - [Formspree: dokumentace](https://help.formspree.io/)
+
+
+## Limity, doména a uchování kontaktů
+
+- Projekt Formspree omezuje příjem na watra.cz a jeho subdomény. Náhledové domény pages.dev a localhost mají ovládání formulářů vypnuté a odkaz na ostrý web, aby poptávky nekončily ve spamu. Omezení v projektu a formDomain v site.config.json udržovat shodné.
+- Bezplatný účet: 50 odeslání měsíčně společně pro účet; archiv ve Formspree je omezený na 30 dní. Kontakty proto uchovávat také v doručených e-mailech nebo v soukromém exportu.
+- Formspree dokumentuje systémový limit 20 odeslání za minutu na formulář i u placených plánů. Před reportáží řešit měsíční kapacitu i krátkodobou špičku. Vyšší tarif sám tento minutový limit neodstraňuje. Při HTTP 429 návštěvník dostane vysvětlení a přímý e-mail; rozepsané údaje zůstanou zachované.
+- Lhůta 12 měsíců není automatické mazání v e-mailové schránce. Provozovatel musí průběžně mazat uzavřené zájmy po splnění účelu, nejpozději po této lhůtě od poslední komunikace, a vyřizovat odvolání souhlasu ve všech kopiích a exportech. Archiv Formspree může být kratší.
+- U upozornění ukládáme znění, verzi a čas souhlasu. Při pozdějším rozesílání kontaktovat pouze platné souhlasy, respektovat odhlášení a nepřidávat příjemce automaticky do jiných kampaní.
+- Odkazy: [Formspree limity](https://help.formspree.io/articles/form-and-project-settings/system-limits), [omezení domény](https://help.formspree.io/articles/form-and-project-settings/restrict-to-domain), [ceník](https://formspree.io/plans), [předávání údajů](https://formspree.io/security/), [GDPR](https://eur-lex.europa.eu/eli/reg/2016/679/oj).

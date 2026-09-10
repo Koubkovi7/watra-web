@@ -4,6 +4,14 @@
   const say = (cs, en) => lang === 'cs' ? cs : en;
   const $ = (s, root = document) => root.querySelector(s);
   const $$ = (s, root = document) => [...root.querySelectorAll(s)];
+  $$('form[data-domain]').forEach(form=>{
+    const domain=form.dataset.domain;
+    if(!domain||location.hostname===domain||location.hostname.endsWith('.'+domain)) return;
+    form.dataset.ready='false';
+    $$('input,button,select,textarea',form).forEach(control=>control.disabled=true);
+    const notice=$('[data-form-domain-note]',form);
+    if(notice) notice.hidden=false;
+  });
   const showPhoto=(photo,src,srcset,container)=>{
     if(window.WatraLoading) window.WatraLoading.image(photo,src,{srcset,container,label:say('Načítáme fotografii…','Loading photograph…')});
     else {photo.srcset=srcset;photo.src=src;}
@@ -163,15 +171,17 @@
     const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),20000);
     try {
       const r=await fetch(endpoint,{method:'POST',body:data,headers:{Accept:'application/json'},signal:controller.signal});
+      if(r.status===429) throw Error('rate-limit');
       if(!r.ok) throw Error('response');
-      const result=await r.json();if(result.errors || result.ok===false) throw Error('response');
+      const result=await r.json();if(result?.errors || result?.ok!==true) throw Error('response');
       complete=true;event('generate_lead',{lead_type:type.value,item_id:model.value==='IRIKON +e'?'irikon-e':model.value==='IRIKON'?'irikon':'undecided'});
       button.textContent=say('Odesláno','Sent');
       status.textContent=say('Děkujeme. Váš nezávazný zájem jsme přijali. Ozveme se na uvedený e-mail.','Thank you. We received your non-binding enquiry and will respond to the email address you provided.');
       form.reset();status.focus();
-    } catch {
+    } catch (error) {
       button.disabled=false;button.innerHTML=original;
       status.textContent=say('Odeslání se nepodařilo potvrdit. Vyplněné údaje zůstaly zachované. Zkuste to za chvíli znovu nebo využijte uvedený e-mail. Pokud byl požadavek doručen navzdory chybě spojení, opakování může vytvořit druhou poptávku.','We could not confirm delivery. Your entries have been kept. Please try again shortly or use the email listed on this page. If delivery succeeded despite a connection error, retrying may create a second enquiry.');
+      if(error.message==='rate-limit') status.textContent=say('Formulář právě dosáhl limitu příjmu. Údaje zůstaly vyplněné. Zkuste odeslání později nebo nám napište přímo e-mailem.','The form has reached its submission limit. Your entries have been kept. Please try again later or contact us directly by email.');
       status.focus();
     } finally {clearTimeout(timer);finishLoading();busy=false;}
   });
