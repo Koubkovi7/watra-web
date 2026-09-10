@@ -15,6 +15,7 @@ Náhled: http://localhost:3010/cs/. Místní server na / používá češtinu; C
 - src/pages.mjs: HTML a obsah obou jazyků.
 - public/style.css, public/components.css: vzhled a responzivní pravidla.
 - public/app.js: navigace, galerie, formulář, souhlasy a připravené integrace.
+- src/launch.mjs, public/launch.css a public/launch.js: informace o zahájení prodeje a e-mailové okno na CS/EN homepage, otevírané pouze kliknutím.
 - site.config.json: veřejné kontakty a ID. Tajné klíče sem nepatří.
 - functions/index.js, functions/tv.js: přesměrování vstupních adres.
 - public/_headers: bezpečnostní hlavičky a noindex pro pages.dev.
@@ -28,6 +29,16 @@ Všechny běžné podstránky jsou statické. Soubor _routes.json omezuje spušt
 Fotografie jsou pracovní náhledy. Pro jejich nové zpracování slouží scripts/prepare-assets.cjs, který vyžaduje místně dostupný Sharp a původní soubory mimo repozitář. Běžné nasazení tento krok nepotřebuje.
 
 Testy ověřují lokalizované cesty a odkazy, metadata, přesměrování, ochranu náhledů, podmíněné měření, odvolání souhlasu a chybové i úspěšné odeslání formuláře pomocí simulované služby. Neodesílají skutečné poptávky.
+
+## Zahájení prodeje a upozornění e-mailem
+
+Plán prodeje má samostatné nastavení launchExpected (YYYY-MM), oddělené od certificationExpected. Obě hodnoty jsou nyní listopad 2026. Homepage výslovně podmiňuje zahájení prodeje úspěšnou certifikací a uvádí možnost změny termínu.
+
+Okno se nikdy neotevírá automaticky. Bez JavaScriptu odkazy vedou na kontaktní stránku. Aktivace příjmu vyžaduje platné formspreeId, email a dokončené informace o zpracování údajů (privacyApproved). Do té doby jsou pole vypnutá a okno nabízí přímý e-mail.
+
+Formspree dostane lead_type=launch_notification, jazyk, zdrojovou stránku a čas, verzi a text výslovného souhlasu. Úspěch se zobrazí až po potvrzeném přijetí službou; při chybě zůstanou údaje vyplněné. E-mail ani obsah polí nejdou do analytiky. Událost generate_lead respektuje existující analytické/reklamní souhlasy. Clarity se na stránkách s tímto formulářem nespouští.
+
+Před aktivací dokončit informace o příjemcích, době uchování, odvolání souhlasu a právech zájemců. Ověřit reálný test ve Formspree i cílové schránce. Automatické potvrzovací e-maily / double opt-in vyžadují samostatné nastavení ve službě; web je neslibuje.
 
 ## Logo a plamen při načítání
 

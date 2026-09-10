@@ -11,9 +11,10 @@
     "www.watra.cz"
   ],
   "certificationExpected": "2026-11",
-  "operator": "Richard Koubek",
-  "address": "",
-  "companyId": "",
+  "launchExpected": "2026-11",
+  "operator": "Ing. Richard Koubek",
+  "address": "Kokonínská 971, 468 02 Rychnov u Jablonce nad Nisou, Česká republika",
+  "companyId": "21069611",
   "retention": "",
   "privacyApproved": false,
   "crispWebsiteId": "5e9c1294-73b7-47e5-bfdd-44e0d7ab1fb1"

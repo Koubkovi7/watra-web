@@ -90,7 +90,7 @@
       if(['irikon','electric'].includes(document.body.dataset.page)) event('view_item',{item_id:document.body.dataset.page==='electric'?'irikon-e':'irikon'});
     }
     // Session recording stays off on pages containing a form or any URL parameters.
-    if(consent.analytics && /^[a-z0-9]+$/i.test(config.clarityId || '') && !clarityLoaded && !$('#interest-form') && !location.search) {
+    if(consent.analytics && /^[a-z0-9]+$/i.test(config.clarityId || '') && !clarityLoaded && !$('#interest-form') && !$('#launch-form') && !location.search) {
       window.clarity = window.clarity || function(){(window.clarity.q=window.clarity.q||[]).push(arguments);};
       window.clarity('consentv2',{analytics_Storage:'granted',ad_Storage:'denied'});
       loadScript('https://www.clarity.ms/tag/'+config.clarityId); clarityLoaded=true;
@@ -134,6 +134,7 @@
   }).catch(()=>{});
   $$('[data-event]').forEach(a=>a.addEventListener('click',()=>event(a.dataset.event)));
   $$('a[href*="/kontakt/"],a[href*="/contact/"]').forEach(a=>a.addEventListener('click',()=>event('cta_click',{destination:'contact'})));
+  document.addEventListener('watra:launch-interest',()=>event('generate_lead',{lead_type:'launch_notification'}));
   const form=$('#interest-form');
   if(!form) return;
   const type=$('[name=lead_type]',form), model=$('[name=model]',form), company=$('.company-fields',form);

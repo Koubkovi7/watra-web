@@ -1,5 +1,9 @@
 # WATRA — služby a údaje k doplnění
 
+Aktualizace 10. 9. 2026: homepage má informaci o probíhající certifikaci, plánovaném prodeji v listopadu 2026 a okno pro upozornění e-mailem. Otevírá se kliknutím. Kontaktní e-mail richard@watra.cz a údaje OSVČ jsou doplněné; příjem formulářů čeká na veřejné ID Formspree a dokončení informací o zpracování údajů včetně doby uchování. Do té doby okno nabízí přímý e-mail. GTM a Crisp mají v nastavení vlastní ID; nastavení jejich účtů ověřujeme samostatně.
+
+Provozovatel: Ing. Richard Koubek, IČO 21069611, Kokonínská 971, 468 02 Rychnov u Jablonce nad Nisou. Údaje ověřeny v [ARES](https://ares.gov.cz/ekonomicke-subjekty/res/21069611) dne 10. 9. 2026.
+
 Web je připravený jako tmavá prezentace v češtině a angličtině. Nyní jde o náhled: formulář ještě nepřijímá poptávky, WhatsApp a měření čekají na doplnění údajů.
 
 ## Co založit
@@ -51,6 +55,8 @@ Před souhlasem se nenahrává GTM ani Clarity. Na náhledových adresách pages
 3. Doplnit formspreeId a teprve potom nastavit privacyApproved na true. Sestavení se zastaví, pokud chybí provozovatel, adresa, e-mail nebo doba uchování.
 4. Odeslat jeden domluvený test, ověřit jeho přijetí ve Formspree i e-mailu a při použití tabulky také v Google Sheets.
 5. Teprve po ověření zapnout konverzní měření. Zkontrolovat chybovou odpověď služby a zachování rozepsané zprávy.
+
+Nový formulář na homepage používá stejný účet Formspree a označení lead_type=launch_notification. Žádá výslovný souhlas se zprávou o zahájení prodeje a s kontaktováním k zájmu o kamna; souhlas není předem zaškrtnutý. Neslouží k automatickému přihlášení k dalším kampaním. E-mailové potvrzení adresy (double opt-in) lze nastavit ve službě, ale do jeho ověření ho návštěvníkovi neslibujeme. Stránky s novým formulářem jsou stejně jako kontaktní stránka vyloučené ze záznamů Clarity; konverzi lze vyhodnotit přes generate_lead bez obsahu formuláře.
 
 ## Nasazení na watra.cz a den reportáže
 

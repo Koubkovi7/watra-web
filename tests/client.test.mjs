@@ -9,7 +9,7 @@ function element(extra={}) {
     focus(){this.focused=true;},showModal(){this.open=true;},close(){this.open=false;},...extra};
 }
 const tick=()=>new Promise(r=>setImmediate(r));
-async function client({host='watra.cz',stored,ids={},formReady,reply={ok:true},httpOK=true,search='',modelValue='IRIKON +e'}={}) {
+async function client({host='watra.cz',stored,ids={},formReady,reply={ok:true},httpOK=true,search='',modelValue='IRIKON +e',launchForm=false}={}) {
   const scripts=[],storage=new Map(stored?[['watra_consent',JSON.stringify({...stored,version:1,at:Date.now()})]]:[]);
   const analytics=element(),marketing=element(),dialog=element({querySelector:s=>s.includes('analytics')?analytics:marketing});
   const buttons=['reject','all','save'].map(consent=>element({dataset:{consent}})),settings=element();
@@ -19,10 +19,11 @@ async function client({host='watra.cz',stored,ids={},formReady,reply={ok:true},h
     dataset:{ready:String(formReady)},action:'https://formspree.io/f/abcdefgh',checkValidity:()=>true,reset(){this.didReset=true;},
     querySelector:s=>s.includes('lead_type')?fields.lead_type:s.includes('model')?fields.model:s.includes('company-fields')?fields.company:s.includes('_gotcha')?fields._gotcha:s.includes('submit')?fields.submit:null
   });
+  const documentEvents={};
   const document={
     documentElement:{lang:'cs'},body:{dataset:{page:form?'contact':'home'}},cookie:'',referrer:'',
-    head:{append:s=>scripts.push(s)},createElement:()=>({}),addEventListener(){},
-    querySelector:s=>s==='#cookie-dialog'?dialog:s==='#interest-form'?form:s==='#form-status'?fields.status:null,
+    head:{append:s=>scripts.push(s)},createElement:()=>({}),addEventListener(n,f){documentEvents[n]=f;},
+    querySelector:s=>s==='#cookie-dialog'?dialog:s==='#interest-form'?form:s==='#form-status'?fields.status:s==='#launch-form'&&launchForm?element():null,
     querySelectorAll:s=>s==='[data-cookie-settings]'?[settings]:s==='[data-consent]'?buttons:[],
   };
   const context={document,URL,URLSearchParams,Date,JSON,Object,String,Number,RegExp,Promise,
@@ -33,7 +34,7 @@ async function client({host='watra.cz',stored,ids={},formReady,reply={ok:true},h
     fetch:async url=>url==='/site-config.json'?{ok:true,json:async()=>({analyticsHosts:['watra.cz'],...ids})}:(sent++,{ok:httpOK,json:async()=>reply})
   };
   context.window=context;vm.runInNewContext(code,context);await tick();
-  return {context,scripts,dialog,buttons,settings,analytics,marketing,form,fields,storage,sent:()=>sent,reloaded:()=>reloaded,
+  return {context,scripts,dialog,buttons,settings,analytics,marketing,form,fields,storage,documentEvents,sent:()=>sent,reloaded:()=>reloaded,
     submit:async()=>{await form.handlers.submit({preventDefault(){}});await tick();}};
 }
 test('unconfigured preview loads no optional scripts and no automatic banner',async()=>{
@@ -54,6 +55,17 @@ test('revocation persists denied consent and reloads optional code out of the pa
 });
 test('Clarity does not record the contact form',async()=>{
   const c=await client({ids:{clarityId:'abcdef'},stored:{analytics:true},formReady:true});assert.equal(c.scripts.length,0);
+});
+
+test('launch form excludes Clarity while lead analytics respects consent and omits personal data',async()=>{
+  for(const allowed of [false,true]){
+    const c=await client({launchForm:true,ids:{clarityId:'abcdef',gtmId:'GTM-ABC123'},stored:{analytics:allowed,marketing:false}});
+    assert.equal(c.scripts.filter(s=>s.src.includes('clarity')).length,0);
+    c.documentEvents['watra:launch-interest']();
+    const leads=(c.context.dataLayer||[]).filter(v=>v.event==='generate_lead');
+    assert.equal(leads.length,allowed?1:0);
+    if(allowed){assert.equal(leads[0].lead_type,'launch_notification');assert.deepEqual(Object.keys(leads[0]).sort(),['event','language','lead_type','page_location','page_path'].sort());}
+  }
 });
 test('disabled form cannot submit, including an attempted keyboard submission',async()=>{
   const c=await client({formReady:false});await c.submit();assert.equal(c.sent(),0);
