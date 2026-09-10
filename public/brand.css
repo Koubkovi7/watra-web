@@ -1,6 +1,10 @@
 /* The two clips separate the original PNG's flame and W without redrawing them. */
 .brand.brand-image{display:block;flex:0 0 auto;width:128px;height:auto;line-height:0;letter-spacing:0}
 .brand-image img{display:block;width:100%;height:auto;aspect-ratio:356/208}
+/* Both layers use the supplied logo: only its original flame moves. */
+.header .brand-image{position:relative;isolation:isolate}
+.header .brand-image img{clip-path:polygon(0 61%,5.55% 61%,9.5% 70.7%,26.94% 70.7%,29.7% 62.5%,100% 62.5%,100% 100%,0 100%)}
+.header .brand-image::after{content:"";position:absolute;inset:0;background:url('/brand/logo.png') center/100% 100% no-repeat;clip-path:polygon(0 0,40% 0,40% 62.5%,29.7% 62.5%,26.94% 70.7%,9.5% 70.7%,5.55% 61%,0 61%);transform-origin:19.4% 66%;animation:watra-flame 2.1s ease-in-out infinite,watra-heat 3.4s ease-in-out infinite;pointer-events:none}
 .footer .brand-image{width:156px}
 .watra-mark{--mark-size:44px;--watra-symbol:url('/brand/symbol-gg.png');display:inline-block;position:relative;flex:0 0 auto;width:var(--mark-size);aspect-ratio:141/208;vertical-align:middle;isolation:isolate}
 .watra-mark--wg{--watra-symbol:url('/brand/symbol-wg.png')}
@@ -47,4 +51,4 @@
 .demo-example__result .watra-loading{position:absolute;inset:0;background:#191d18}
 .demo-demo-only{font-size:12px!important;color:#8e9586;margin:18px 0 0!important}
 @media(max-width:760px){.header .brand-image{width:106px}.footer .brand-image{width:138px}.demo-header{padding:16px 0}.demo-header .brand-image{width:108px}.demo-main{padding-top:34px}.demo-stage{height:250px}.demo-stage .watra-mark{--mark-size:112px}.demo-example{padding:26px 20px;margin-top:48px}.demo-main h1{letter-spacing:-1.5px}.demo-main>.eyebrow{font-size:10px}.demo-options{gap:8px}.demo-options button{font-size:12px;padding:10px 12px}}
-@media(prefers-reduced-motion:reduce){.watra-mark__flame,.watra-mark__heat{animation:none!important;transform:none;opacity:1;filter:none}}
+@media(prefers-reduced-motion:reduce){.watra-mark__flame,.watra-mark__heat,.header .brand-image::after{animation:none!important;transform:none;opacity:1;filter:none}}
