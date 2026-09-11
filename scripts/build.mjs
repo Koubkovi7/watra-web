@@ -1,4 +1,5 @@
-import {mkdir,writeFile,readFile,cp,rm} from 'node:fs/promises';
+import {mkdir,writeFile,readFile,readdir,cp,rm} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
 import path from 'node:path';
 import {render, routes} from '../src/pages.mjs';
 const config=JSON.parse(await readFile('site.config.json','utf8'));
@@ -22,4 +23,14 @@ await writeFile(path.join(output,'site-config.json'),JSON.stringify({email:confi
 await writeFile(path.join(output,'sitemap.xml'),'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+['cs','en'].flatMap(l=>Object.keys(routes).filter(k=>!['thanks','notfound'].includes(k)).map(k=>'<url><loc>'+config.origin+'/'+l+'/'+routes[k][l]+'</loc></url>')).join('')+'</urlset>');
 await writeFile(path.join(output,'robots.txt'),'User-agent: *\nAllow: /\nSitemap: '+config.origin+'/sitemap.xml\n');
 await writeFile(path.join(output,'_routes.json'),JSON.stringify({version:1,include:['/','/tv','/tv/'],exclude:[]}));
+// A changed stylesheet gets a new URL, including for returning visitors.
+const styleVersions=new Map();
+for(const file of await readdir(output)) if(file.endsWith('.css')) {
+ styleVersions.set(file,createHash('sha256').update(await readFile(path.join(output,file))).digest('hex').slice(0,12));
+}
+for(const file of await readdir(output,{recursive:true})) if(file.endsWith('.html')) {
+ const location=path.join(output,file),html=await readFile(location,'utf8');
+ const versioned=html.replace(/href="\/([a-z0-9-]+\.css)(?:\?[^"]*)?"/g,(match,css)=>styleVersions.has(css)?'href="/'+css+'?v='+styleVersions.get(css)+'"':match);
+ if(versioned!==html) await writeFile(location,versioned);
+}
 console.log('Built '+Object.keys(routes).length*2+' localized pages to dist');
