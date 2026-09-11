@@ -35,7 +35,7 @@ test('localized homepage has a conditional sales date independent of certificati
     assert.match(html,/id="launch-form" data-ready="false"/);assert.match(html,/<fieldset disabled>/);
     assert.match(html,/mailto:richard@watra.cz/);assert.doesNotMatch(html,/action="https:\/\/formspree/);
     assert.doesNotMatch(html,/class="availability wrap"/);
-    assert.match(html,/class="collection wrap"/);
+    assert.match(html,/class="collection wrap range-collection"/);
   }
   const other=render('en','models',config);assert.doesNotMatch(other,/launch.js|id="launch-dialog"/);
 });
