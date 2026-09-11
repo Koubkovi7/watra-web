@@ -3,12 +3,12 @@ import {modeIcon} from './mode-icons.mjs';
 const text=(l,cs,en)=>l==='cs'?cs:en;
 const modelDescriptions={
  irikon:{
-  cs:'IRIKON jsou saunová kamna na dřevo s přípravou na elektrické rozšíření. Spalovací část má výkon 11 kW a umožňuje topení poleny délky 33 cm. Konstrukce počítá s pozdějším doplněním elektrického vytápění a přechodem na IRIKON +e. Můžete tak začít se saunováním na dřevo a hybridní provoz doplnit podle budoucích potřeb.',
-  en:'IRIKON is a wood-fired sauna heater prepared for an electric upgrade. Its wood-burning section delivers 11 kW and accommodates 33 cm logs. The heater is designed for the later addition of electric heating and an upgrade to IRIKON +e. You can start with wood-fired sauna sessions and add hybrid operation as your needs change.'
+  cs:'Saunová kamna na dřevo s přípravou na elektřinu. Později je můžete rozšířit na hybridní IRIKON +e.',
+  en:'Wood-fired sauna heater prepared for electric heating. An upgrade to the hybrid IRIKON +e can be added later.'
  },
  'irikon-e':{
-  cs:'Saunová kamna IRIKON +e spojují vytápění dřevem a elektřinou v jedné konstrukci. Saunu můžete nahřát elektřinou bez přikládání, zatopit pouze dřevem nebo oba zdroje využít současně pro rychlejší nahřátí. S kompatibilním regulátorem spustíte elektrické vytápění na dálku ještě před příchodem. Při topení dřevem pak prosklená dvířka nabídnou pohled na oheň a atmosféru tradičního saunování.',
-  en:'The IRIKON +e sauna heater combines wood-fired and electric heating in one unit. You can warm up the sauna with electricity without tending a fire, burn wood alone, or use both sources together for a faster warm-up. With a compatible controller, you can start electric heating remotely before you arrive. When burning wood, the glass door offers a view of the fire and the atmosphere of a traditional sauna.'
+  cs:'Dřevo, elektřina nebo oba zdroje pro rychlejší nahřátí. S kompatibilním regulátorem spustíte elektrický ohřev i na dálku.',
+  en:'Wood, electricity, or both for a faster warm-up. Start electric heating remotely with a compatible controller.'
  }
 };
 // Prices and approximate warm-up times supplied by Richard; no inferred installation data.
