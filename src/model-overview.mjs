@@ -14,7 +14,7 @@ const modelDescriptions={
 // Prices and approximate warm-up times supplied by Richard; no inferred installation data.
 export const modelData=[
  {id:'irikon',name:'IRIKON',image:'modelWoodFire',price:49950,modes:[{type:'wood',power:11,minutes:90}]},
- {id:'irikon-e',name:'IRIKON +e',image:'modelHybridGlow',price:69000,modes:[{type:'wood',power:11,minutes:90},{type:'electric',power:9,minutes:60},{type:'combined',power:20,minutes:35}]}
+ {id:'irikon-e',name:'IRIKON +e',image:'modelHybridGlow',price:59000,modes:[{type:'wood',power:11,minutes:90},{type:'electric',power:9,minutes:60},{type:'combined',power:20,minutes:35}]}
 ];
 const names=(l,type)=>({wood:text(l,'Dřevo','Wood'),electric:text(l,'Elektřina','Electricity'),combined:text(l,'Kombinace','Combined')})[type];
 const name=m=>m.id==='irikon-e'?'<span class="model-name">IRIKON <span class="model-suffix">+e</span></span>':'IRIKON';
