@@ -13,6 +13,7 @@ Node.js 22 nebo novější. Sestavení nemá závislosti třetích stran.
 Náhled: http://localhost:3010/cs/. Místní server na / používá češtinu; Cloudflare přesměrování podle země testují jednotkové testy a poté živé nasazení.
 
 - src/pages.mjs: HTML a obsah obou jazyků.
+- src/hybrid.mjs, public/hybrid.css: stránka Proč hybrid / Why hybrid s mood fotografií, krátkými příklady použití a společným FAQ; CSS se načítá jen na této stránce.
 - public/style.css, public/components.css: vzhled a responzivní pravidla.
 - public/app.js: navigace, galerie, formulář, souhlasy a připravené integrace.
 - src/launch.mjs, public/launch.css a public/launch.js: informace o zahájení prodeje a e-mailové okno na CS/EN homepage, otevírané pouze kliknutím.
