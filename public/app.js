@@ -41,9 +41,11 @@
   const box = $('#lightbox');
   $$('[data-photo]').forEach(button => button.addEventListener('click', () => {
     const name = button.dataset.photo;
-    if(!['portraitStove','front','side','rear'].includes(name)) return;
+    if(!['portraitStove','front','side','rear','mood1','mood2'].includes(name)) return;
     const main = $('.gallery-main'), photo = $('img',main);
-    showPhoto(photo,'/media/' + name + '-960.webp','/media/' + name + '-480.webp 480w, /media/' + name + '-960.webp 960w, /media/' + name + '-1600.webp 1600w',main);
+    showPhoto(photo,'/media/' + name + '-960.webp',$('img',button).srcset,main);
+    const caption = $('[data-gallery-caption]');
+    if(caption) caption.textContent = button.dataset.caption || $('img',button).alt;
     photo.alt = $('img',button).alt; main.href = '/media/' + name + '-1600.webp';
     $$('[data-photo]').forEach(b => b.setAttribute('aria-pressed',String(b === button)));
   }));
