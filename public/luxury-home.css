@@ -9,10 +9,9 @@
 
 /* One aligned detail section, with the same gutters as the surrounding content. */
 .craft{padding-top:64px;padding-bottom:88px;border-top:1px solid var(--line)}
-.craft-heading{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:end;margin-bottom:36px}
+.craft-heading{margin-bottom:36px}
 .craft-heading .eyebrow{margin-bottom:18px}
 .craft-heading h2{font-size:clamp(38px,4.2vw,60px);margin:0;line-height:1.08}
-.craft-intro{font-size:16px;line-height:1.65;max-width:330px;margin:0 0 3px;justify-self:end}
 .craft-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
 .craft-detail{margin:0;min-width:0}
 .craft-image{position:relative;aspect-ratio:1;border-radius:22px;overflow:hidden;background:var(--surface)}
@@ -20,6 +19,5 @@
 .craft-detail-handle img{object-position:50% 72%}
 .craft-detail-logoDetail img{object-position:50% 55%}
 .craft-image:after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;box-shadow:inset 0 0 24px 5px rgba(17,19,17,.35)}
-.craft-detail figcaption{padding:17px 0 0;color:var(--muted);font-size:14px;line-height:1.5}
-@media(max-width:900px){.craft-heading,.craft-gallery{gap:20px}.craft-intro{font-size:15px}}
-@media(max-width:700px){.craft{padding-top:40px;padding-bottom:48px}.craft-heading{grid-template-columns:1fr;gap:20px;margin-bottom:28px}.craft-heading h2{font-size:38px;letter-spacing:-1.3px}.craft-heading .eyebrow{margin-bottom:14px}.craft-intro{justify-self:start;margin:0;max-width:none}.craft-gallery{grid-template-columns:1fr;gap:28px}.craft-image{border-radius:16px}.craft-detail figcaption{padding-top:12px}}
+@media(max-width:900px){.craft-gallery{gap:20px}}
+@media(max-width:700px){.craft{padding-top:40px;padding-bottom:48px}.craft-heading{margin-bottom:28px}.craft-heading h2{font-size:38px;letter-spacing:-1.3px}.craft-heading .eyebrow{margin-bottom:14px}.craft-gallery{grid-template-columns:1fr;gap:28px}.craft-image{border-radius:16px}}
