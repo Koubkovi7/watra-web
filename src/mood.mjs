@@ -2,7 +2,10 @@ const text = (lang, cs, en) => lang === 'cs' ? cs : en;
 
 export const moodPhotos = {
   mood1: { width: 1586, height: 992, cs: 'Vizualizace sauny s kamny WATRA IRIKON a výhledem na jezero', en: 'Sauna visualization with a WATRA IRIKON heater and a lake view' },
-  mood2: { width: 1122, height: 1402, cs: 'Vizualizace světlé dřevěné sauny s kamny WATRA IRIKON', en: 'Visualization of a light timber sauna with a WATRA IRIKON heater' }
+  mood2: { width: 1122, height: 1402, cs: 'Vizualizace světlé dřevěné sauny s kamny WATRA IRIKON', en: 'Visualization of a light timber sauna with a WATRA IRIKON heater' },
+  mood3: { width: 1122, height: 1402, cs: 'Vizualizace kamen WATRA IRIKON v tmavé sauně s výhledem do lesa', en: 'Visualization of a WATRA IRIKON heater in a dark sauna overlooking the forest' },
+  mood4: { width: 1122, height: 1402, cs: 'Vizualizace saunování s kamny WATRA IRIKON ve světlém dřevěném interiéru', en: 'Visualization of a sauna session with a WATRA IRIKON heater in a light timber interior' },
+  mood5: { width: 1536, height: 1024, model: 'IRIKON +e', cs: 'Vizualizace hybridních kamen WATRA IRIKON +e se žhnoucími elektrickými tělesy a dohořívajícím dřevem', en: 'Visualization of a WATRA IRIKON +e hybrid heater with glowing electric elements and the wood fire burning down' }
 };
 
 export function moodImage(name, lang, { eager = false, sizes = '(max-width: 760px) calc(100vw - 40px), 55vw' } = {}) {
@@ -11,7 +14,7 @@ export function moodImage(name, lang, { eager = false, sizes = '(max-width: 760p
 }
 
 export function moodFigure(name, lang, options = {}) {
-  return `<figure class="mood-figure"><div class="mood-frame">${moodImage(name, lang, options)}</div><figcaption>${text(lang, 'Vizualizace sauny · WATRA IRIKON', 'Sauna visualization · WATRA IRIKON')}</figcaption></figure>`;
+  return `<figure class="mood-figure"><div class="mood-frame">${moodImage(name, lang, options)}</div><figcaption>${text(lang, 'Vizualizace sauny', 'Sauna visualization')} · WATRA ${moodPhotos[name].model || 'IRIKON'}</figcaption></figure>`;
 }
 
 export function moodHome(lang) {
@@ -24,18 +27,21 @@ export function moodHome(lang) {
   </section>`;
 }
 
-export function productGallery(lang, studioImage, includeMood = true) {
+export function productGallery(lang, studioImage, isHybrid = false) {
   const studio = {
     portraitStove: text(lang, 'Ateliér · WATRA IRIKON s kamennou náplní', 'Studio · WATRA IRIKON with sauna stones'),
     front: text(lang, 'Ateliér · IRIKON zepředu', 'Studio · IRIKON front view'),
     side: text(lang, 'Ateliér · IRIKON z boku', 'Studio · IRIKON side view'),
     rear: text(lang, 'Ateliér · IRIKON zezadu', 'Studio · IRIKON rear view')
   };
-  const names = ['portraitStove', ...(includeMood ? ['mood1', 'mood2'] : []), 'front', 'side', 'rear'];
+  const moods = isHybrid ? ['mood5', 'mood3', 'mood4', 'mood1', 'mood2'] : ['mood3', 'mood4', 'mood1', 'mood2', 'mood5'];
+  const names = ['portraitStove', ...moods, 'front', 'side', 'rear'];
   const thumbnails = names.map((name, i) => {
-    const caption = moodPhotos[name]?.[lang] || studio[name];
-    const photo = moodPhotos[name] ? moodImage(name, lang, { sizes: '110px' }) : studioImage(name, caption).replace('sizes="(max-width: 700px) 100vw, 55vw"', 'sizes="110px"');
+    const caption = name === 'mood5' && !isHybrid
+      ? text(lang, 'Po elektrickém rozšíření · vizualizace modelu IRIKON +e', 'After the electric upgrade · visualization of the IRIKON +e model')
+      : moodPhotos[name]?.[lang] || studio[name];
+    const photo = moodPhotos[name] ? moodImage(name, lang, { sizes: '90px' }) : studioImage(name, caption).replace('sizes="(max-width: 700px) 100vw, 55vw"', 'sizes="90px"');
     return `<button type="button" data-photo="${name}" data-caption="${caption}" aria-label="${caption}" aria-pressed="${i === 0}">${photo}</button>`;
   }).join('');
-  return `<div class="product-gallery${includeMood ? ' gallery-with-mood' : ''}"><a href="/media/portraitStove-1600.webp" class="gallery-main" data-gallery>${studioImage('portraitStove', studio.portraitStove, '', true)}</a><p class="gallery-caption" data-gallery-caption aria-live="polite">${studio.portraitStove}</p><div class="thumbnails">${thumbnails}</div></div>`;
+  return `<div class="product-gallery gallery-with-mood"><a href="/media/portraitStove-1600.webp" class="gallery-main" data-gallery>${studioImage('portraitStove', studio.portraitStove, '', true)}</a><p class="gallery-caption" data-gallery-caption aria-live="polite">${studio.portraitStove}</p><div class="thumbnails" role="group" aria-label="${text(lang, 'Ateliérové fotografie a vizualizace sauny', 'Studio photographs and sauna visualizations')}">${thumbnails}</div></div>`;
 }

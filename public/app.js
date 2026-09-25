@@ -41,8 +41,9 @@
   const box = $('#lightbox');
   $$('[data-photo]').forEach(button => button.addEventListener('click', () => {
     const name = button.dataset.photo;
-    if(!['portraitStove','front','side','rear','mood1','mood2'].includes(name)) return;
+    if(!['portraitStove','front','side','rear','mood1','mood2','mood3','mood4','mood5'].includes(name)) return;
     const main = $('.gallery-main'), photo = $('img',main);
+    main.dataset.photoKind = name.startsWith('mood') ? 'mood' : 'studio';
     showPhoto(photo,'/media/' + name + '-960.webp',$('img',button).srcset,main);
     const caption = $('[data-gallery-caption]');
     if(caption) caption.textContent = button.dataset.caption || $('img',button).alt;
