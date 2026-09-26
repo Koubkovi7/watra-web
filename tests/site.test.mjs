@@ -49,6 +49,23 @@ test('every localized page has valid links, one H1, structured data, and correct
     assert.ok(!/\b(?:22\s?kW|30\s?min)\b/.test(html),'Unverified numerical claim');
   }
 });
+test('pre-launch model pages describe both models without incomplete shopping markup',async()=>{
+  for(const lang of ['cs','en']) for(const key of ['irikon','electric']){
+    const html=await readFile(path.join('dist',lang,routes[key][lang],'index.html'),'utf8');
+    const schema=JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
+    const page=schema.find(item=>item['@type']==='WebPage');
+    assert.ok(page,'Model description must remain available to search engines');
+    assert.equal(page.url,config.origin+'/'+lang+'/'+routes[key][lang]);
+    assert.equal(page.inLanguage,lang);
+    assert.equal(page.name,html.match(/<title>(.*?)<\/title>/)[1]);
+    assert.equal(page.about.name,key==='irikon'?'WATRA IRIKON':'WATRA IRIKON +e');
+    assert.match(page.primaryImageOfPage.url,/^https:\/\/watra\.cz\/media\//);
+    assert.ok(schema.some(item=>item['@type']==='BreadcrumbList'));
+    assert.doesNotMatch(JSON.stringify(schema),/"(?:Product|Offer|Review|AggregateRating)"/);
+    assert.doesNotMatch(html,/<meta name="robots" content="noindex"/);
+  }
+});
+
 test('blank integrations never publish a working form or fake contacts',()=>{
   const html=render('cs','contact',{...config,email:'',phone:'',whatsapp:'',formspreeId:'',privacyApproved:false});
   assert.match(html,/data-ready="false"/);assert.match(html,/type="submit" disabled/);

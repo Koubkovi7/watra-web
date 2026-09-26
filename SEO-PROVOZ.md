@@ -4,6 +4,16 @@ Produkční doména je `https://watra.cz`. Lokalizované stránky jsou statické
 
 `node scripts/build.mjs` aktualizuje `/robots.txt` a `/sitemap.xml` z existujících cest. Sitemap obsahuje 28 indexovatelných stránek v obou jazycích. Děkovací, chybové a náhledové stránky zůstávají mimo ni. Náhledy `*.pages.dev` nadále používají `X-Robots-Tag: noindex`.
 
+## Strukturovaná data před zahájením prodeje
+
+Search Console dne 26. 9. 2026 nahlásila u obou českých produktů chybu „Je třeba zadat buď offers, review, nebo aggregateRating“. Původní značení `Product` neobsahovalo žádnou z těchto povinných vlastností pro produktové úryvky Googlu. Stejná šablona se používala i v angličtině.
+
+Web nyní sbírá nezávazný zájem a certifikace probíhá. Modelové stránky proto používají `WebPage` s lokalizovaným názvem, popisem, adresou, jazykem, předmětem stránky a ateliérovou fotografií. Značení `Organization` a `BreadcrumbList` zůstává zachováno, stejně jako canonical, hreflang, indexovatelnost a sitemap. Nepublikujeme smyšlené recenze ani aktivní nabídku prodeje. Stránky v této fázi neusilují o rozšířené produktové výsledky; běžné výsledky vyhledávání nejsou podmíněné značením `Product`.
+
+Při skutečném spuštění prodeje doplnit `Product` s odpovídajícím `Offer`: cena a měna musí souhlasit s viditelným obsahem dané stránky, dostupnost se skutečným stavem objednávání. Recenze a hodnocení přidávat pouze skutečné a viditelné návštěvníkům. Upravit také testy pro novou fázi prodeje. Před nasazením ověřit v Google Rich Results Test a následně v Search Console.
+
+Dokumentace: https://developers.google.com/search/docs/appearance/structured-data/product-snippet
+
 ## Přesměrování v Cloudflare
 
 Dne 25. 9. 2026 bylo v zóně watra.cz nasazeno pravidlo **WATRA canonical HTTPS without www**. Jde o Single Redirect na úrovni Cloudflare, nikoli Pages Function; obsah stránek nadále obsluhuje statické CDN.
