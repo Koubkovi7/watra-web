@@ -5,7 +5,8 @@ export const moodPhotos = {
   mood2: { width: 1122, height: 1402, cs: 'Vizualizace světlé dřevěné sauny s kamny WATRA IRIKON', en: 'Visualization of a light timber sauna with a WATRA IRIKON heater' },
   mood3: { width: 1122, height: 1402, cs: 'Vizualizace kamen WATRA IRIKON v tmavé sauně s výhledem do lesa', en: 'Visualization of a WATRA IRIKON heater in a dark sauna overlooking the forest' },
   mood4: { width: 1122, height: 1402, cs: 'Vizualizace saunování s kamny WATRA IRIKON ve světlém dřevěném interiéru', en: 'Visualization of a sauna session with a WATRA IRIKON heater in a light timber interior' },
-  mood5: { width: 1536, height: 1024, model: 'IRIKON +e', cs: 'Vizualizace hybridních kamen WATRA IRIKON +e se žhnoucími elektrickými tělesy a dohořívajícím dřevem', en: 'Visualization of a WATRA IRIKON +e hybrid heater with glowing electric elements and the wood fire burning down' }
+  mood5: { width: 1536, height: 1024, model: 'IRIKON +e', cs: 'Vizualizace hybridních kamen WATRA IRIKON +e se žhnoucími elektrickými tělesy a dohořívajícím dřevem', en: 'Visualization of a WATRA IRIKON +e hybrid heater with glowing electric elements and the wood fire burning down' },
+  mood6: { width: 1536, height: 1024, cs: 'Vizualizace saunových kamen WATRA IRIKON s dohořívajícím dřevem v tmavé sauně', en: 'Visualization of a WATRA IRIKON wood-fired sauna heater with glowing embers in a dark sauna' }
 };
 
 export function moodImage(name, lang, { eager = false, sizes = '(max-width: 760px) calc(100vw - 40px), 55vw' } = {}) {
@@ -34,12 +35,10 @@ export function productGallery(lang, studioImage, isHybrid = false) {
     side: text(lang, 'Ateliér · IRIKON z boku', 'Studio · IRIKON side view'),
     rear: text(lang, 'Ateliér · IRIKON zezadu', 'Studio · IRIKON rear view')
   };
-  const moods = isHybrid ? ['mood5', 'mood3', 'mood4', 'mood1', 'mood2'] : ['mood3', 'mood4', 'mood1', 'mood2', 'mood5'];
+  const moods = isHybrid ? ['mood5', 'mood3', 'mood4', 'mood1', 'mood2'] : ['mood3', 'mood4', 'mood1', 'mood2', 'mood6'];
   const names = ['portraitStove', ...moods, 'front', 'side', 'rear'];
   const thumbnails = names.map((name, i) => {
-    const caption = name === 'mood5' && !isHybrid
-      ? text(lang, 'Po elektrickém rozšíření · vizualizace modelu IRIKON +e', 'After the electric upgrade · visualization of the IRIKON +e model')
-      : moodPhotos[name]?.[lang] || studio[name];
+    const caption = moodPhotos[name]?.[lang] || studio[name];
     const photo = moodPhotos[name] ? moodImage(name, lang, { sizes: '90px' }) : studioImage(name, caption).replace('sizes="(max-width: 700px) 100vw, 55vw"', 'sizes="90px"');
     return `<button type="button" data-photo="${name}" data-caption="${caption}" aria-label="${caption}" aria-pressed="${i === 0}">${photo}</button>`;
   }).join('');

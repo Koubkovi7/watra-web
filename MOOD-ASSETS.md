@@ -1,12 +1,13 @@
 # Mood fotografie na webu
 
-Aktuální umístění 25. 9. 2026, shodně pro CS a EN:
+Aktuální umístění 26. 9. 2026, shodně pro CS a EN:
 
 - mood1: homepage pod modely, úvod stránky pro výrobce saun, galerie obou modelů.
 - mood2: galerie obou modelů.
 - mood3: kontakt a galerie obou modelů; tmavý interiér s výhledem do lesa.
 - mood4: galerie obou modelů; saunování ve světlém dřevěném interiéru.
-- mood5: úvod stránky Proč hybrid / Why hybrid a galerie obou modelů. Zobrazuje IRIKON +e s elektrickými tělesy. V galerii základního IRIKONu je výslovně označen jako ukázka po elektrickém rozšíření, nikoli jako výbava základního modelu.
+- mood5: úvod stránky Proč hybrid / Why hybrid a galerie IRIKON +e. Zobrazuje hybrid s elektrickými tělesy a nesmí být v galerii základního IRIKONu.
+- mood6: galerie základního IRIKONu, kde nahrazuje mood5. Zobrazuje kamna na dřevo bez elektrických topných těles.
 - Portrét a skutečná výroba zůstávají u příběhu a zakladatele. Technické fotografie zůstávají beze změn.
 
 Každá produktová galerie obsahuje čtyři ateliérové snímky a pět vizualizací. Začíná ateliérovým pohledem na výrobek, u hybridu je první následující vizualizací mood5. Náhledy jsou v jedné vodorovně posuvné řadě, dostupné i klávesnicí. Kliknutí na hlavní snímek otevře zvětšení. Při změně výběru se aktualizuje popis i alternativní text.
@@ -18,6 +19,7 @@ Každá produktová galerie obsahuje čtyři ateliérové snímky a pět vizuali
 - mood3.png: původní PNG, 1122 × 1402 px, 3 415 373 bajtů.
 - mood4.png: původní PNG, 1122 × 1402 px, 2 415 453 bajtů.
 - mood5.png: původní PNG, 1536 × 1024 px, 1 985 456 bajtů.
+- mood6.png: původní PNG, 1536 × 1024 px, 1 813 283 bajtů; převzatý 26. 9. 2026 ze stejné synchronizované složky FOTO. Webové velikosti jsou připravené přímo z originálu, bez generativních úprav.
 
 Nové soubory mood3–mood5 byly převzaty 25. 9. 2026 přímo ze synchronizované složky [FOTO na Google Drive](https://drive.google.com/drive/folders/18ddVMtnqpgRgEr5lQFKswL-TEdXo10vZ) do `../watra-assets/mood/`. Nebyly generativně upravovány, retušovány, ořezávány ani zvětšovány. Webové soubory vznikly jedním převodem z těchto originálních PNG.
 
