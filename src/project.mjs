@@ -40,8 +40,8 @@ export function renderProject(lang, config) {
         <p>${t('Nechtěl jsem si vybrat jednu cestu a později litovat, že jsem se vzdal té druhé.', 'I did not want to choose one way and later regret giving up the other.')}</p>
       </div>
       <div class="project-build-photos project-production-photos">
-        <figure>${photo('production-prototype', t('Rozpracovaný prototyp kamen WATRA v dílně', 'WATRA heater prototype under construction in the workshop'))}<figcaption>${t('První prototyp v dílně.', 'The first prototype in the workshop.')}</figcaption></figure>
-        <figure>${photo('production-workbench', t('Richard s rozpracovanými kamny WATRA na pracovním stole', 'Richard with the WATRA heater under construction on the workbench'))}<figcaption>${t('Od návrhu k vlastní konstrukci.', 'From design to construction.')}</figcaption></figure>
+        <figure>${photo('production-parts', t('Ocelové díly kamen WATRA připravené k sestavení v dílně', 'Steel parts of the WATRA heater laid out for assembly in the workshop'))}<figcaption>${t('Díly připravené k sestavení.', 'Parts ready for assembly.')}</figcaption></figure>
+        <figure>${photo('production-prototype', t('Sestavený prototyp kamen WATRA v dílně', 'Assembled WATRA heater prototype in the workshop'))}<figcaption>${t('Sestavený prototyp v dílně.', 'The assembled prototype in the workshop.')}</figcaption></figure>
       </div>
     </section>
 

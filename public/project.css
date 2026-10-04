@@ -122,4 +122,4 @@
   .project-next .project-next-actions .small { text-align: center; }
 }
 
-.project-production-photos img { aspect-ratio: 3/4; object-fit: cover; }
+.project-production-photos img { aspect-ratio: 4/3; object-fit: contain; background: #101311; }
