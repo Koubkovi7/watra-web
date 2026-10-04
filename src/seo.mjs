@@ -1,6 +1,10 @@
 // Page-specific search snippets; product status stays in the existing visible content.
 const metadata={
   cs:{
+    project:{
+      title:'Příběh WATRA – jak vznikla hybridní saunová kamna IRIKON',
+      description:'Od stavby rodinné sauny k hybridním kamnům na dřevo a elektřinu. Richard Koubek vypráví, jak vznikla WATRA a proč její kamna nesou jméno IRIKON.'
+    },
     home:{
       title:'WATRA – saunová kamna na dřevo i elektřinu',
       description:'Objevte česká saunová kamna WATRA: IRIKON na dřevo a hybridní IRIKON +e na dřevo i elektřinu. Poznejte oba modely a jejich výhody.'
@@ -15,6 +19,10 @@ const metadata={
     }
   },
   en:{
+    project:{
+      title:'The WATRA story – how the IRIKON hybrid sauna heater began',
+      description:'From building a family sauna to a wood-fired and electric hybrid heater. Richard Koubek tells the WATRA story and explains the meaning behind the name IRIKON.'
+    },
     home:{
       title:'WATRA – wood-fired and electric sauna heaters',
       description:'Discover Czech WATRA sauna heaters: the wood-fired IRIKON and the IRIKON +e hybrid for wood and electric heating. Explore both models and their benefits.'

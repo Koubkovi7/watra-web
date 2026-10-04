@@ -15,6 +15,7 @@ Náhled: http://localhost:3010/cs/. Místní server na / používá češtinu; C
 - src/pages.mjs: HTML a obsah obou jazyků.
 - src/seo.mjs: samostatné titulky a popisy homepage a produktů v češtině a angličtině. Viditelný H1 homepage je oddělený od velkého grafického sloganu.
 - src/hybrid.mjs, public/hybrid.css: stránka Proč hybrid / Why hybrid s mood fotografií, krátkými příklady použití a společným FAQ; CSS se načítá jen na této stránce.
+- src/project.mjs, public/project.css: osobní příběh WATRA v CS/EN, stavba rodinné sauny, prototyp, rodinné testování v sezóně 2025/26 a vzpomínka na Jiřího Novotného. Předběžná zkouška je odlišená od probíhající certifikace; termín prodeje přebírá konfiguraci. Fotografie sauna-frame/front/timber pocházejí z IMG_0087/0088/0092, jejich JPEG originály zůstávají mimo repozitář a web načítá WebP ve třech velikostech.
 - public/style.css, public/components.css: vzhled a responzivní pravidla.
 - public/app.js: navigace, galerie, formulář, souhlasy a připravené integrace.
 - src/launch.mjs, public/launch.css a public/launch.js: informace o zahájení prodeje a e-mailové okno na CS/EN homepage, otevírané pouze kliknutím.
