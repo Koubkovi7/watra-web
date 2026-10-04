@@ -121,3 +121,5 @@
   .project-next-actions > .text-link { justify-content: center; }
   .project-next .project-next-actions .small { text-align: center; }
 }
+
+.project-production-photos img { aspect-ratio: 3/4; object-fit: cover; }

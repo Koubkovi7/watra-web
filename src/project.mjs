@@ -39,9 +39,9 @@ export function renderProject(lang, config) {
         <p>${t('Procházel jsem saunové diskuze, ptal se přátel i prodejců. Miluji praskání ohně, přípravu dřeva a chvíli, kdy rodině řeknu: „Sauna už je vytopená, můžeme jít.“ Jindy ale ocením elektrické vytápění bez přikládání a možnost saunu připravit předem, s odpovídající regulací i na dálku.', 'I read sauna discussions and asked friends and suppliers. I love the crackle of a fire, preparing the wood and telling my family: “The sauna is ready. Let’s go.” At other times, I appreciate electric heating without tending a fire, and being able to warm the sauna ahead of time, including remotely with a suitable control system.')}</p>
         <p>${t('Nechtěl jsem si vybrat jednu cestu a později litovat, že jsem se vzdal té druhé.', 'I did not want to choose one way and later regret giving up the other.')}</p>
       </div>
-      <div class="project-build-photos">
-        <figure>${photo('sauna-front', t('Čelní pohled na rozestavěnou rodinnou saunu s odkrytou dřevěnou konstrukcí', 'Front view of the family sauna under construction, showing the exposed timber frame'))}<figcaption>${t('Vlastní stavba, od základů.', 'Our own build, from the ground up.')}</figcaption></figure>
-        <figure>${photo('sauna-timber', t('Boční pohled na dřevěnou konstrukci sauny a střechu během stavby', 'Side view of the sauna timber frame and roof during construction'))}<figcaption>${t('Místo pro společný čas s rodinou.', 'A place for time together as a family.')}</figcaption></figure>
+      <div class="project-build-photos project-production-photos">
+        <figure>${photo('production-prototype', t('Rozpracovaný prototyp kamen WATRA v dílně', 'WATRA heater prototype under construction in the workshop'))}<figcaption>${t('První prototyp v dílně.', 'The first prototype in the workshop.')}</figcaption></figure>
+        <figure>${photo('production-workbench', t('Richard s rozpracovanými kamny WATRA na pracovním stole', 'Richard with the WATRA heater under construction on the workbench'))}<figcaption>${t('Od návrhu k vlastní konstrukci.', 'From design to construction.')}</figcaption></figure>
       </div>
     </section>
 
