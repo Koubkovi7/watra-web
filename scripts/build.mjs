@@ -28,9 +28,12 @@ const styleVersions=new Map();
 for(const file of await readdir(output)) if(file.endsWith('.css')) {
  styleVersions.set(file,createHash('sha256').update(await readFile(path.join(output,file))).digest('hex').slice(0,12));
 }
+const mediaVersions=new Map();
+for(const file of await readdir(path.join(output,'media'))) if(file.endsWith('.webp')) mediaVersions.set(file,createHash('sha256').update(await readFile(path.join(output,'media',file))).digest('hex').slice(0,12));
 for(const file of await readdir(output,{recursive:true})) if(file.endsWith('.html')) {
  const location=path.join(output,file),html=await readFile(location,'utf8');
  const versioned=html.replace(/href="\/([a-z0-9-]+\.css)(?:\?[^"]*)?"/g,(match,css)=>styleVersions.has(css)?'href="/'+css+'?v='+styleVersions.get(css)+'"':match);
- if(versioned!==html) await writeFile(location,versioned);
+ const withMedia=versioned.replace(/\/media\/([a-zA-Z0-9-]+\.webp)(?!\?)/g,(match,file)=>mediaVersions.has(file)?match+'?v='+mediaVersions.get(file):match);
+ if(withMedia!==html) await writeFile(location,withMedia);
 }
 console.log('Built '+Object.keys(routes).length*2+' localized pages to dist');
