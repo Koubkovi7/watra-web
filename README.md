@@ -13,6 +13,7 @@ Node.js 22 nebo novější. Sestavení nemá závislosti třetích stran.
 Náhled: http://localhost:3010/cs/. Místní server na / používá češtinu; Cloudflare přesměrování podle země testují jednotkové testy a poté živé nasazení.
 
 - src/pages.mjs: HTML a obsah obou jazyků.
+- src/heat-shields.mjs, public/heat-shields.css: příslušenství pro oba modely v CS/EN, nerezové štíty po jednotlivých dílech, schválený sestavený náhled a varianta s vysunutým zadním dílem. Vysunutí slouží jen k vysvětlení modularity. Obě vizualizace jsou také v produktových galeriích; konkrétní bezpečnostní odstupy a jejich snížení zde nejsou odhadované.
 - src/seo.mjs: samostatné titulky a popisy homepage a produktů v češtině a angličtině. Viditelný H1 homepage je oddělený od velkého grafického sloganu.
 - src/hybrid.mjs, public/hybrid.css: stránka Proč hybrid / Why hybrid s mood fotografií, krátkými příklady použití a společným FAQ; CSS se načítá jen na této stránce.
 - src/project.mjs, public/project.css: osobní příběh WATRA v CS/EN, stavba rodinné sauny, prototyp, rodinné testování v sezóně 2025/26 a vzpomínka na Jiřího Novotného. Předběžná zkouška je odlišená od probíhající certifikace; termín prodeje přebírá konfiguraci. Fotografie sauna-frame/front/timber pocházejí z IMG_0087/0088/0092, jejich JPEG originály zůstávají mimo repozitář a web načítá WebP ve třech velikostech.

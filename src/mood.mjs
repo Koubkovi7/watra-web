@@ -1,3 +1,4 @@
+import {heatShieldPhotos, heatShieldImage} from './heat-shields.mjs';
 const text = (lang, cs, en) => lang === 'cs' ? cs : en;
 
 export const moodPhotos = {
@@ -36,10 +37,10 @@ export function productGallery(lang, studioImage, isHybrid = false) {
     rear: text(lang, 'Ateliér · IRIKON zezadu', 'Studio · IRIKON rear view')
   };
   const moods = isHybrid ? ['mood5', 'mood3', 'mood4', 'mood1', 'mood2'] : ['mood3', 'mood4', 'mood1', 'mood2', 'mood6'];
-  const names = ['portraitStove', ...moods, 'front', 'side', 'rear'];
+  const names = ['portraitStove', ...moods, 'heatShields', 'heatShieldsExploded', 'front', 'side', 'rear'];
   const thumbnails = names.map((name, i) => {
-    const caption = moodPhotos[name]?.[lang] || studio[name];
-    const photo = moodPhotos[name] ? moodImage(name, lang, { sizes: '90px' }) : studioImage(name, caption).replace('sizes="(max-width: 700px) 100vw, 55vw"', 'sizes="90px"');
+    const caption = moodPhotos[name]?.[lang] || heatShieldPhotos[name]?.[lang] || studio[name];
+    const photo = heatShieldPhotos[name] ? heatShieldImage(name, lang, {sizes:'90px'}) : moodPhotos[name] ? moodImage(name, lang, { sizes: '90px' }) : studioImage(name, caption).replace('sizes="(max-width: 700px) 100vw, 55vw"', 'sizes="90px"');
     return `<button type="button" data-photo="${name}" data-caption="${caption}" aria-label="${caption}" aria-pressed="${i === 0}">${photo}</button>`;
   }).join('');
   return `<div class="product-gallery gallery-with-mood"><a href="/media/portraitStove-1600.webp" class="gallery-main" data-gallery>${studioImage('portraitStove', studio.portraitStove, '', true)}</a><p class="gallery-caption" data-gallery-caption aria-live="polite">${studio.portraitStove}</p><div class="thumbnails" role="group" aria-label="${text(lang, 'Ateliérové fotografie a vizualizace sauny', 'Studio photographs and sauna visualizations')}">${thumbnails}</div></div>`;

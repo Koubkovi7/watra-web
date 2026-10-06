@@ -1,0 +1,10 @@
+.heat-shields{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:80px;align-items:center;border-top:1px solid var(--line)}
+.heat-shields-figure{min-width:0}
+.heat-shields-figure>a{display:block;border-radius:18px;overflow:hidden;cursor:zoom-in;background:var(--bg)}
+.heat-shields-figure img{display:block;width:100%;height:auto;max-height:700px;object-fit:contain}
+.heat-shields-figure figcaption{font-size:12px;line-height:1.6;padding:12px 0 0}
+.heat-shields-copy{max-width:470px}
+.heat-shields-copy h2{font-size:clamp(32px,3.1vw,46px);line-height:1.15}
+.heat-shields-copy>p:not(.eyebrow){max-width:430px}
+@media(max-width:1000px){.heat-shields{gap:40px}}
+@media(max-width:760px){.heat-shields{grid-template-columns:1fr;gap:30px}.heat-shields-figure>a{border-radius:16px}.heat-shields-figure img{max-height:560px}.heat-shields-copy{max-width:none}.heat-shields-copy h2{font-size:36px}.heat-shields-copy>p:not(.eyebrow){max-width:none}}
