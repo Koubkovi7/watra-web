@@ -29,7 +29,7 @@ export function modelCards(l){
 }
 
 export function modelCollection(l){
- return '<section class="collection wrap range-collection" id="kolekce"><div class="range-heading"><div><p class="eyebrow">'+text(l,'Kolekce IRIKON','The IRIKON collection')+'</p><h2>'+text(l,'Jedna saunová kamna.<br><em>Dvě cesty k teplu.</em>','One WATRA.<br><em>Two ways to warmth.</em>')+'</h2></div><a class="text-link" href="/'+l+'/'+(l==='cs'?'modely/':'models/')+'">'+text(l,'Porovnat modely','Compare models')+'</a></div>'+modelCards(l)+'</section>';
+ return '<section class="collection wrap range-collection" id="kolekce"><div class="range-heading"><div><p class="eyebrow">'+text(l,'Kolekce IRIKON','The IRIKON collection')+'</p><h2>'+text(l,'Saunová kamna<br><em>na dřevo a elektřinu.</em>','One WATRA.<br><em>Two ways to warmth.</em>')+'</h2></div><a class="text-link" href="/'+l+'/'+(l==='cs'?'modely/':'models/')+'">'+text(l,'Porovnat modely','Compare models')+'</a></div>'+modelCards(l)+'</section>';
 }
 
 export function modelComparison(l,{collapsible=false}={}){
