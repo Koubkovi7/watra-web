@@ -18,7 +18,7 @@ export function renderProject(lang, config) {
       <div class="project-hero-copy">
         <p class="eyebrow">${t('Příběh WATRA / od roku 2024', 'The WATRA story / since 2024')}</p>
         <h1 id="project-title">${t('Začalo to saunou.<br><em>A jednou otázkou.</em>', 'It started with a sauna.<br><em>And one question.</em>')}</h1>
-        <p class="project-lead">${t('Saunová kamna na dřevo, nebo na elektřinu? Chtěl jsem atmosféru ohně i pohodlí elektrického vytápění. A nechtěl jsem se jednoho vzdát.', 'A wood-fired sauna heater, or an electric one? I wanted the atmosphere of a fire and the convenience of electric heating. And I did not want to give either up.')}</p>
+        <p class="project-lead">${t('Saunová kamna na dřevo, nebo na elektřinu? Chtěl jsem obojí. Tak vznikla česká saunová kamna WATRA, která spojují atmosféru ohně a pohodlí elektrického vytápění.', 'A wood-fired sauna heater, or an electric one? I wanted the atmosphere of a fire and the convenience of electric heating. And I did not want to give either up.')}</p>
         <p class="project-byline"><span>Richard Koubek</span>${t('Zakladatel WATRA', 'Founder of WATRA')}</p>
         <a class="text-link" href="#zacatek">${t('Jak vznikla hybridní saunová kamna', 'How the hybrid sauna heater began')}</a>
       </div>

@@ -26,8 +26,8 @@ export function renderHybrid(l,faq,launchDate){
     <section class="hy-hero wrap">
       <div class="hy-hero-copy">
         <p class="eyebrow"><span class="hy-name">IRIKON <span class="hy-plus">+e</span></span> / ${t(l,'Proč hybrid','Why hybrid')}</p>
-        <h1>${t(l,'Atmosféra kamen na dřevo.<br><em>Pohodlí elektrického ohřevu.</em>','The atmosphere of a wood fire.<br><em>The convenience of electric heat.</em>')}</h1>
-        <p class="hy-lead">${t(l,'Hybridní saunová kamna IRIKON +e spojují vytápění dřevem a elektrický ohřev. Oba zdroje fungují samostatně i společně.', 'IRIKON +e hybrid sauna heaters combine wood-fired and electric heating. The two heat sources work independently or together.')}</p>
+        <h1>${t(l,'Hybridní saunová kamna.<br><em>Dřevo i elektřina.</em>','The atmosphere of a wood fire.<br><em>The convenience of electric heat.</em>')}</h1>
+        <p class="hy-lead">${t(l,'WATRA IRIKON +e jsou saunová kamna na elektřinu a dřevo v jednom zařízení. Spalovací část a elektrická topná tělesa fungují nezávisle — samostatně i společně.', 'IRIKON +e hybrid sauna heaters combine wood-fired and electric heating. The two heat sources work independently or together.')}</p>
         <a class="text-link" href="#situace">${t(l,'Kdy se hybrid hodí','When hybrid makes a difference')}</a>
       </div>
       <figure class="hy-hero-photo">${moodImage('mood5',l,{eager:true,sizes:'(max-width: 900px) calc(100vw - 40px), 52vw'})}<figcaption>${t(l,'Vizualizace sauny · WATRA IRIKON +e','Sauna visualization · WATRA IRIKON +e')}</figcaption></figure>

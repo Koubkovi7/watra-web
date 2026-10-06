@@ -7,7 +7,7 @@ const modelDescriptions={
   en:'Wood-fired sauna heater prepared for electric heating. An upgrade to the hybrid IRIKON +e can be added later.'
  },
  'irikon-e':{
-  cs:'Dřevo, elektřina nebo oba zdroje pro rychlejší nahřátí. S kompatibilním regulátorem spustíte elektrický ohřev i na dálku.',
+  cs:'Saunová kamna na elektřinu a dřevo. Oba zdroje mohou nahřívat společně; s kompatibilní regulací lze elektrický ohřev spustit i na dálku.',
   en:'Wood, electricity, or both for a faster warm-up. Start electric heating remotely with a compatible controller.'
  }
 };
