@@ -42,12 +42,13 @@
   $$('[data-photo]').forEach(button => button.addEventListener('click', () => {
     const name = button.dataset.photo;
     if(!['portraitStove','front','side','rear','mood1','mood2','mood3','mood4','mood5','mood6'].includes(name)) return;
-    const main = $('.gallery-main'), photo = $('img',main);
+    const main = $('.gallery-main'), photo = $('img',main), thumbnail = $('img',button);
     main.dataset.photoKind = name.startsWith('mood') ? 'mood' : 'studio';
-    showPhoto(photo,'/media/' + name + '-960.webp',$('img',button).srcset,main);
+    showPhoto(photo,thumbnail.src,thumbnail.srcset,main);
     const caption = $('[data-gallery-caption]');
     if(caption) caption.textContent = button.dataset.caption || $('img',button).alt;
-    photo.alt = $('img',button).alt; main.href = '/media/' + name + '-1600.webp';
+    photo.alt = thumbnail.alt;
+    main.href = thumbnail.srcset.split(',').map(candidate => candidate.trim().split(/\s+/)[0]).find(src => src.includes('/media/' + name + '-1600.webp')) || '/media/' + name + '-1600.webp';
     $$('[data-photo]').forEach(b => b.setAttribute('aria-pressed',String(b === button)));
   }));
   $$('[data-gallery]').forEach(a => a.addEventListener('click', e => {
