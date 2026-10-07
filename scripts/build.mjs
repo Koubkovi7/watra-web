@@ -23,16 +23,16 @@ await writeFile(path.join(output,'site-config.json'),JSON.stringify({email:confi
 await writeFile(path.join(output,'sitemap.xml'),'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+['cs','en'].flatMap(l=>Object.keys(routes).filter(k=>!['thanks','notfound'].includes(k)).map(k=>'<url><loc>'+config.origin+'/'+l+'/'+routes[k][l]+'</loc></url>')).join('')+'</urlset>');
 await writeFile(path.join(output,'robots.txt'),'User-agent: *\nAllow: /\nSitemap: '+config.origin+'/sitemap.xml\n');
 await writeFile(path.join(output,'_routes.json'),JSON.stringify({version:1,include:['/','/tv','/tv/'],exclude:[]}));
-// A changed stylesheet gets a new URL, including for returning visitors.
-const styleVersions=new Map();
-for(const file of await readdir(output)) if(file.endsWith('.css')) {
- styleVersions.set(file,createHash('sha256').update(await readFile(path.join(output,file))).digest('hex').slice(0,12));
+// Changed styles and scripts get new URLs, including for returning visitors.
+const clientVersions=new Map();
+for(const file of await readdir(output)) if(file.endsWith('.css') || file.endsWith('.js')) {
+ clientVersions.set(file,createHash('sha256').update(await readFile(path.join(output,file))).digest('hex').slice(0,12));
 }
 const mediaVersions=new Map();
 for(const file of await readdir(path.join(output,'media'))) if(file.endsWith('.webp')) mediaVersions.set(file,createHash('sha256').update(await readFile(path.join(output,'media',file))).digest('hex').slice(0,12));
 for(const file of await readdir(output,{recursive:true})) if(file.endsWith('.html')) {
  const location=path.join(output,file),html=await readFile(location,'utf8');
- const versioned=html.replace(/href="\/([a-z0-9-]+\.css)(?:\?[^"]*)?"/g,(match,css)=>styleVersions.has(css)?'href="/'+css+'?v='+styleVersions.get(css)+'"':match);
+ const versioned=html.replace(/\b(href|src)="\/([a-z0-9-]+\.(?:css|js))(?:\?[^"]*)?"/g,(match,attribute,file)=>clientVersions.has(file)?attribute+'="/'+file+'?v='+clientVersions.get(file)+'"':match);
  const withMedia=versioned.replace(/\/media\/([a-zA-Z0-9-]+\.webp)(?!\?)/g,(match,file)=>mediaVersions.has(file)?match+'?v='+mediaVersions.get(file):match);
  if(withMedia!==html) await writeFile(location,withMedia);
 }
