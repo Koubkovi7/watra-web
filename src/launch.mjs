@@ -13,7 +13,7 @@ export const launchSection=(l,c)=>`<section class="launch-section"><div class="w
 
 export function launchDialog(l,c){
   const ready=launchReady(c);
-  const consent=pick(l,'Souhlasím se zasláním zprávy o zahájení prodeje a s kontaktováním ohledně mého zájmu o kamna WATRA.','I agree to receive a sales launch notification and to be contacted about my interest in WATRA sauna heaters.');
+  const consent=pick(l,'Souhlasím se zasláním zprávy o zahájení prodeje e-mailem a s kontaktováním e-mailem nebo telefonicky ohledně mého zájmu o kamna WATRA.','I agree to receive a sales launch notification by email and to be contacted by email or phone about my interest in WATRA sauna heaters.');
   const mail=c.email?`<a data-event="email_click" href="mailto:${escape(c.email)}?subject=${encodeURIComponent(pick(l,'Zájem o zahájení prodeje WATRA','WATRA sales launch interest'))}">${escape(c.email)}</a>`:'';
   return `<dialog id="launch-dialog" aria-labelledby="launch-title" aria-describedby="launch-description" data-clarity-mask="true">
     <div class="launch-popup">
@@ -23,25 +23,27 @@ export function launchDialog(l,c){
         <div class="launch-signup">
           <p class="eyebrow">${pick(l,'WATRA / Buďte u začátku','WATRA / Be there from the start')}</p>
           <h2 id="launch-title">${pick(l,'Vaše sauna.<br><em>Už brzy.</em>','Your sauna.<br><em>Coming soon.</em>')}</h2>
-          <p id="launch-description">${pick(l,'Nechte nám e-mail. Ozveme se vám při zahájení prodeje a případně spolu probereme váš zájem o kamna WATRA.','Leave your email. We’ll let you know when sales begin and can discuss your interest in WATRA sauna heaters.')}</p>
+          <p id="launch-description">${pick(l,'Nechte nám e-mail a telefon. Ozveme se vám při zahájení prodeje a případně spolu probereme váš zájem o kamna WATRA.','Leave your email and phone number. We’ll let you know when sales begin and can discuss your interest in WATRA sauna heaters.')}</p>
           <p class="launch-sale-date">${pick(l,'Plánovaný prodej:','Planned sales launch:')} ${launchMonth(l,c)}</p>
           <p class="launch-cert-note">${pick(l,'Certifikace právě probíhá. Prodej zahájíme po jejím úspěšném dokončení. Termín se může změnit.','Certification is in progress. Sales will begin after successful certification. The planned date may change.')}</p>
           ${!ready?`<div class="launch-unavailable" role="note">${pick(l,'Automatické přihlášení připravujeme. Zájem nám zatím můžete napsat přímo:','Email signup is coming soon. For now, tell us about your interest directly:')} ${mail||`<a href="${contact(l)}">${pick(l,'Kontakt','Contact')}</a>`}</div>`:''}
           <form id="launch-form" data-ready="${ready}" ${ready?`action="https://formspree.io/f/${escape(c.formspreeId)}" method="post"`:''}${formDomainAttribute(c)}>
             ${formDomainNotice(l,c,'home')}
             <fieldset ${!ready?'disabled':''}>
-              <label for="launch-email">${pick(l,'Váš e-mail','Your email')}</label>
+              <label for="launch-email">${pick(l,'Váš e-mail','Your email')} <span>*</span></label>
               <input id="launch-email" name="email" type="email" autocomplete="email" inputmode="email" maxlength="254" placeholder="${pick(l,'vas@email.cz','you@example.com')}" required>
+              <label for="launch-phone">${pick(l,'Váš telefon','Your phone')} <span>*</span></label>
+              <input id="launch-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="40" required>
               <label class="launch-consent"><input name="contact_consent" type="checkbox" value="yes" required><span>${consent}</span></label>
               <input type="hidden" name="lead_type" value="launch_notification">
               <input type="hidden" name="language" value="${l}">
               <input type="hidden" name="source_page" value="/${l}/">
-              <input type="hidden" name="consent_version" value="launch-2026-09-10">
+              <input type="hidden" name="consent_version" value="launch-2026-10-19">
               <input type="hidden" name="consent_text" value="${escape(consent)}">
               <div class="honey" aria-hidden="true"><label>Leave empty<input name="_gotcha" tabindex="-1" autocomplete="off"></label></div>
               <button type="submit" class="button" ${!ready?'disabled':''}>${pick(l,'Dejte mi vědět','Keep me informed')}</button>
             </fieldset>
-            <p class="launch-privacy">${pick(l,'Bez platby a závazku. Souhlas můžete kdykoli odvolat.','No payment or commitment. You can withdraw your consent at any time.')}<br><a href="${privacy(l)}">${pick(l,'Jak použijeme váš e-mail','How we use your email')}</a>${ready?`<br>${mail}`:''}</p>
+            <p class="launch-privacy">${pick(l,'Bez platby a závazku. Souhlas můžete kdykoli odvolat.','No payment or commitment. You can withdraw your consent at any time.')}<br><a href="${privacy(l)}">${pick(l,'Jak použijeme vaše údaje','How we use your details')}</a>${ready?`<br>${mail}`:''}</p>
             <p id="launch-status" role="status" aria-live="polite" tabindex="-1"></p>
           </form>
           <button class="launch-later" type="button" data-launch-close>${pick(l,'Zatím si chci prohlédnout kamna','I’d like to explore the heaters first')}</button>
