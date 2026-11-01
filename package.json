@@ -5,7 +5,9 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "dev": "node scripts/serve.mjs",
-    "test": "node --test tests/*.test.mjs"
+    "test": "node scripts/test.mjs",
+    "mode:teaser": "node scripts/site-mode.mjs teaser",
+    "mode:full": "node scripts/site-mode.mjs full"
   },
   "engines": {
     "node": ">=22"

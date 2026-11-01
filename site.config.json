@@ -19,5 +19,8 @@
   "privacyApproved": true,
   "crispWebsiteId": "5e9c1294-73b7-47e5-bfdd-44e0d7ab1fb1",
   "retentionEn": "We keep contact details of enquirers who do not become customers only as long as needed to handle their interest, and for no longer than 12 months after the last communication.",
-  "formDomain": "watra.cz"
+  "formDomain": "watra.cz",
+  "siteMode": "teaser",
+  "teaserFormEnabled": true,
+  "turnstileSiteKey": "0x4AAAAAAFvisV6p8bMn7qVj"
 }

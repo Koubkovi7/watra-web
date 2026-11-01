@@ -61,3 +61,14 @@ WatraLoading.start(container, {label, overlay, variant}) vrací funkci pro ukon�
 Formspree: projekt WATRA, veřejné ID mppzbljw, cílový e-mail richard@watra.cz. Stejný formulář přijímá kontaktní poptávky a launch_notification z homepage. Formspree omezuje příjem na watra.cz a subdomény; app.js podle data-domain na jiných hostitelích vypne odesílání a ukáže odkaz na produkci. Lokální testy neobcházejí toto omezení.
 
 src/privacy.mjs obsahuje CS/EN informace o skutečném zpracování; retention a retentionEn v site.config.json obsahují odsouhlasených nejvýše 12 měsíců od poslední komunikace. Tato informace sama nemaže externí e-maily ani exporty. Provozní kroky a limity jsou v SLUZBY-A-SPUSTENI.md.
+
+
+## Dočasná teaser stránka
+
+Režim určuje siteMode v site.config.json. `teaser` publikuje pouze schválenou úvodní stránku v CS/EN, informace o soukromí a potvrzení kontaktu. Původní prezentace včetně zdrojů, stylů a fotografií zůstává v repozitáři; v tomto režimu se produktové podstránky ani fotografie nekopírují do nasazení. Staré známé adresy mají dočasné přesměrování 302.
+
+Návrat k plné prezentaci: `npm run mode:full`, potom `npm run build`, kontrola a zveřejnění konfigurace ve větvi redesign. Teaser: `npm run mode:teaser`. Jednorázové místní ověření bez změny konfigurace umožňuje proměnná WATRA_SITE_MODE=full nebo teaser. `npm test` ověřuje obě sestavení a na konci ponechá sestavení podle zvoleného režimu.
+
+Příjem teaseru zajišťuje Worker services/forms, soukromá databáze Cloudflare D1 v EU a neviditelný Turnstile. Úspěch se vrací až po uložení. Opakovaný požadavek se stejným UUID a obsahem nevytváří další kontakt. Pole e-mail, telefon a souhlas se ověřují také na serveru. Tajné klíče patří výhradně do Cloudflare Secrets; veřejná konfigurace obsahuje pouze sitekey. Google CRM a e-mailová upozornění zatím nejsou připojené: ověřené kontakty jsou dostupné správci v D1, nikoli veřejně.
+
+Worker se spravuje odděleně od statického webu. Nové nasazení statických stránek samo nezveřejní změny Workeru. Změny backendu vyžadují kontrolu, testy a samostatné nasazení přes jeho wrangler.jsonc. Databázové migrace jsou v services/forms/migrations. Soukromé koncové body /api/watra/crm/* vyžadují CRM_SYNC_SECRET a nesmějí být propojené z veřejné stránky.

@@ -1,0 +1,34 @@
+{
+  "name": "watra-forms",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-10-21",
+  "workers_dev": false,
+  "vars": {
+    "ALLOWED_ORIGINS": "https://watra.cz,https://www.watra.cz",
+    "THANKS_ORIGIN": "https://watra.cz",
+    "PUBLIC_ENABLED": "true",
+    "MAX_PER_TEN_MINUTES": "30"
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 0.1
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "watra-project-contacts",
+      "database_id": "dceb4e83-7138-4565-86a8-3223d620ad37"
+    }
+  ],
+  "account_id": "0499bc00e2a762619aa7e81c701297b6",
+  "routes": [
+    {
+      "pattern": "watra.cz/api/watra/*",
+      "zone_name": "watra.cz"
+    },
+    {
+      "pattern": "www.watra.cz/api/watra/*",
+      "zone_name": "watra.cz"
+    }
+  ]
+}
