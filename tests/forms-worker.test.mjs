@@ -3,9 +3,10 @@ import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
 import {readFile} from 'node:fs/promises';
 import {handleRequest} from '../services/forms/worker.mjs';
+import {dispatchPendingNotifications,notifyEnquiry} from '../services/forms/notifications.mjs';
 import {teaserConsent,teaserConsentVersion,renderTeaser} from '../src/teaser.mjs';
 
-const schema=await readFile('services/forms/migrations/0001_enquiries.sql','utf8');
+const schema=(await readFile('services/forms/migrations/0001_enquiries.sql','utf8')) + '\n' + (await readFile('services/forms/migrations/0002_notifications.sql','utf8'));
 const config=JSON.parse(await readFile('site.config.json','utf8'));
 function database(){
   const sql=new DatabaseSync(':memory:');sql.exec(schema);
@@ -102,4 +103,56 @@ test('oversized and unsupported request bodies are rejected before verification'
   const c=context();assert.equal((await c.send({...c.record(),message:'x'.repeat(17000)})).status,413);
   const request=new Request('https://watra.cz/api/watra/enquiries',{method:'POST',headers:{Origin:'https://watra.cz','Content-Type':'text/plain'},body:'test'});
   assert.equal((await handleRequest(request,c.env,c.dependencies)).status,415);assert.equal(c.calls(),0);
+});
+
+test('notification sends only to the owner after storage and cannot send twice concurrently',async()=>{
+  const messages=[],jobs=[],c=context({EMAIL_NOTIFICATIONS_ENABLED:'true',NOTIFY_EMAIL:{async send(message){messages.push(message);return {messageId:'provider-1'};}}});
+  c.dependencies.waitUntil=promise=>jobs.push(promise);
+  const data=c.record();
+  assert.equal((await c.send(data)).status,200);
+  await Promise.all([Promise.all(jobs),notifyEnquiry(data._request_id,c.env)]);
+  assert.equal(messages.length,1);assert.equal(messages[0].to,'richard@watra.cz');assert.equal(messages[0].replyTo,data.email);
+  assert.equal(messages[0].from.email,'formular@watra.cz');assert.ok(messages[0].text.includes(data.phone));
+  const row=c.DB.sql.prepare('SELECT * FROM enquiries').get();
+  assert.equal(row.notification_state,'sent');assert.equal(row.notification_message_id,'provider-1');
+  await c.send(data);await Promise.all(jobs);await dispatchPendingNotifications(c.env);assert.equal(messages.length,1);
+});
+
+test('mail failure leaves the contact stored and retries later without blocking intake',async()=>{
+  const jobs=[],c=context({EMAIL_NOTIFICATIONS_ENABLED:'true',NOTIFY_EMAIL:{async send(){throw Object.assign(Error('private provider detail'),{code:'E_INTERNAL_SERVER_ERROR'});}}});
+  c.dependencies.waitUntil=promise=>jobs.push(promise);
+  const data=c.record();assert.equal((await c.send(data)).status,200);await Promise.all(jobs);
+  const row=c.DB.sql.prepare('SELECT * FROM enquiries').get();assert.equal(row.notification_state,'pending');assert.equal(row.notification_attempts,1);
+  assert.equal(row.notification_error_code,'E_INTERNAL_SERVER_ERROR');assert.ok(row.notification_next_at > new Date().toISOString());
+  let calls=0;c.env.NOTIFY_EMAIL.send=async()=>{calls++;return {messageId:'retry-accepted'};};
+  await dispatchPendingNotifications(c.env);assert.equal(calls,0);
+  c.DB.sql.prepare('UPDATE enquiries SET notification_next_at = NULL').run();await dispatchPendingNotifications(c.env);
+  assert.equal(calls,1);assert.equal(c.DB.sql.prepare('SELECT notification_state FROM enquiries').get().notification_state,'sent');
+});
+
+test('unconfirmed or repeatedly failed email stays visible for manual attention',async()=>{
+  const c=context({EMAIL_NOTIFICATIONS_ENABLED:'true',NOTIFY_EMAIL:{async send(){return {};}}});
+  const data=c.record();await c.send(data);await notifyEnquiry(data._request_id,c.env);
+  assert.equal(c.DB.sql.prepare('SELECT notification_state FROM enquiries').get().notification_state,'uncertain');
+  c.DB.sql.prepare("UPDATE enquiries SET notification_state='pending', notification_attempts=4").run();
+  c.env.NOTIFY_EMAIL.send=async()=>{throw Error('do not record private detail');};await notifyEnquiry(data._request_id,c.env);
+  const row=c.DB.sql.prepare('SELECT * FROM enquiries').get();assert.equal(row.notification_state,'uncertain');assert.equal(row.notification_error_code,'E_SEND_FAILED');
+});
+
+test('failed durable storage never queues an email notification',async()=>{
+  const jobs=[],c=context({EMAIL_NOTIFICATIONS_ENABLED:'true',NOTIFY_EMAIL:{async send(){assert.fail('cannot mail an unaccepted contact');}}});
+  c.dependencies.waitUntil=promise=>jobs.push(promise);
+  const db=c.env.DB;c.env.DB={prepare(query){if(query.startsWith('INSERT INTO enquiries'))throw Error('storage failure');return db.prepare(query);}};
+  const original=console.error;console.error=()=>{};
+  try {assert.equal((await c.send(c.record())).status,503);}finally{console.error=original;}
+  assert.equal(jobs.length,0);
+});
+
+test('mail delivery test requires private authentication and always targets the owner',async()=>{
+  const messages=[],c=context({NOTIFY_EMAIL:{async send(message){messages.push(message);return {messageId:'test-accepted'};}}});
+  const url='https://watra.cz/api/watra/crm/test-email';
+  const make=authorized=>new Request(url,{method:'POST',headers:{'Content-Type':'application/json',...(authorized?{Authorization:'Bearer '+c.env.CRM_SYNC_SECRET}:{})},body:JSON.stringify({confirm:'send-to-richard@watra.cz',to:'other@example.test'})});
+  assert.equal((await handleRequest(make(false),c.env)).status,401);assert.equal(messages.length,0);
+  assert.equal((await handleRequest(make(true),c.env)).status,200);assert.equal(messages.length,1);
+  assert.equal(messages[0].to,'richard@watra.cz');assert.match(messages[0].subject,/\[TEST\]/);
 });

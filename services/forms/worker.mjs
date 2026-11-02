@@ -1,4 +1,5 @@
 import {teaserConsent, teaserConsentVersion} from '../../src/teaser.mjs';
+import {dispatchPendingNotifications, scheduleNotification} from './notifications.mjs';
 const PREFIX = '/api/watra';
 const MAX_BODY = 16000;
 const TYPES = ['customer', 'manufacturer', 'business', 'technical', 'launch_notification', 'project_update'];
@@ -96,7 +97,11 @@ async function submit(request, env, dependencies) {
   const {requestId, payload, token} = submission;
   const fingerprint = await digest(JSON.stringify(payload));
   const stored = await env.DB.prepare('SELECT fingerprint FROM enquiries WHERE request_id = ?').bind(requestId).first();
-  if (stored) return stored.fingerprint === fingerprint ? json({ok: true, request_id: requestId, duplicate: true}) : failure('request-conflict', 409);
+  if (stored) {
+    if (stored.fingerprint !== fingerprint) return failure('request-conflict', 409);
+    scheduleNotification(requestId, env, dependencies.waitUntil);
+    return json({ok: true, request_id: requestId, duplicate: true});
+  }
   const verify = await (dependencies.fetch || fetch)('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
     method: 'POST', body: new URLSearchParams({secret: env.TURNSTILE_SECRET, response: token, ...(request.headers.get('cf-connecting-ip') ? {remoteip: request.headers.get('cf-connecting-ip')} : {}), idempotency_key: crypto.randomUUID()})
   });
@@ -115,6 +120,7 @@ async function submit(request, env, dependencies) {
     .bind(requestId, fingerprint, now, JSON.stringify(payload)).run();
   const confirmed = await env.DB.prepare('SELECT fingerprint FROM enquiries WHERE request_id = ?').bind(requestId).first();
   if (!confirmed || confirmed.fingerprint !== fingerprint) return failure('request-conflict', 409);
+  scheduleNotification(requestId, env, dependencies.waitUntil);
   if (!(request.headers.get('accept') || '').includes('application/json')) {
     return new Response(null, {status: 303, headers: {'Location': (env.THANKS_ORIGIN || 'https://watra.cz') + (payload.language === 'cs' ? '/cs/dekujeme/' : '/en/thank-you/'), 'Cache-Control': 'no-store'}});
   }
@@ -124,9 +130,25 @@ async function submit(request, env, dependencies) {
 async function bridge(request, env, path) {
   if (!await authenticate(request, env)) return failure('unauthorized', 401);
   if (!env.DB) return failure('unavailable', 503);
+  if (path === PREFIX + '/crm/test-email' && request.method === 'POST') {
+    let data;
+    try {data = await readBody(request);} catch {return failure('invalid-fields');}
+    if (data.confirm !== 'send-to-richard@watra.cz') return failure('invalid-fields');
+    if (!env.NOTIFY_EMAIL) return failure('email-unavailable', 503);
+    try {
+      const result = await env.NOTIFY_EMAIL.send({
+        to: 'richard@watra.cz', from: {email: env.NOTIFY_FROM || 'formular@watra.cz', name: 'WATRA – webový formulář'},
+        replyTo: 'richard@watra.cz', subject: '[TEST] WATRA – upozornění z webového formuláře',
+        text: 'Toto je označený test doručení upozornění z webu WATRA.\n\nPo zapnutí upozornění sem budou chodit kontakty zájemců: e-mail, telefon, jazyk a čas přijetí. Kontakty zůstanou zároveň uložené v soukromém úložišti.\n\nTato zpráva neobsahuje skutečný kontakt zákazníka.'
+      });
+      return json({ok: true, accepted: true, message_id: result?.messageId || null});
+    } catch (error) {
+      return failure(typeof error?.code === 'string' && /^[A-Z_]+$/.test(error.code) ? error.code : 'email-send-failed', 502);
+    }
+  }
   if (path === PREFIX + '/crm/health' && request.method === 'GET') {
-    const counts = await env.DB.prepare("SELECT COUNT(*) AS total, COALESCE(SUM(CASE WHEN crm_synced_at IS NULL THEN 1 ELSE 0 END), 0) AS pending, COALESCE(SUM(CASE WHEN notification_state = 'uncertain' THEN 1 ELSE 0 END), 0) AS uncertain FROM enquiries").first();
-    return json({ok: true, ...counts});
+    const counts = await env.DB.prepare("SELECT COUNT(*) AS total, COALESCE(SUM(CASE WHEN crm_synced_at IS NULL THEN 1 ELSE 0 END), 0) AS pending, COALESCE(SUM(CASE WHEN notification_state = 'pending' THEN 1 ELSE 0 END), 0) AS pending_notifications, COALESCE(SUM(CASE WHEN notification_state = 'sent' THEN 1 ELSE 0 END), 0) AS sent_notifications, COALESCE(SUM(CASE WHEN notification_state = 'uncertain' THEN 1 ELSE 0 END), 0) AS uncertain FROM enquiries").first();
+    return json({ok: true, notifications_enabled: env.EMAIL_NOTIFICATIONS_ENABLED === 'true', ...counts});
   }
   if (path === PREFIX + '/crm/pending' && request.method === 'GET') {
     const result = await env.DB.prepare("SELECT request_id, received_at, payload, crm_synced_at, notification_state FROM enquiries WHERE crm_synced_at IS NULL OR notification_state = 'pending' ORDER BY received_at, request_id LIMIT 25").all();
@@ -158,4 +180,7 @@ export async function handleRequest(request, env, dependencies = {}) {
   }
 }
 
-export default {fetch: handleRequest};
+export default {
+  fetch(request, env, ctx) { return handleRequest(request, env, {waitUntil: promise => ctx.waitUntil(promise)}); },
+  scheduled(_event, env, ctx) { ctx.waitUntil(dispatchPendingNotifications(env)); }
+};

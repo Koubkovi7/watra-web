@@ -3,12 +3,16 @@
   "main": "worker.mjs",
   "compatibility_date": "2026-10-21",
   "workers_dev": false,
+  "send_email": [{"name": "NOTIFY_EMAIL", "destination_address": "richard@watra.cz"}],
   "vars": {
     "ALLOWED_ORIGINS": "https://watra.cz,https://www.watra.cz",
     "THANKS_ORIGIN": "https://watra.cz",
     "PUBLIC_ENABLED": "true",
-    "MAX_PER_TEN_MINUTES": "30"
+    "MAX_PER_TEN_MINUTES": "30",
+    "EMAIL_NOTIFICATIONS_ENABLED": "true",
+    "NOTIFY_FROM": "formular@watra.cz"
   },
+  "triggers": {"crons": ["*/5 * * * *"]},
   "observability": {
     "enabled": true,
     "head_sampling_rate": 0.1
