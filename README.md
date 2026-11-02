@@ -84,3 +84,5 @@ Soukromý POST /api/watra/crm/test-email vyžaduje CRM_SYNC_SECRET a JSON {"conf
 Poštovní DNS ověřené 2. 11. 2026: SPF obsahuje Google Workspace i include:_spf.mx.cloudflare.net, cf2024-1._domainkey obsahuje 2048bitový veřejný klíč poskytnutý Cloudflare a _dmarc má úvodní zásadu v=DMARC1; p=none;. MX směřuje na smtp.google.com. Záznamy byly ověřené přes veřejné DNS Googlu. Správné ověření odesílatele zvyšuje důvěryhodnost zpráv, ale samo nezaručuje zařazení do Doručené pošty.
 
 Živý test z 2. 11. 2026 v 21:08 SEČ byl doručen za tři sekundy do Doručené pošty. SPF prošlo. Google v okamžiku přijetí ještě uváděl no key for signature pro cf2024-1 na watra.cz a DMARC FAIL, ačkoli veřejné DNS Googlu už vracelo nově doplněný DKIM i DMARC; pravděpodobnou příčinou je dříve uložená negativní odpověď v mezipaměti příjmu. Tato kontrola sama tedy nepotvrzuje dokončení propagace podpisu u přijímajícího serveru.
+
+Automatické zpracování uloženého syntetického kontaktu bylo ověřené 2. 11. 2026: upozornění dorazilo v 21:10 SEČ do Doručené pošty a stav v D1 přešel na sent. Nový časovač se může po nasazení podle dokumentace Cloudflare šířit až 15 minut.
