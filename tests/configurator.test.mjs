@@ -49,4 +49,5 @@ test('configurator script respects analytics consent and the page language',asyn
   assert.match(js,/localStorage\.getItem\('watra_consent'\)/);
   assert.match(js,/document\.documentElement\.lang/);
   assert.ok(js.includes("tr('/cs/kontakt/', '/en/contact/')"));
+  assert.match(js,/const HASH_ENUM = \{sw: WALLS4, dw: WALLS4, ww: WALLS4, win:/,'unknown values in a shared link fall back to defaults');
 });
