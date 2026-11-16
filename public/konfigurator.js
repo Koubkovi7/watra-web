@@ -62,7 +62,13 @@ function readHash() {
   S.w = clamp(S.w, 120, 400); S.d = clamp(S.d, 120, 400); S.h = clamp(S.h, 180, 260);
   if (!D_.models[S.m]) S.m = 'e';
   S.rot = ((Math.round(S.rot) % 4) + 4) % 4; S.sh = clamp(Math.round(S.sh), 0, 3);
+  // odkaz je vstup zvenčí: neznámá hodnota (překlep, podvržený odkaz) = výchozí, jinak by konfigurátor spadl
+  for (const k in HASH_ENUM) if (!HASH_ENUM[k].includes(S[k])) S[k] = DEF[k];
+  S.sp = clamp(Math.round(S.sp), 0, 100); S.dp = clamp(Math.round(S.dp), 0, 100);
+  for (const k of ['ub', 'ul', 'ur', 'lb', 'll', 'lr', 'dg', 'ppl']) S[k] = S[k] ? 1 : 0;
 }
+const WALLS4 = ['left', 'back', 'right', 'front'];
+const HASH_ENUM = {sw: WALLS4, dw: WALLS4, ww: WALLS4, win: ['none', 'small', 'big', 'wall'], mw: ['wood', 'masonry'], fx: ['wood', 'el', 'both']};
 let hashT = 0;
 function writeHash() {
   clearTimeout(hashT);
@@ -1145,6 +1151,7 @@ function bindUI() {
   addEventListener('keydown', e => {
     if (e.code !== 'KeyR' || e.ctrlKey || e.metaKey || e.altKey) return;
     const t = e.target; if (t.closest && t.closest('input, select, textarea, [contenteditable]')) return;
+    if ($('dialog[open]')) return;  // za otevřeným oknem (odeslání, výkres, cookies) kamna neotáčet
     const v = $('#wk-viewer'), r = v && v.getBoundingClientRect(); if (!r || r.bottom < 60 || r.top > innerHeight - 60) return;
     e.preventDefault(); rotateStove();
   });
