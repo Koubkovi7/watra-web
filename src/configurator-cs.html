@@ -144,6 +144,7 @@
       <p class="wk-honest"><strong>Orientační výpočet.</strong> Kamna WATRA jsou ve vývoji a certifikace probíhá. Odstup od stěn (asi 16 cm, strana s tepelným štítem polovina) je předběžný údaj WATRA. Odstup před dvířky, strop a doporučený objem sauny jsou zatím obvyklé hodnoty kamen na dřevo podobné velikosti. Vše potvrdí certifikace; před stavbou to ověříme s vámi a s kominíkem.</p>
       <div class="wk-actions">
         <a class="button wk-send" href="/cs/kontakt/?type=customer">Poslat návrh sauny WATRA</a>
+        <button class="button outline" type="button" data-wk-sheet>Výkres (PDF)</button>
         <button class="button outline" type="button" id="wk-copy">Zkopírovat odkaz</button>
       </div>
       <p class="small" style="margin-top:12px">Odkaz obsahuje celou saunu. Můžete ho poslat i stavební firmě.</p>
@@ -178,5 +179,35 @@
     <details><summary>Jak saunu větrat?<span aria-hidden="true">+</span></summary><p>Konfigurátor umístí tři otvory: přívod vzduchu k hoření za kamny asi 35 cm nad podlahou, cirkulaci na protější stěně asi v 60 cm u dveří a uzavíratelné větrání úhlopříčně od kamen u stropu na vyvětrání po saunování nebo při přetopení. Přesné umístění u IRIKON upřesníme s návodem k instalaci.</p></details>
   </div>
 </section>
+<dialog class="wk-dlg" id="wk-send-dlg" aria-labelledby="wk-send-h">
+  <div class="wk-dlg-in">
+    <button type="button" class="wk-dlg-x" data-wk-close aria-label="Zavřít"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+    <p class="eyebrow">Návrh sauny</p>
+    <h2 id="wk-send-h">Pošlete nám svou saunu</h2>
+    <div class="wk-sbox"><div class="wk-sthumb" id="wk-sthumb" aria-hidden="true"></div><div><ul class="wk-sfacts" id="wk-sfacts"></ul><button type="button" class="wk-link" data-wk-sheet>Zobrazit výkres s rozměry →</button></div></div>
+    <form id="wk-send-form" class="wk-sform" data-ready="false" novalidate>
+      <div class="wk-sgrid">
+        <label><span class="wk-lt">Jméno <b aria-label="povinné">*</b></span><input name="name" autocomplete="name" required maxlength="100"></label>
+        <label><span class="wk-lt">E-mail <b aria-label="povinné">*</b></span><input name="email" type="email" autocomplete="email" required maxlength="254"></label>
+        <label><span class="wk-lt">Telefon <b aria-label="povinné">*</b></span><input name="phone" type="tel" autocomplete="tel" required maxlength="40"></label>
+      </div>
+      <label><span class="wk-lt">Poznámka <i>(nepovinné)</i></span><textarea name="note" rows="3" maxlength="1500" placeholder="Např. kdy chcete stavět, jaký máte komín, na co se chcete zeptat…"></textarea></label>
+      <input type="text" name="_gotcha" class="wk-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <p class="wk-snote">Spolu s kontaktem odejde popis sauny a odkaz na výkres s rozměry a 3D. Zájem je nezávazný, bez platby a bez zaručeného termínu dodání. <a href="/cs/ochrana-udaju/">Jak pracujeme s osobními údaji</a></p>
+      <!--wk-domain-note-->
+      <div class="wk-sactions"><button class="button" type="submit">Odeslat návrh</button><a class="wk-link wk-sfallback" href="/cs/kontakt/?type=customer">Raději přes kontaktní formulář</a></div>
+      <p class="wk-sstatus" id="wk-sstatus" role="status" aria-live="polite"></p>
+    </form>
+    <div class="wk-sdone" id="wk-sdone" hidden>
+      <p class="wk-sdone-h"><span aria-hidden="true">✓</span> Návrh je odeslaný.</p>
+      <p>Děkujeme. Ozveme se na <strong id="wk-sdone-mail"></strong>. Výkres si můžete uložit i pro sebe.</p>
+      <div class="wk-sactions"><button type="button" class="button" data-wk-sheet>Stáhnout výkres (PDF)</button><button type="button" class="button outline" data-wk-close>Zavřít</button></div>
+    </div>
+  </div>
+</dialog>
+<dialog class="wk-dlg wk-sheetdlg" id="wk-sheet-dlg" aria-label="Výkres sauny">
+  <div class="wk-sheet-bar"><strong>Výkres sauny</strong><span class="sp"></span><button type="button" class="button" id="wk-print">Uložit PDF / tisk</button><button type="button" class="wk-dlg-x" data-wk-close aria-label="Zavřít"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button></div>
+  <div class="wk-sheet" id="wk-sheet"></div>
+</dialog>
 <p class="wk-credit wrap">Konfigurátor vytvořil <a href="https://www.honzasorm.cz/" target="_blank" rel="noopener">Honza Šorm</a></p>
 </div>

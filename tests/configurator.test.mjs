@@ -17,6 +17,20 @@ test('sauna configurator page exists in both languages and loads its own assets 
   }
   assert.doesNotMatch(await page('cs','contact'),/konfigurator\.js|three-r128/);
 });
+test('design is sent from the configurator through the site enquiry intake, with the drawing link',async()=>{
+  for(const lang of ['cs','en']){
+    const html=await page(lang,'configurator');
+    assert.match(html,/<dialog class="wk-dlg" id="wk-send-dlg"/);
+    assert.match(html,/<form id="wk-send-form" class="wk-sform" data-clarity-mask="true" action="\/api\/watra\/enquiries" method="post" data-sitekey="0x[^"]+" data-ready="true" data-domain="watra\.cz" novalidate>/);
+    assert.match(html,/data-form-domain-note hidden/,'preview hosts show a notice instead of sending');
+    assert.match(html,/<dialog class="wk-dlg wk-sheetdlg" id="wk-sheet-dlg"/);
+    for(const n of ['name','email','phone','note','_gotcha']) assert.match(html,new RegExp('name="'+n+'"'));
+  }
+  const js=await readFile('public/konfigurator.js','utf8');
+  assert.ok(js.includes("data.set('lead_type', 'customer')")&&js.includes("data.set('source_page', EN ? '/en/contact/' : '/cs/kontakt/')"),'worker accepts only contact source pages');
+  assert.ok(js.includes("designUrl('vykres')"),'message links the drawing');
+  assert.ok(js.includes("track('generate_lead'"),'successful send is a lead');
+});
 test('configurator is linked from the navigation and from home and model pages',async()=>{
   for(const lang of ['cs','en']){
     const target='href="/'+lang+'/'+routes.configurator[lang];
