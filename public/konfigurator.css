@@ -251,6 +251,107 @@
   .wk-row{grid-template-columns:58px minmax(0,1fr) 80px}
   .wk-model{grid-template-columns:1fr 1fr}
 }
+/* okna: poslat návrh a výkres */
+.wk-dlg{border:1px solid var(--line);background:var(--panel);color:var(--text);padding:0;width:calc(100% - 24px);max-width:680px;max-height:calc(100dvh - 24px);overflow:auto}
+.wk-dlg::backdrop{background:rgba(8,9,9,.74);backdrop-filter:blur(3px)}
+.wk-dlg[open]{animation:wkDlg .22s ease-out}
+@keyframes wkDlg{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.wk-dlg-in{position:relative;padding:28px 28px 24px}
+.wk-dlg h2{font-size:clamp(24px,3vw,32px);line-height:1.15;margin:0 0 18px}
+.wk-dlg .eyebrow{margin:0 0 6px}
+.wk-dlg-x{position:absolute;top:12px;right:12px;width:38px;height:38px;display:grid;place-items:center;padding:0;background:transparent;border:1px solid var(--btn);color:var(--text);cursor:pointer}
+.wk-dlg-x svg{width:16px;height:16px}
+.wk-dlg-x:hover{border-color:var(--gold);color:var(--gold)}
+.wk-sbox{display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;align-items:center;padding:14px;border:1px solid var(--line);background:#141615;margin-bottom:18px}
+.wk-sthumb .ws-svg{width:100%;height:auto;display:block}
+.wk-sfacts{list-style:none;margin:0 0 8px;padding:0;font-size:13.5px;line-height:1.55}
+.wk-sfacts li{display:grid;grid-template-columns:76px minmax(0,1fr);gap:8px}
+.wk-sfacts li span{color:var(--muted)}
+.wk-link{background:none;border:0;padding:0;color:var(--gold);font:inherit;font-size:13px;cursor:pointer;text-decoration:underline;text-underline-offset:4px}
+.wk-link:hover{color:var(--text)}
+.wk-sform{display:grid;gap:12px}
+.wk-sform[hidden]{display:none}
+.wk-sgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.wk-sform label{display:grid;gap:6px;font-size:13px;color:var(--muted)}
+.wk-sform label b{color:var(--gold);font-weight:400}
+.wk-sform .wk-lt{display:block}
+.wk-sform label i{font-style:normal;font-size:12px;opacity:.8}
+.wk .wk-sform input,.wk .wk-sform textarea{width:100%;background:#101211;border:1px solid var(--btn);color:var(--text);padding:10px 12px;font:inherit;font-size:15px;min-height:44px;border-radius:0}
+.wk .wk-sform textarea{resize:vertical;min-height:84px}
+.wk .wk-sform input:focus,.wk .wk-sform textarea:focus{outline:none;border-color:var(--gold)}
+.wk .wk-sform input:disabled,.wk .wk-sform textarea:disabled{opacity:.5}
+.wk-hp{position:absolute!important;left:-9999px!important;width:1px!important;height:1px!important;opacity:0}
+.wk-snote{font-size:12px;line-height:1.55;color:var(--muted);margin:0}
+.wk-snote a{color:var(--gold)}
+.wk-sactions{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;margin-top:4px}
+.wk-sstatus{margin:0;font-size:13.5px;line-height:1.45}
+.wk-sstatus:empty{display:none}
+.wk-sstatus.bad{color:var(--bad)}.wk-sstatus.warn{color:var(--warn)}
+.wk-sdone-h{font-size:22px;color:var(--ok);margin:0 0 8px}
+.wk-sdone p{margin:0 0 16px}
+.wk-sdone[hidden]{display:none}
+.wk-dlg .form-notice{font-size:12.5px;color:var(--warn);margin:0}
+/* výkres: světlý papír v tmavém okně */
+.wk-sheetdlg{max-width:1180px;background:#d9d6cf}
+.wk-sheet-bar{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--panel);border-bottom:1px solid var(--line)}
+.wk-sheet-bar .sp{flex:1}
+.wk-sheet-bar .wk-dlg-x{position:static}
+.wk-sheet-bar .button{padding:9px 16px}
+.wk-sheet{background:#fff;color:#1b1b1b;margin:18px;padding:24px 26px;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.ws-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;border-bottom:2px solid #1b1b1b;padding-bottom:10px;margin-bottom:14px}
+.ws-brand{font-size:11px;letter-spacing:4px;color:#a8803c;margin:0}
+.ws-head h3{margin:2px 0;font-size:24px;line-height:1.2;color:#1b1b1b}
+.ws-sub{margin:0;font-size:13px;color:#555}
+.ws-status{margin:0;padding:6px 10px;font-size:13px;border:1px solid;white-space:nowrap}
+.ws-status.ok{color:#3c7a2c;border-color:#3c7a2c}.ws-status.warn{color:#8a6100;border-color:#c99a2e}.ws-status.bad{color:#b23a26;border-color:#b23a26}
+.ws-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:22px;align-items:start}
+.ws-plan{margin:0}
+.ws-svg{width:100%;height:auto;display:block}
+.ws-plan figcaption{font-size:11px;color:#666;margin-top:4px;line-height:1.4}
+.ws-legend{font-size:11px;color:#444;margin:6px 0 0;display:flex;gap:4px 14px;flex-wrap:wrap}
+.ws-legend i{display:inline-block;width:12px;height:8px;margin-right:5px;border:1px dashed}
+.ws-legend .lz{border-color:#c9a24f;background:rgba(201,162,79,.14)}.ws-legend .ls{border-color:#6f9a5f}.ws-legend .lh{border:0;background:#6d7372}
+.ws-3d{width:100%;height:auto;display:block;border:1px solid #ddd;margin-bottom:10px;background:#121413}
+.ws-tab{width:100%;border-collapse:collapse;font-size:12px;line-height:1.4}
+.ws-tab th{text-align:left;font-weight:600;color:#444;padding:4px 8px 4px 0;vertical-align:top;width:34%;border-bottom:1px solid #eee}
+.ws-tab td{padding:4px 0;border-bottom:1px solid #eee;color:#1b1b1b}
+.ws-issues{margin:10px 0 0;padding:0;list-style:none;font-size:12px;line-height:1.45}
+.ws-issues li{padding:6px 8px;margin-bottom:6px;border-left:3px solid #c99a2e;background:#fbf6ea}
+.ws-issues li.bad{border-color:#b23a26;background:#fbeeeb}
+.ws-foot{font-size:10.5px;color:#666;margin:14px 0 0;border-top:1px solid #ddd;padding-top:8px;line-height:1.45}
+.ws-foot span{color:#999;word-break:break-all}
+.ws-svg text{font-family:Arial,Helvetica,sans-serif}
+.ws-svg .fl{fill:#faf8f3}.ws-svg .wl{fill:none;stroke:#2c2c2c}.ws-svg .dg{fill:#fff}.ws-svg .wn{fill:#cfe3ee}
+.ws-svg .dr{stroke:#2c2c2c;stroke-width:1.4}.ws-svg .sw{fill:none;stroke:#888;stroke-width:.8;stroke-dasharray:3 3}
+.ws-svg .vt.supply{fill:#5b9cc4}.ws-svg .vt.circ{fill:#4fae94}.ws-svg .vt.air{fill:#9aa3a8}
+.ws-svg .bn{fill:#ecdcbc;stroke:#b8955c;stroke-width:.8}.ws-svg .bn.lower{fill:#f4ead6}
+.ws-svg .sv{fill:none;stroke:#6f9a5f;stroke-width:.8;stroke-dasharray:2 3}
+.ws-svg .zn{fill:rgba(201,162,79,.12);stroke:#c9a24f;stroke-width:1;stroke-dasharray:5 3}
+.ws-svg .sh{fill:#6d7372}.ws-svg .st{fill:#2b2d2c}.ws-svg .sf{fill:#5a5d5b}.ws-svg .fu{fill:#777;stroke:#2b2d2c;stroke-width:1}
+.ws-svg .d{stroke:#555;stroke-width:.7}.ws-svg .dt{font-size:7.5px;fill:#222}.ws-svg .bt{font-size:5.6px;fill:#6b5229}.ws-svg .stt{font-size:5px;fill:#fff}
+.ws-svg .vn{fill:#fff;stroke:#2c2c2c;stroke-width:.8}.ws-svg .vnt{font-size:6px;fill:#222;font-weight:700}
+.ws-mini .fl{fill:#202321}.ws-mini .wl{stroke:#55584f}.ws-mini .dg{fill:#202321}.ws-mini .bn,.ws-mini .bn.lower{fill:#c9a46a;stroke:none}
+.ws-mini .zn{fill:rgba(212,174,108,.16);stroke:#d4ae6c}.ws-mini .st{fill:#0d0e0e;stroke:#d4ae6c;stroke-width:1.5}.ws-mini .sv,.ws-mini .sw{display:none}
+@media(max-width:800px){.ws-grid{grid-template-columns:minmax(0,1fr)}.wk-sheet{margin:10px;padding:16px}.ws-head{flex-direction:column}}
+@media(max-width:700px){.wk-dlg-in{padding:22px 16px 18px}.wk-sbox{grid-template-columns:96px minmax(0,1fr);gap:12px;padding:10px}.wk-sgrid{grid-template-columns:minmax(0,1fr)}.wk-sheet-bar strong{display:none}}
+/* tisk / PDF: jen výkres (kopie v #wk-print-root, zbytek stránky pryč, ať nejsou prázdné stránky) */
+#wk-print-root{display:none}
+@media print{
+  @page{size:A4 landscape;margin:9mm}
+  html:has(body.wk-print),body.wk-print{background:#fff!important}
+  body.wk-print>*:not(#wk-print-root){display:none!important}
+  body.wk-print #wk-print-root{display:block}
+  body.wk-print #wk-print-root .wk-sheet{margin:0;padding:0;box-shadow:none}
+  body.wk-print .ws-grid{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}
+  body.wk-print .ws-3d{max-height:56mm;object-fit:cover;margin-bottom:6px}
+  body.wk-print .ws-head{flex-direction:row;padding-bottom:6px;margin-bottom:8px}
+  body.wk-print .ws-head h3{font-size:20px}
+  body.wk-print .ws-plan .ws-svg{max-height:122mm;width:auto;max-width:100%;margin:0 auto}
+  body.wk-print .ws-tab{font-size:10.5px}
+  body.wk-print .ws-tab th,body.wk-print .ws-tab td{padding-top:2.5px;padding-bottom:2.5px}
+  body.wk-print .ws-issues{font-size:10.5px}
+  body.wk-print .ws-foot{font-size:9px;margin-top:8px}
+}
 /* podpis autora konfigurátoru */
 .wk-credit{font-size:12.5px;color:var(--muted);text-align:center;margin:0 auto;padding:6px 20px 46px;letter-spacing:.3px}
 .wk-credit a{color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(212,174,108,.35);padding-bottom:1px}

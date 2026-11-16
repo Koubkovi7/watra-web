@@ -1,10 +1,21 @@
 // Konfigurátor sauny (Honza Šorm, 11/2026): stránka /cs/konfigurator-sauny/ a /en/sauna-configurator/ + upoutávky na úvodu a u modelů.
 // Obsah stránky je v configurator-cs.html / configurator-en.html, logika v public/konfigurator.js (3D: public/three-r128-min.js).
 import {readFileSync} from 'node:fs';
+import {formReady} from './form-intake.mjs';
+import {formDomainAttribute,formDomainNotice} from './form-domain.mjs';
 const html={cs:readFileSync(new URL('./configurator-cs.html',import.meta.url),'utf8'),en:readFileSync(new URL('./configurator-en.html',import.meta.url),'utf8')};
 const t=(l,a,b)=>l==='cs'?a:b;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const configuratorRoute={cs:'konfigurator-sauny/',en:'sauna-configurator/'};
-export const configuratorPage=l=>html[l];
+// „Poslat návrh“ v konfigurátoru jde stejným příjmem jako kontaktní formulář (Worker /api/watra/enquiries, Turnstile);
+// na náhledech mimo formDomain ho app.js vypne a ukáže upozornění, bez hotové konfigurace zůstane jen odkaz na kontakt.
+const FORM='<form id="wk-send-form" class="wk-sform" data-ready="false" novalidate>';
+export const configuratorPage=(l,c={})=>{
+ const ready=formReady(c);
+ if(!html[l].includes(FORM)) throw Error('Configurator send form placeholder missing');
+ return html[l].replace(FORM,'<form id="wk-send-form" class="wk-sform" data-clarity-mask="true" '+(ready?'action="/api/watra/enquiries" method="post" data-sitekey="'+esc(c.turnstileSiteKey)+'" ':'')+'data-ready="'+ready+'"'+formDomainAttribute(c)+' novalidate>')
+  .replace('<!--wk-domain-note-->',formDomainNotice(l,c,'contact'));
+};
 const href=(l,hash='')=>'/'+l+'/'+configuratorRoute[l]+hash;
 function teaser(l,model,hash='',sit='#v=sit'){
  return '<section class="section wrap border-top wk-teaser"><div class="wk-teaser-grid">'+

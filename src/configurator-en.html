@@ -144,6 +144,7 @@
       <p class="wk-honest"><strong>Indicative calculation.</strong> WATRA heaters are in development and certification is in progress. The wall clearance (about 16 cm, half on a side with a heat shield) is a preliminary WATRA figure. The clearance in front of the door, the ceiling distance and the recommended sauna volume are typical values for wood-fired heaters of a similar size for now. Certification will confirm everything; before you build, we will check it with you and your chimney sweep.</p>
       <div class="wk-actions">
         <a class="button wk-send" href="/en/contact/?type=customer">Send my WATRA sauna</a>
+        <button class="button outline" type="button" data-wk-sheet>Drawing (PDF)</button>
         <button class="button outline" type="button" id="wk-copy">Copy link</button>
       </div>
       <p class="small" style="margin-top:12px">The link contains your whole sauna. You can also send it to your builder.</p>
@@ -178,5 +179,35 @@
     <details><summary>How should the sauna be ventilated?<span aria-hidden="true">+</span></summary><p>The configurator places three vents: a combustion air inlet behind the heater about 35 cm above the floor, a circulation vent on the opposite wall at about 60 cm by the door, and a closable vent diagonally opposite the heater near the ceiling for airing after the sauna or when it gets too hot. We will confirm the exact placement for the IRIKON with the installation manual.</p></details>
   </div>
 </section>
+<dialog class="wk-dlg" id="wk-send-dlg" aria-labelledby="wk-send-h">
+  <div class="wk-dlg-in">
+    <button type="button" class="wk-dlg-x" data-wk-close aria-label="Close"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+    <p class="eyebrow">Sauna design</p>
+    <h2 id="wk-send-h">Send us your sauna</h2>
+    <div class="wk-sbox"><div class="wk-sthumb" id="wk-sthumb" aria-hidden="true"></div><div><ul class="wk-sfacts" id="wk-sfacts"></ul><button type="button" class="wk-link" data-wk-sheet>Show the drawing with dimensions →</button></div></div>
+    <form id="wk-send-form" class="wk-sform" data-ready="false" novalidate>
+      <div class="wk-sgrid">
+        <label><span class="wk-lt">Name <b aria-label="required">*</b></span><input name="name" autocomplete="name" required maxlength="100"></label>
+        <label><span class="wk-lt">Email <b aria-label="required">*</b></span><input name="email" type="email" autocomplete="email" required maxlength="254"></label>
+        <label><span class="wk-lt">Phone <b aria-label="required">*</b></span><input name="phone" type="tel" autocomplete="tel" required maxlength="40"></label>
+      </div>
+      <label><span class="wk-lt">Note <i>(optional)</i></span><textarea name="note" rows="3" maxlength="1500" placeholder="For example when you plan to build, what chimney you have, what you would like to ask…"></textarea></label>
+      <input type="text" name="_gotcha" class="wk-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <p class="wk-snote">Together with your contact details we send a description of the sauna and a link to the drawing with dimensions and 3D. Your interest is non-binding, with no payment and no guaranteed delivery date. <a href="/en/privacy/">How we handle personal data</a></p>
+      <!--wk-domain-note-->
+      <div class="wk-sactions"><button class="button" type="submit">Send my design</button><a class="wk-link wk-sfallback" href="/en/contact/?type=customer">Use the contact form instead</a></div>
+      <p class="wk-sstatus" id="wk-sstatus" role="status" aria-live="polite"></p>
+    </form>
+    <div class="wk-sdone" id="wk-sdone" hidden>
+      <p class="wk-sdone-h"><span aria-hidden="true">✓</span> Your design has been sent.</p>
+      <p>Thank you. We will get back to you at <strong id="wk-sdone-mail"></strong>. You can also save the drawing for yourself.</p>
+      <div class="wk-sactions"><button type="button" class="button" data-wk-sheet>Download the drawing (PDF)</button><button type="button" class="button outline" data-wk-close>Close</button></div>
+    </div>
+  </div>
+</dialog>
+<dialog class="wk-dlg wk-sheetdlg" id="wk-sheet-dlg" aria-label="Sauna drawing">
+  <div class="wk-sheet-bar"><strong>Sauna drawing</strong><span class="sp"></span><button type="button" class="button" id="wk-print">Save PDF / print</button><button type="button" class="wk-dlg-x" data-wk-close aria-label="Close"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button></div>
+  <div class="wk-sheet" id="wk-sheet"></div>
+</dialog>
 <p class="wk-credit wrap">Configurator by <a href="https://www.honzasorm.cz/" target="_blank" rel="noopener">Honza Šorm</a></p>
 </div>

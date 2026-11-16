@@ -1005,8 +1005,7 @@ function renderResult(L) {
     if (L.seats) notes.push(tr(`Na lavice se vejde ${lidi(L.seats)} vsedě${L.lie ? ' a na horní lavici si můžete lehnout' : ''}.`, `${lidi(L.seats)} can sit on the benches${L.lie ? ' and you can lie down on the upper bench' : ''}.`));
   const nl = $('#wk-notes'); if (nl) nl.innerHTML = notes.map(n => `<li>${n}</li>`).join('');
   // odkaz na poptávku s popisem sauny (web běží v kořeni i v podsložce dema)
-    const txt = tr(`Moje sauna z konfigurátoru: ${S.w} × ${S.d} × ${S.h} cm (${nf1.format(L.V)} m³), ${m.name} ${WALL_CZ[S.sw]}, lavice: ${benchCz(L)}, ${L.door.glass ? 'skleněné' : 'dřevěné'} dveře${L.win ? ', okno' : ''}${S.rot ? `, kamna otočená o ${S.rot * 90}°` : ''}${S.sh ? `, ${S.sh === 1 ? '1 tepelný štít' : S.sh + ' tepelné štíty'} (${S.sh} × 1 000 Kč)` : ''}. Odkaz: `,
-      `My sauna from the configurator: ${S.w} × ${S.d} × ${S.h} cm (${nf1.format(L.V)} m³), ${m.name} ${WALL_CZ[S.sw]}, benches: ${benchCz(L)}, ${L.door.glass ? 'glass' : 'wooden'} door${L.win ? ', window' : ''}${S.rot ? `, heater rotated by ${S.rot * 90}°` : ''}${S.sh ? `, ${S.sh} heat shield${S.sh > 1 ? 's' : ''} (${S.sh} × CZK 1,000)` : ''}. Link: `) + `${location.origin}${location.pathname}${location.hash}`;
+    const txt = designText(L) + tr(' Odkaz: ', ' Link: ') + `${location.origin}${location.pathname}${location.hash}`;
     const base = location.pathname.replace(/\/(cs|en)\/(konfigurator-sauny|sauna-configurator)\/.*$/, '');
     $$('.wk-send').forEach(a => { a.href = `${base}${tr('/cs/kontakt/', '/en/contact/')}?type=customer&model=${encodeURIComponent(m.name)}&sauna=${encodeURIComponent(txt)}`; });
 }
@@ -1152,7 +1151,8 @@ function bindUI() {
   addEventListener('resize', () => placeRot());
   const mini = $('#wk-mini'); if (mini) mini.addEventListener('click', () => setTab('plan'));
   const c3 = $('#wk-3d'); if (c3) c3.addEventListener('pointerdown', () => setTimeout(hideHint, 900));
-  $$('.wk-send').forEach(a => a.addEventListener('click', () => { const L = LAST; track('configurator_send', {sauna_m3: L ? +L.V.toFixed(1) : null, configurator_ok: L ? !L.bad && !L.warn : null}); }));
+  $$('.wk-send').forEach(a => a.addEventListener('click', e => { const L = LAST; track('configurator_send', {sauna_m3: L ? +L.V.toFixed(1) : null, configurator_ok: L ? !L.bad && !L.warn : null}); if (openSend()) e.preventDefault(); }));
+  bindSend();
   const copy = $('#wk-copy');
     if (copy) copy.addEventListener('click', async () => { track('configurator_share'); try { await navigator.clipboard.writeText(location.href); toast(tr('Odkaz na vaši saunu je zkopírovaný.', 'The link to your sauna has been copied.')); } catch (e) { toast(tr('Zkopírujte adresu stránky, je v ní celá sauna.', 'Copy the page address; it contains your whole sauna.')); } });
   const full = $('#wk-full');
@@ -1179,6 +1179,189 @@ function toast(t) {
   el.textContent = t; el.classList.add('show'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 2600);
 }
 
+/* ---------- výkres (k tisku / do PDF) a odeslání návrhu přímo z konfigurátoru (Říša 17. 11.) ----------
+   Formulář webu WATRA (Cloudflare Worker /api/watra/enquiries) bere jen textová pole do 16 kB → výkres nejde jako příloha,
+   posílá se odkaz #…&v=vykres, který otevře výkres s rozměry (Uložit PDF / tisk). */
+const hashStr = () => { const q = new URLSearchParams(); for (const k of Object.keys(DEF)) if (S[k] !== DEF[k]) q.set(k, S[k]); return q.toString(); };
+const designUrl = view => location.origin + location.pathname + '#' + [hashStr(), view ? 'v=' + view : ''].filter(Boolean).join('&');
+const escH = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+function designText(L) {
+  const m = D_.models[S.m];
+  return tr(`Moje sauna z konfigurátoru: ${S.w} × ${S.d} × ${S.h} cm (${nf1.format(L.V)} m³), ${m.name} ${WALL_CZ[S.sw]}, lavice: ${benchCz(L)}, ${L.door.glass ? 'skleněné' : 'dřevěné'} dveře${L.win ? ', okno' : ''}${S.rot ? `, kamna otočená o ${S.rot * 90}°` : ''}${S.sh ? `, ${S.sh === 1 ? '1 tepelný štít' : S.sh + ' tepelné štíty'} (${S.sh} × 1 000 Kč)` : ''}.`,
+    `My sauna from the configurator: ${S.w} × ${S.d} × ${S.h} cm (${nf1.format(L.V)} m³), ${m.name} ${WALL_CZ[S.sw]}, benches: ${benchCz(L)}, ${L.door.glass ? 'glass' : 'wooden'} door${L.win ? ', window' : ''}${S.rot ? `, heater rotated by ${S.rot * 90}°` : ''}${S.sh ? `, ${S.sh} heat shield${S.sh > 1 ? 's' : ''} (${S.sh} × CZK 1,000)` : ''}.`);
+}
+const statusHead = L => L.bad ? tr('Takhle to nepůjde', 'This won’t work') : L.warn ? tr(`Jde to, ${L.warn === 1 ? 'jedna věc' : L.warn + ' věci'} k doladění`, `It works, ${L.warn === 1 ? 'one thing' : L.warn + ' things'} to fine-tune`) : tr('Kamna se vejdou', 'The heater fits');
+const VENT_SHORT = () => ({supply: tr('přívod vzduchu k hoření', 'combustion air inlet'), circ: tr('cirkulace', 'circulation'), air: tr('větrání (uzavíratelné)', 'ventilation (closable)')});
+
+// půdorys s kótami pro výkres (světlý, na papír); compact = malý náhled v okně odeslání (bez kót a popisků)
+function sheetPlan(L, compact = false) {
+  const W = S.w, D = S.d, T = 8, M = compact ? 12 : 50, st = L.stove, Y = y => D - y;
+  const o = [], r = (q, a) => o.push(`<rect x="${q.x0}" y="${Y(q.y1)}" width="${q.x1 - q.x0}" height="${q.y1 - q.y0}" ${a}/>`);
+  const txt = (x, y, s, a = '') => o.push(`<text x="${x}" y="${y}" ${a}>${escH(s)}</text>`);
+  // kóta: čára s dorazy a číslem uprostřed
+  const dim = (x1, y1, x2, y2, label, rot = false) => {
+    const tk = 3.5, vert = Math.abs(x1 - x2) < .01;
+    o.push(`<line class="d" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`);
+    o.push(vert ? `<line class="d" x1="${x1 - tk}" y1="${y1}" x2="${x1 + tk}" y2="${y1}"/><line class="d" x1="${x2 - tk}" y1="${y2}" x2="${x2 + tk}" y2="${y2}"/>`
+      : `<line class="d" x1="${x1}" y1="${y1 - tk}" x2="${x1}" y2="${y1 + tk}"/><line class="d" x1="${x2}" y1="${y2 - tk}" x2="${x2}" y2="${y2 + tk}"/>`);
+    const cx = (x1 + x2) / 2, cy = (y1 + y2) / 2;
+    if (vert || rot) txt(cx - 3, cy, label, `class="dt" text-anchor="middle" transform="rotate(-90 ${cx - 3} ${cy})"`);
+    else txt(cx, cy - 3, label, 'class="dt" text-anchor="middle"');
+  };
+  o.push(`<rect class="fl" x="0" y="0" width="${W}" height="${D}"/>`);
+  o.push(`<rect class="wl" x="${-T / 2}" y="${-T / 2}" width="${W + T}" height="${D + T}" stroke-width="${T}"/>`);
+  // otvory ve zdi: okno, dveře, větrání
+  const gap = (wall, u0, u1, cls) => {
+    const a = wallPt(wall, u0, 0), b = wallPt(wall, u1, 0);
+    if (wall === 'left' || wall === 'right') o.push(`<rect class="${cls}" x="${wall === 'left' ? -T : W}" y="${Y(Math.max(a.y, b.y))}" width="${T}" height="${Math.abs(b.y - a.y)}"/>`);
+    else o.push(`<rect class="${cls}" x="${Math.min(a.x, b.x)}" y="${wall === 'front' ? D : -T}" width="${Math.abs(b.x - a.x)}" height="${T}"/>`);
+  };
+  if (L.win) gap(L.win.wall, L.win.u0, L.win.u1, 'wn');
+  gap(L.door.wall, L.door.u0, L.door.u1, 'dg');
+  { // dveře se otvírají ven
+    const d = L.door, w = d.u1 - d.u0, h = wallPt(d.wall, d.u0, 0), tp = wallPt(d.wall, d.u1, 0), op = wallPt(d.wall, d.u0, -w);
+    const cross = (op.x - h.x) * (Y(tp.y) - Y(h.y)) - (Y(op.y) - Y(h.y)) * (tp.x - h.x);
+    o.push(`<line class="dr" x1="${h.x}" y1="${Y(h.y)}" x2="${op.x}" y2="${Y(op.y)}"/><path class="sw" d="M${op.x} ${Y(op.y)} A${w} ${w} 0 0 ${cross > 0 ? 1 : 0} ${tp.x} ${Y(tp.y)}"/>`);
+  }
+  const vents = L.vents || [];
+  vents.forEach(v => gap(v.wall, v.u - v.w / 2, v.u + v.w / 2, 'vt ' + v.kind));
+  // lavice, zóna, místo na přikládání, štíty, kamna
+  for (const b of L.benches) r(b, `class="bn ${b.level}"`);
+  if (L.service) r(L.service, 'class="sv"');
+  r(st.zone, 'class="zn"');
+  for (const q of L.shields || []) r(q, 'class="sh"');
+  r(st.body, 'class="st" rx="2"'); r(st.front, 'class="sf"');
+  o.push(`<circle class="fu" cx="${st.flue.x}" cy="${Y(st.flue.y)}" r="${B.flueD / 2}"/>`);
+  if (!compact) {
+    // popisky lavic: patro, délka × hloubka, výška sedáku
+    for (const b of L.benches) {
+      const cx = (b.x0 + b.x1) / 2, cy = Y((b.y0 + b.y1) / 2), side = b.wall === 'left' || b.wall === 'right';
+      const s = `${b.level === 'upper' ? tr('horní', 'upper') : tr('dolní', 'lower')} ${Math.round(b.len)} × ${b.depth} · ${tr('v.', 'h')} ${b.top}`;
+      txt(cx, cy + 2.2, s, `class="bt" text-anchor="middle"${side ? ` transform="rotate(-90 ${cx} ${cy})"` : ''}`);
+    }
+    // čísla větracích otvorů (vysvětlení v tabulce)
+    vents.forEach((v, i) => { const p = wallPt(v.wall, v.u, -T - 7); o.push(`<circle class="vn" cx="${p.x}" cy="${Y(p.y)}" r="4.5"/>`); txt(p.x, Y(p.y) + 2.2, String(i + 1), 'class="vnt" text-anchor="middle"'); });
+    // kóty: místnost, kamna k nejbližším stěnám, dveře od rohu
+    dim(0, -T - 14, W, -T - 14, `${S.w}`);
+    dim(-T - 14, 0, -T - 14, D, `${S.d}`);
+    const b = st.body, cxs = (b.x0 + b.x1) / 2, cys = Y((b.y0 + b.y1) / 2);
+    const dl = b.x0, dr = W - b.x1, df = b.y0, db = D - b.y1;
+    if (dl <= dr) dim(0, cys, b.x0, cys, `${Math.round(dl)}`); else dim(b.x1, cys, W, cys, `${Math.round(dr)}`);
+    if (df <= db) dim(cxs, Y(0), cxs, Y(b.y0), `${Math.round(df)}`); else dim(cxs, Y(b.y1), cxs, Y(D), `${Math.round(db)}`);
+    const d = L.door, off = d.wall === 'back' || d.wall === 'left' ? 34 : 16, a = wallPt(d.wall, 0, -T - off), p0 = wallPt(d.wall, d.u0, -T - off), p1 = wallPt(d.wall, d.u1, -T - off);
+    dim(a.x, Y(a.y), p0.x, Y(p0.y), `${Math.round(d.u0)}`); dim(p0.x, Y(p0.y), p1.x, Y(p1.y), `${tr('dveře', 'door')} ${Math.round(d.u1 - d.u0)}`);
+    txt(cxs, cys + 2.4, D_.models[S.m].short, 'class="stt" text-anchor="middle"');
+  }
+  const vb = `${-M} ${-M} ${W + 2 * M} ${D + 2 * M}`;
+  return `<svg class="ws-svg${compact ? ' ws-mini' : ''}" viewBox="${vb}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${escH(tr('Půdorys sauny s kótami v cm', 'Sauna floor plan with dimensions in cm'))}">${o.join('')}</svg>`;
+}
+function snap3d() {
+  if (!R3) return '';
+  try { R3.renderer.render(R3.scene, R3.camera); const u = R3.renderer.domElement.toDataURL('image/jpeg', .86); return u.length > 200 ? u : ''; } catch (e) { return ''; }
+}
+function sheetRows(L) {
+  const m = D_.models[S.m], st = L.stove, b = st.body, near = Math.round(Math.min(b.x0, S.w - b.x1, b.y0, S.d - b.y1));
+  const sides = {K: tr('záda', 'back'), L: tr('levý bok', 'left side'), R: tr('pravý bok', 'right side')};
+  const sh = [st.shK && sides.K, st.shL && sides.L, st.shR && sides.R].filter(Boolean);
+  return [
+    [tr('Vnitřní rozměry', 'Inside dimensions'), `${S.w} × ${S.d} × ${S.h} cm`],
+    [tr('Objem', 'Volume'), fm3(L.V) + (L.Veff - L.V > .05 ? tr(` (počítá se jako ${fm3(L.Veff)} kvůli ${L.masonry ? 'zdivu a sklu' : 'sklu'})`, ` (counts as ${fm3(L.Veff)} because of ${L.masonry ? 'masonry and glass' : 'glass'})`) : '')],
+    [tr('Stěny', 'Walls'), S.mw === 'masonry' ? tr('zdivo bez izolace', 'uninsulated masonry') : tr('dřevo, zateplené', 'insulated timber')],
+    [tr('Kamna', 'Heater'), `${m.name} · ${m.kw} · ${m.price} ${tr('vč. DPH', 'incl. VAT')}`],
+    [tr('Umístění kamen', 'Heater position'), `${tr('u stěny', 'wall:')} ${WALL_CZ[S.sw]}, ${ROT_CZ[S.rot || 0]}${S.rot ? ` (${S.rot * 90}°)` : ''}; ${tr('k nejbližší stěně', 'nearest wall')} ${near} cm`],
+    [tr('Odstupy', 'Clearances'), tr(`boky ${st.cA} / ${st.cB} cm, záda ${st.cK} cm, před dvířky ${D_.clear.front} cm (${D_.clear.status})`, `sides ${st.cA} / ${st.cB} cm, back ${st.cK} cm, front ${D_.clear.front} cm (${D_.clear.status})`)],
+    [tr('Tepelné štíty', 'Heat shields'), S.sh ? tr(`${S.sh} × 1 000 Kč (${sh.join(', ')})`, `${S.sh} × CZK 1,000 (${sh.join(', ')})`) : tr('bez štítů', 'none')],
+    [tr('Lavice', 'Benches'), `${benchCz(L)}${L.seats ? ' · ' + tr(`${lidi(L.seats)} vsedě`, `${lidi(L.seats)} seated`) : ''}`],
+    [tr('Dveře a okno', 'Door and window'), `${tr('dveře', 'door')} ${DOOR_CZ[S.dw]} (${L.door.glass ? tr('sklo', 'glass') : tr('dřevo', 'wood')}) · ${WIN_CZ[S.win]}${L.win ? ' ' + WALL_CZ[S.ww] : ''}`],
+    [tr('Větrání', 'Ventilation'), (L.vents || []).map((v, i) => `${i + 1} ${VENT_SHORT()[v.kind]} (${v.z} cm)`).join(', ')],
+  ];
+}
+function renderSheet(L) {
+  const status = L.bad ? 'bad' : L.warn ? 'warn' : 'ok', img = snap3d(), date = new Date().toLocaleDateString(LOC);
+  const issues = L.checks.filter(c => c.lvl === 'bad' || c.lvl === 'warn');
+  return `<div class="ws-head"><div><p class="ws-brand">WATRA</p><h3>${escH(tr('Návrh sauny', 'Sauna design'))}</h3><p class="ws-sub">${escH(`${D_.models[S.m].name} · ${S.w} × ${S.d} × ${S.h} cm · ${date}`)}</p></div><p class="ws-status ${status}">${escH(statusHead(L))}</p></div>
+<div class="ws-grid"><figure class="ws-plan">${sheetPlan(L)}<figcaption>${escH(tr('Půdorys, rozměry v cm. Kóty: místnost, kamna k nejbližším stěnám, dveře od rohu. Lavice: délka × hloubka · výška sedáku.', 'Floor plan, dimensions in cm: room, heater to the nearest walls, door from the corner. Benches: length × depth · seat height.'))}</figcaption>
+<p class="ws-legend"><i class="lz"></i>${escH(tr('bezpečná zóna', 'safe zone'))} <i class="ls"></i>${escH(tr('místo na přikládání', 'space to load wood'))} <i class="lh"></i>${escH(tr('tepelný štít', 'heat shield'))}</p></figure>
+<div class="ws-side">${img ? `<img class="ws-3d" src="${img}" alt="${escH(tr('Sauna ve 3D', 'The sauna in 3D'))}">` : ''}<table class="ws-tab">${sheetRows(L).map(([k, v]) => `<tr><th>${escH(k)}</th><td>${escH(v)}</td></tr>`).join('')}</table>
+${issues.length ? `<ul class="ws-issues">${issues.map(c => `<li class="${c.lvl}"><strong>${escH(c.title)}.</strong> ${escH(c.text)}</li>`).join('')}</ul>` : ''}</div></div>
+<p class="ws-foot">${escH(tr('Orientační návrh z konfigurátoru WATRA. Odstup od stěn je předběžný údaj WATRA, ostatní hodnoty jsou obvyklé pro kamna na dřevo podobné velikosti; vše potvrdí certifikace a návod k instalaci. Napojení na komín a elektro navrhne kominík a elektrikář.', 'Indicative design from the WATRA configurator. The wall clearance is a preliminary WATRA figure, other values are typical for wood-fired heaters of a similar size; certification and the installation manual will confirm everything. A chimney sweep and an electrician will design the flue and electrical connections.'))}<br><span>${escH(designUrl())}</span></p>`;
+}
+function openSheet() {
+  const d = $('#wk-sheet-dlg'); if (!d || !LAST) return;
+  $('#wk-sheet').innerHTML = renderSheet(LAST);
+  if (!d.open) { if (d.showModal) d.showModal(); else d.setAttribute('open', ''); }
+}
+function printSheet() {
+  const t0 = document.title;
+  document.title = tr('WATRA návrh sauny ', 'WATRA sauna design ') + `${S.w}x${S.d}`;
+  // kopie výkresu přímo do <body>: při tisku je vidět jen ona (bez prázdných stránek za ní)
+  let root = $('#wk-print-root'); if (!root) { root = document.createElement('div'); root.id = 'wk-print-root'; document.body.appendChild(root); }
+  root.innerHTML = '<div class="wk-sheet">' + ($('#wk-sheet') ? $('#wk-sheet').innerHTML : renderSheet(LAST)) + '</div>';
+  document.body.classList.add('wk-print');
+  const done = () => { document.body.classList.remove('wk-print'); document.title = t0; root.innerHTML = ''; removeEventListener('afterprint', done); };
+  addEventListener('afterprint', done);
+  window.print();
+}
+// okno „Poslat návrh“: shrnutí + krátký formulář → stejný příjem jako kontaktní formulář webu
+function openSend() {
+  const d = $('#wk-send-dlg'), form = $('#wk-send-form');
+  if (!d || !d.showModal || !form || !LAST) return false;
+  const L = LAST, m = D_.models[S.m];
+  $('#wk-sthumb').innerHTML = sheetPlan(L, true);
+  $('#wk-sfacts').innerHTML = [[tr('Sauna', 'Sauna'), `${S.w} × ${S.d} × ${S.h} cm · ${fm3(L.V)}`], [tr('Kamna', 'Heater'), `${m.name} · ${WALL_CZ[S.sw]}${S.sh ? ' · ' + (S.sh === 1 ? tr('1 štít', '1 shield') : S.sh + tr(' štíty', ' shields')) : ''}`],
+    [tr('Lavice', 'Benches'), benchCz(L)], [tr('Kontrola', 'Check'), statusHead(L)]].map(([k, v]) => `<li><span>${escH(k)}</span>${escH(v)}</li>`).join('');
+  form.hidden = false; $('#wk-sdone').hidden = true;
+  const s = $('#wk-sstatus'); s.textContent = ''; s.className = 'wk-sstatus';
+  d.showModal();
+  return true;
+}
+function bindSend() {
+  $$('[data-wk-close]').forEach(b => b.addEventListener('click', () => { const d = b.closest('dialog'); if (d) d.close(); }));
+  $$('dialog.wk-dlg').forEach(d => d.addEventListener('click', e => { if (e.target === d) d.close(); }));  // klik vedle okna zavře
+  $$('[data-wk-sheet]').forEach(b => b.addEventListener('click', openSheet));
+  const pr = $('#wk-print'); if (pr) pr.addEventListener('click', printSheet);
+  const form = $('#wk-send-form'); if (!form) return;
+  const f = n => form.elements.namedItem(n), st = $('#wk-sstatus'), btn = form.querySelector('[type=submit]');
+  const say = (t, cls) => { st.textContent = t; st.className = 'wk-sstatus' + (cls ? ' ' + cls : ''); };
+  const done = demo => {
+    set('#wk-sdone-mail', f('email').value.trim());
+    const dn = $('#wk-sdone'); let n = dn.querySelector('.wk-sdemo');
+    if (demo) { if (!n) { n = document.createElement('p'); n.className = 'wk-snote wk-sdemo'; dn.insertBefore(n, dn.querySelector('.wk-sactions')); } n.textContent = demo; } else if (n) n.remove();
+    form.reset(); form.hidden = true; dn.hidden = false;
+  };
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    if (form.dataset.ready !== 'true' && window.WATRA_NAHLED) {  // demo: předvést poděkování, nic neodesílat
+      if (!form.checkValidity()) { form.reportValidity(); return; }
+      done(tr('Náhled webu: návrh se ve skutečnosti neodeslal. Na watra.cz odejde rovnou do WATRA.', 'Website preview: nothing was actually sent. On watra.cz it goes straight to WATRA.')); return;
+    }
+    if (form.dataset.ready !== 'true' || !window.WatraEnquiry || form.getAttribute('action') !== '/api/watra/enquiries') {
+      say(tr('Tady se návrh neodesílá (náhled webu). Na watra.cz odejde rovnou do WATRA. Můžete použít i kontaktní formulář.', 'Sending is off here (website preview). On watra.cz it goes straight to WATRA. You can also use the contact form.'), 'warn'); return;
+    }
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+    if (f('_gotcha').value) return;
+    const ph = f('phone').value.trim(), digits = ph.replace(/\D/g, '');
+    if (!/^[+()\d\s./-]+$/.test(ph) || digits.length < 7 || digits.length > 15) { say(tr('Zkontrolujte prosím telefon (7–15 číslic, třeba +420 777 123 456).', 'Please check the phone number (7–15 digits, e.g. +420 777 123 456).'), 'bad'); f('phone').focus(); return; }
+    const L = LAST, m = D_.models[S.m], note = f('note').value.trim();
+    const data = new FormData();
+    data.set('lead_type', 'customer'); data.set('language', EN ? 'en' : 'cs'); data.set('source_page', EN ? '/en/contact/' : '/cs/kontakt/');
+    data.set('name', f('name').value.trim()); data.set('email', f('email').value.trim()); data.set('phone', f('phone').value.trim());
+    data.set('model', m.name); data.set('_gotcha', '');
+    data.set('message', ((note ? note + '\n\n' : '') + designText(L) + '\n' + tr('Výkres s rozměry a 3D: ', 'Drawing with dimensions and 3D: ') + designUrl('vykres')).slice(0, 3000));
+    btn.disabled = true; say(tr('Odesíláme…', 'Sending…'));
+    try {
+      await window.WatraEnquiry.send(form, data);
+      track('generate_lead', {lead_type: 'customer', item_id: S.m === 'e' ? 'irikon-e' : 'irikon'});
+      done();
+    } catch (err) {
+      const c = err && err.message;
+      say(c === 'rate-limit' ? tr('Odesíláte příliš často. Zkuste to prosím za chvíli.', 'Too many attempts. Please try again in a moment.')
+        : c === 'verification' ? tr('Nepodařilo se ověřit, že nejste robot. Zkuste to prosím znovu.', 'We could not verify that you are not a robot. Please try again.')
+        : tr('Návrh se nepodařilo odeslat. Zkuste to znovu, nebo použijte kontaktní formulář.', 'Your design could not be sent. Please try again or use the contact form.'), 'bad');
+    } finally { btn.disabled = false; }
+  });
+}
+
 /* ---------- start ---------- */
 readHash();
 bindUI(); syncInputs();
@@ -1188,6 +1371,7 @@ update();
   const v0 = new URLSearchParams(location.hash.slice(1)).get('v');
   if (R3) setMode(v0 === 'sit' || v0 === 'walk' ? v0 : 'orbit');
   if (v0 === 'plan' || !R3) setTab('plan');
+  if (v0 === 'vykres') setTimeout(openSheet, 900);
 }
 addEventListener('hashchange', () => { readHash(); syncInputs(); update(); });
 window.WATRA_KONFIGURATOR = {S, layout, data: D_, rotate: rotateStove, update: () => { syncInputs(); update(); }, get last() { return LAST; }, get sel() { return SEL; }, get r3() { return R3; }};
