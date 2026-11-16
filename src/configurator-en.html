@@ -1,0 +1,182 @@
+<div class="wk">
+<section class="wk-hero wrap">
+  <p class="eyebrow">WATRA / Sauna configurator<span class="wk-new">new</span></p>
+  <h1>Will it fit?<br><em>Build your sauna.</em></h1>
+  <p class="lead">Enter the size of your sauna and place an IRIKON heater and benches in it. You will see right away whether the heater keeps a safe distance, how many people fit and what the sauna will look like. Walk around it, or sit down on the upper bench.</p>
+  <div class="wk-presets" role="group" aria-label="Start from a ready-made sauna">
+    <span class="wk-presets-l">Start from:</span>
+    <button class="wk-chip" type="button" data-preset="mala">Home sauna 2 × 2 m</button>
+    <button class="wk-chip" type="button" data-preset="zahrada">Garden sauna with a window</button>
+    <button class="wk-chip" type="button" data-preset="dolniL">Upper bench at the back, lower in an L</button>
+    <button class="wk-chip" type="button" data-preset="penzion">Larger, upper bench in an L</button>
+    <button class="wk-chip ghost" type="button" data-preset="reset">Start over</button>
+  </div>
+</section>
+
+<section class="wrap wk-app" aria-label="Sauna configurator">
+  <div class="wk-panel">
+    <details class="wk-group" data-sec="sauna" open>
+      <summary><h2><span>1</span>Sauna</h2><output class="wk-sum" id="wk-sum-sauna"></output></summary>
+      <div class="wk-gbody">
+      <p class="wk-help">Inside dimensions, without cladding.</p>
+      <div class="wk-row"><label for="wk-w">Width</label><input id="wk-w" type="range" min="120" max="400" step="5" data-k="w" aria-label="Sauna width"><span class="wk-num"><input type="number" min="120" max="400" step="5" data-k="w" aria-label="Width in cm" inputmode="numeric"><i>cm</i></span></div>
+      <div class="wk-row"><label for="wk-d">Depth</label><input id="wk-d" type="range" min="120" max="400" step="5" data-k="d" aria-label="Sauna depth"><span class="wk-num"><input type="number" min="120" max="400" step="5" data-k="d" aria-label="Depth in cm" inputmode="numeric"><i>cm</i></span></div>
+      <div class="wk-row"><label for="wk-h">Height</label><input id="wk-h" type="range" min="180" max="260" step="5" data-k="h" aria-label="Sauna height"><span class="wk-num"><input type="number" min="180" max="260" step="5" data-k="h" aria-label="Height in cm" inputmode="numeric"><i>cm</i></span></div>
+      <div class="wk-field"><span>Walls</span>
+        <div class="wk-seg" role="group" aria-label="Sauna walls"><button type="button" data-set="mw" data-val="wood">Insulated timber</button><button type="button" data-set="mw" data-val="masonry">Uninsulated masonry</button></div></div>
+      </div>
+    </details>
+
+    <details class="wk-group" data-sec="kamna">
+      <summary><h2><span>2</span>Heater</h2><output class="wk-sum" id="wk-sum-kamna"></output></summary>
+      <div class="wk-gbody">
+      <div class="wk-model" role="group" aria-label="Heater model">
+        <button type="button" data-model="wood"><strong>IRIKON</strong><small>Wood · 11 kW</small></button>
+        <button type="button" data-model="e"><strong>IRIKON +e</strong><small>Wood + 9 kW electric</small></button>
+      </div>
+      <div class="wk-field"><span>Wall</span>
+        <div class="wk-seg" role="group" aria-label="Heater stands at the wall"><button type="button" data-set="sw" data-val="left">left</button><button type="button" data-set="sw" data-val="back">back</button><button type="button" data-set="sw" data-val="right">right</button><button type="button" data-set="sw" data-val="front">by the door</button></div></div>
+      <div class="wk-row"><label for="wk-sp">Position</label><input id="wk-sp" type="range" min="0" max="100" step="1" data-k="sp"><output id="wk-spo"></output></div>
+      <div class="wk-field"><span>Rotation</span>
+        <div class="wk-rotrow"><button type="button" class="wk-rotb" id="wk-rotb" aria-label="Rotate the heater by 90°"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M15.5 9.5A5.6 5.6 0 1 1 13.6 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M14.4 1.8l.3 4.1-4.1.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Rotate 90°</button><output id="wk-roto"></output></div></div>
+      <p class="wk-help">Drag the heater in the floor plan to move it. Click it (in the plan or in 3D) and rotate it with the ⟳ arrow or the R key.</p>
+      <div class="wk-acc">
+        <p class="wk-acc-h"><strong>Heat shields</strong><em>accessory · CZK 1,000 each</em></p>
+        <div class="wk-seg" role="group" aria-label="Number of heat shields"><button type="button" data-set="sh" data-val="0">none</button><button type="button" data-set="sh" data-val="1">1 shield</button><button type="button" data-set="sh" data-val="2">2 shields</button><button type="button" data-set="sh" data-val="3">3 shields</button></div>
+        <small>A steel panel on a side or the back of the heater halves that side’s distance to the wall (16 → 8 cm), so the heater can stand closer to the wall. Shields go on the sides nearest to a wall.</small>
+      </div>
+      </div>
+    </details>
+
+    <details class="wk-group" data-sec="lavice">
+      <summary><h2><span>3</span>Benches</h2><output class="wk-sum" id="wk-sum-lavice"></output></summary>
+      <div class="wk-gbody">
+      <div class="wk-field"><span>Upper bench</span>
+        <div class="wk-seg" role="group" aria-label="Upper bench along the walls">
+          <label class="wk-tog" data-wall="back"><input type="checkbox" data-k="ub"><span>back</span></label>
+          <label class="wk-tog" data-wall="left"><input type="checkbox" data-k="ul"><span>left</span></label>
+          <label class="wk-tog" data-wall="right"><input type="checkbox" data-k="ur"><span>right</span></label>
+        </div></div>
+      <div class="wk-field"><span>Lower bench</span>
+        <div class="wk-seg" role="group" aria-label="Lower bench along the walls">
+          <label class="wk-tog" data-wall="back"><input type="checkbox" data-k="lb"><span>back</span></label>
+          <label class="wk-tog" data-wall="left"><input type="checkbox" data-k="ll"><span>left</span></label>
+          <label class="wk-tog" data-wall="right"><input type="checkbox" data-k="lr"><span>right</span></label>
+        </div></div>
+      <p class="wk-help">The lower bench stands in front of the upper one. Where there is no upper bench, it stands against the wall on its own, for example an upper bench only at the back and a lower bench in an L.</p>
+      </div>
+    </details>
+
+    <details class="wk-group" data-sec="dvere">
+      <summary><h2><span>4</span>Door and window</h2><output class="wk-sum" id="wk-sum-dvere"></output></summary>
+      <div class="wk-gbody">
+      <div class="wk-field"><span>Door</span>
+        <div class="wk-seg" role="group" aria-label="Door in the wall"><button type="button" data-set="dw" data-val="front">front</button><button type="button" data-set="dw" data-val="left">left</button><button type="button" data-set="dw" data-val="right">right</button><button type="button" data-set="dw" data-val="back">back</button></div></div>
+      <div class="wk-row"><label for="wk-dp">Position</label><input id="wk-dp" type="range" min="0" max="100" step="1" data-k="dp"><output id="wk-dpo"></output></div>
+      <label class="wk-check"><input type="checkbox" data-k="dg">Glass door</label>
+      <div class="wk-field"><span>Window</span>
+        <div class="wk-seg" role="group" aria-label="Window"><button type="button" data-set="win" data-val="none">no window</button><button type="button" data-set="win" data-val="small">small</button><button type="button" data-set="win" data-val="big">large</button><button type="button" data-set="win" data-val="wall">glass wall</button></div></div>
+      <div class="wk-field" id="wk-ww-row"><span>Window wall</span>
+        <div class="wk-seg" role="group" aria-label="Window in the wall"><button type="button" data-set="ww" data-val="left">left</button><button type="button" data-set="ww" data-val="back">back</button><button type="button" data-set="ww" data-val="right">right</button><button type="button" data-set="ww" data-val="front">front</button></div></div>
+      <p class="wk-help">The vents are placed automatically around the heater: air inlet behind the heater, circulation and a closable vent on the opposite wall.</p>
+      </div>
+    </details>
+    <a class="wk-tocheck" href="#wk-report">Full sauna check and next steps ↓</a>
+  </div>
+
+  <div class="wk-col">
+    <div class="wk-sticky">
+      <div class="wk-viewer" id="wk-viewer">
+        <div class="wk-bar">
+          <p class="wk-summary" id="wk-summary" aria-live="polite"></p>
+          <span class="sp"></span>
+          <div class="wk-tabs" role="tablist" aria-label="View">
+            <button type="button" role="tab" aria-selected="true" data-wk-tab="3d">3D</button>
+            <button type="button" role="tab" aria-selected="false" data-wk-tab="plan">Floor plan</button>
+          </div>
+          <button class="wk-icon" type="button" id="wk-full" aria-label="Full screen" title="Full screen"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8V3h5M12 3h5v5M17 12v5h-5M8 17H3v-5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>
+        </div>
+        <div class="wk-alert" id="wk-alert" hidden></div>
+        <div class="wk-stage">
+          <div id="wk-3dwrap">
+            <div id="wk-3d"></div>
+            <div class="wk-modes" role="group" aria-label="3D view">
+              <button type="button" data-wk-view="orbit" aria-pressed="true">Overview</button>
+              <button type="button" data-wk-view="walk" aria-pressed="false">Walk</button>
+              <button type="button" data-wk-view="sit" aria-pressed="false">Sit down</button>
+            </div>
+            <div class="wk-fx" role="group" aria-label="How you heat (visual only)">
+              <button type="button" data-wk-fx="wood">Wood</button>
+              <button type="button" data-wk-fx="el">Electric</button>
+              <button type="button" data-wk-fx="both">Both</button>
+            </div>
+            <div class="wk-toggles" role="group" aria-label="Show">
+              <button type="button" data-toggle="zone" aria-pressed="true">Safe zone</button>
+              <button type="button" data-toggle="ppl" aria-pressed="false">How many fit</button>
+            </div>
+            <button type="button" class="wk-mini" id="wk-mini" aria-label="Open the floor plan" title="Floor plan"></button>
+            <p id="wk-hint"></p>
+          </div>
+          <button type="button" class="wk-rot" id="wk-rot" hidden aria-label="Rotate the heater by 90°" title="Rotate the heater by 90° (R)"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M15.5 9.5A5.6 5.6 0 1 1 13.6 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M14.4 1.8l.3 4.1-4.1.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div id="wk-planwrap" hidden><div id="wk-plan"></div><p class="wk-plan-legend"><i class="lz"></i>safe zone <i class="ls"></i>space to load wood <i class="le"></i>entrance <i class="lv1"></i>air inlet <i class="lv2"></i>circulation <i class="lv3"></i>ventilation</p></div>
+        </div>
+        <div class="wk-foot">
+          <div class="wk-kpi"><span>Volume</span><strong id="wk-vol"></strong><small id="wk-vol-note"></small></div>
+          <div class="wk-kpi"><span>Seats</span><strong id="wk-seats"></strong><small id="wk-seats-note"></small></div>
+          <div class="wk-kpi"><span>Heater</span><strong id="wk-model"></strong><small id="wk-model-note"></small></div>
+          <a class="button wk-send" href="/en/contact/?type=customer">Send my sauna</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap wk-report" id="wk-report">
+  <div class="wk-report-grid">
+    <div>
+      <p class="eyebrow">Your sauna check</p>
+      <h2 class="wk-report-h" id="wk-report-h"></h2>
+      <ul id="wk-checks" aria-label="Sauna check"></ul>
+    </div>
+    <div>
+      <p class="eyebrow">Things to consider</p>
+      <ul id="wk-notes"></ul>
+      <p class="wk-honest"><strong>Indicative calculation.</strong> WATRA heaters are in development and certification is in progress. The wall clearance (about 16 cm, half on a side with a heat shield) is a preliminary WATRA figure. The clearance in front of the door, the ceiling distance and the recommended sauna volume are typical values for wood-fired heaters of a similar size for now. Certification will confirm everything; before you build, we will check it with you and your chimney sweep.</p>
+      <div class="wk-actions">
+        <a class="button wk-send" href="/en/contact/?type=customer">Send my WATRA sauna</a>
+        <button class="button outline" type="button" id="wk-copy">Copy link</button>
+      </div>
+      <p class="small" style="margin-top:12px">The link contains your whole sauna. You can also send it to your builder.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section wrap border-top">
+  <div class="wk-below">
+    <div>
+      <p class="eyebrow">How it works</p>
+      <h2>From measurements<br><em>to your sauna.</em></h2>
+    </div>
+    <ol class="wk-how">
+      <li><strong>Measure the sauna inside.</strong><br><span class="muted">Width, depth and height from floor to ceiling. For a planned sauna, the dimensions from the design are enough.</span></li>
+      <li><strong>Place the heater and benches.</strong><br><span class="muted">The heater usually stands by a wall near the door, with the benches opposite. The golden zone shows where nothing combustible should be.</span></li>
+      <li><strong>Walk around and sit down.</strong><br><span class="muted">In 3D you will see whether there is enough room to load wood and how close to the bench the heater will be.</span></li>
+      <li><strong>Send us your design.</strong><br><span class="muted">The link contains your whole sauna. We will get back to you and go through the model, the chimney and the electrical connection.</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="section wrap faq-section" style="padding-top:0">
+  <div class="section-head"><div><p class="eyebrow">Questions and answers</p><h2>Before you start building.</h2></div></div>
+  <div class="faq-list" id="wk-faq">
+    <details><summary>How large a sauna can an IRIKON heat?<span aria-hidden="true">+</span></summary><p>We will set the exact volume range once certification is complete. For now, the configurator uses the typical range of wood-fired heaters with a similar output. Each m² of glass or uninsulated wall counts as if the sauna had 1.2 m³ more volume.</p></details>
+    <details><summary>How far must the heater be from the wall and the bench?<span aria-hidden="true">+</span></summary><p>For now we count on about 16 cm from the walls. A heat shield is a steel panel on a side or the back of the heater (accessory, CZK 1,000 each, up to 3): with it, about half is enough on that side, so the heater can stand closer to the wall. The full distance applies to benches and in front of the door. Certification will confirm the exact values and they will be in the installation manual.</p></details>
+    <details><summary>What do I need for the chimney?<span aria-hidden="true">+</span></summary><p>The heater’s flue outlet is 115 mm in diameter and points up. The connection to the chimney, the ceiling pass-through and the flue inspection are handled by a chimney sweep according to local regulations.</p></details>
+    <details><summary>What does the electric part of the IRIKON +e need?<span aria-hidden="true">+</span></summary><p>The electric part has 3 × 3 kW and needs a three-phase 400 V supply and an external sauna controller. A 9 kW heater is usually protected by a 3 × 16 A breaker; an electrician will design the protection and wiring. Electricity alone usually heats a sauna of up to 9 m³.</p></details>
+    <details><summary>I have a wooden floor. What goes under the heater?<span aria-hidden="true">+</span></summary><p>A wood-fired heater needs a non-combustible base that extends in front of the door and to the sides, so that no hot ember lands on wood. With stones the heater weighs about 150 kg, and the floor must carry it.</p></details>
+    <details><summary>Do I need a chimney inspection?<span aria-hidden="true">+</span></summary><p>Yes. Before the first firing, a chimney sweep must inspect the flue, and then clean and check it regularly according to local regulations.</p></details>
+    <details><summary>How should the sauna be ventilated?<span aria-hidden="true">+</span></summary><p>The configurator places three vents: a combustion air inlet behind the heater about 35 cm above the floor, a circulation vent on the opposite wall at about 60 cm by the door, and a closable vent diagonally opposite the heater near the ceiling for airing after the sauna or when it gets too hot. We will confirm the exact placement for the IRIKON with the installation manual.</p></details>
+  </div>
+</section>
+<p class="wk-credit wrap">Configurator by <a href="https://www.honzasorm.cz/" target="_blank" rel="noopener">Honza Šorm</a></p>
+</div>

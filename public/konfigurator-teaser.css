@@ -1,0 +1,20 @@
+/* WATRA · upoutávka na konfigurátor sauny (úvod, modely) */
+/* úvod a stránky modelů: sekce s konfigurátorem a odkaz v hero */
+.wk-teaser-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:clamp(28px,5vw,72px);align-items:center}
+.wk-teaser-img{position:relative;display:block;background:#121413;border:1px solid var(--line);overflow:hidden}
+.wk-teaser-img img{width:100%;height:auto;transition:transform .6s ease}
+.wk-teaser-img:hover img{transform:scale(1.03)}
+.wk-teaser-img:hover{border-color:var(--gold)}
+.wk-teaser-tag{position:absolute;left:14px;bottom:14px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);background:rgba(18,20,19,.82);padding:6px 10px}
+.wk-teaser h2{margin-bottom:22px}
+.wk-teaser-list{list-style:none;padding:0;margin:14px 0 6px}
+.wk-teaser-list li{position:relative;padding-left:26px;margin:0 0 8px;color:var(--muted)}
+.wk-teaser-list li:before{content:"";position:absolute;left:0;top:.8em;width:14px;height:1px;background:var(--gold)}
+.wk-teaser .actions{margin-top:24px}
+.wk-hero-chip{display:inline-flex;align-items:center;gap:12px;margin-top:20px;padding:10px 16px 10px 10px;border:1px solid rgba(212,174,108,.45);background:rgba(18,20,19,.66);backdrop-filter:blur(4px);font-size:14px;line-height:1.4;color:var(--text);pointer-events:auto;transition:border-color .2s}
+.wk-hero-chip .wk-new{margin:0;flex:none}
+.wk-hero-chip strong{font-weight:400;color:var(--gold)}
+.wk-hero-chip:hover{border-color:var(--gold)}
+@media(max-width:900px){.wk-teaser-grid{grid-template-columns:minmax(0,1fr);gap:28px}}
+@media(max-width:700px){.wk-hero-chip{font-size:13px}}
+.wk-new{display:inline-block;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;background:var(--gold);color:var(--dark);padding:1px 6px;margin-left:8px;vertical-align:3px}
