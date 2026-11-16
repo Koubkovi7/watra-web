@@ -1,3 +1,4 @@
+import {formReady} from '../src/form-intake.mjs';
 import {mkdir,writeFile,readFile,readdir,cp,rm} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import path from 'node:path';
@@ -19,7 +20,7 @@ for(const lang of ['cs','en'])for(const key of Object.keys(routes)){
 }
 await writeFile(path.join(output,'index.html'),'<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>WATRA — Choose your language</title><link rel="icon" href="/brand/icon-32.png" type="image/png"><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/brand.css"><main class="wrap section"><a class="brand brand-image" href="/cs/"><img src="/brand/logo.png" alt="WATRA" width="356" height="208"></a><h1>Vítejte.<br><em>Welcome.</em></h1><div class="actions"><a class="button" href="/cs/" data-language="cs">Česky</a><a class="button outline" href="/en/" data-language="en">English</a></div></main></html>');
 await writeFile(path.join(output,'404.html'),render('cs','notfound',config));
-await writeFile(path.join(output,'site-config.json'),JSON.stringify({email:config.email,phone:config.phone,whatsapp:config.whatsapp,formspreeId:config.formspreeId,gtmId:config.gtmId,clarityId:config.clarityId,analyticsHosts:config.analyticsHosts,formsEnabled:!!(config.formspreeId&&config.privacyApproved&&config.email)}));
+await writeFile(path.join(output,'site-config.json'),JSON.stringify({email:config.email,phone:config.phone,whatsapp:config.whatsapp,gtmId:config.gtmId,clarityId:config.clarityId,analyticsHosts:config.analyticsHosts,formsEnabled:formReady(config)}));
 await writeFile(path.join(output,'sitemap.xml'),'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+['cs','en'].flatMap(l=>Object.keys(routes).filter(k=>!['thanks','notfound'].includes(k)).map(k=>'<url><loc>'+config.origin+'/'+l+'/'+routes[k][l]+'</loc></url>')).join('')+'</urlset>');
 await writeFile(path.join(output,'robots.txt'),'User-agent: *\nAllow: /\nSitemap: '+config.origin+'/sitemap.xml\n');
 await writeFile(path.join(output,'_routes.json'),JSON.stringify({version:1,include:['/','/tv','/tv/'],exclude:[]}));

@@ -27,7 +27,7 @@ Náhled: http://localhost:3010/cs/. Místní server na / používá češtinu; C
 
 Cloudflare: větev redesign, příkaz node scripts/build.mjs, výstup dist. GitHub hlavní větev a DNS domény mají samostatný postup přechodu.
 
-Všechny běžné podstránky jsou statické. Soubor _routes.json omezuje spuštění Functions na / a /tv; výpadek formulářové služby nebrání čtení webu. Formspree je externí úložiště poptávek, web nemá vlastní databázi.
+Všechny běžné podstránky jsou statické. Soubor _routes.json omezuje spuštění Functions na / a /tv; výpadek formulářové služby nebrání čtení webu. Kontaktní i homepage formulář používají stejný příjem přes Cloudflare Worker, soukromé D1 úložiště a e-mailová upozornění jako teaser.
 
 Fotografie jsou pracovní náhledy. Pro jejich nové zpracování slouží scripts/prepare-assets.cjs, který vyžaduje místně dostupný Sharp a původní soubory mimo repozitář. Běžné nasazení tento krok nepotřebuje.
 
@@ -37,11 +37,11 @@ Testy ověřují lokalizované cesty a odkazy, metadata, přesměrování, ochra
 
 Plán prodeje má samostatné nastavení launchExpected (YYYY-MM), oddělené od certificationExpected. Obě hodnoty jsou nyní listopad 2026. Homepage výslovně podmiňuje zahájení prodeje úspěšnou certifikací a uvádí možnost změny termínu.
 
-Okno se nikdy neotevírá automaticky. Bez JavaScriptu odkazy vedou na kontaktní stránku. Aktivace příjmu vyžaduje platné formspreeId, email a dokončené informace o zpracování údajů (privacyApproved). Do té doby jsou pole vypnutá a okno nabízí přímý e-mail.
+Okno se nikdy neotevírá automaticky. Bez JavaScriptu odkazy vedou na kontaktní stránku. Aktivace příjmu vyžaduje fullFormEnabled, veřejný turnstileSiteKey, email a dokončené informace o zpracování údajů (privacyApproved). Do té doby jsou pole vypnutá a okno nabízí přímý e-mail.
 
-Formspree dostane lead_type=launch_notification, jazyk, zdrojovou stránku a čas, verzi a text výslovného souhlasu. Úspěch se zobrazí až po potvrzeném přijetí službou; při chybě zůstanou údaje vyplněné. E-mail ani obsah polí nejdou do analytiky. Událost generate_lead respektuje existující analytické/reklamní souhlasy. Clarity se na stránkách s tímto formulářem nespouští.
+Cloudflare uloží lead_type=launch_notification, jazyk, zdrojovou stránku a čas, verzi a text výslovného souhlasu. Úspěch se zobrazí až po potvrzeném přijetí službou; při chybě zůstanou údaje vyplněné. E-mail ani obsah polí nejdou do analytiky. Událost generate_lead respektuje existující analytické/reklamní souhlasy. Clarity se na stránkách s tímto formulářem nespouští.
 
-Před aktivací dokončit informace o příjemcích, době uchování, odvolání souhlasu a právech zájemců. Ověřit reálný test ve Formspree i cílové schránce. Automatické potvrzovací e-maily / double opt-in vyžadují samostatné nastavení ve službě; web je neslibuje.
+Před aktivací dokončit informace o příjemcích, době uchování, odvolání souhlasu a právech zájemců. Ověřit příjem v D1 i cílové schránce. Automatické potvrzovací e-maily / double opt-in vyžadují samostatné nastavení ve službě; web je neslibuje.
 
 ## Logo a plamen při načítání
 
@@ -58,7 +58,7 @@ WatraLoading.start(container, {label, overlay, variant}) vrací funkci pro ukon�
 
 ## Zapojený příjem formulářů
 
-Formspree: projekt WATRA, veřejné ID mppzbljw, cílový e-mail richard@watra.cz. Stejný formulář přijímá kontaktní poptávky a launch_notification z homepage. Formspree omezuje příjem na watra.cz a subdomény; app.js podle data-domain na jiných hostitelích vypne odesílání a ukáže odkaz na produkci. Lokální testy neobcházejí toto omezení.
+Oba formuláře plné prezentace posílají na /api/watra/enquiries. Sdílený public/enquiry.js načítá neviditelný Turnstile až při odeslání, přidává UUID pro bezpečné opakování a vyžaduje potvrzení stejného UUID po uložení. Backend je stejný jako u teaseru; bez Formspree. app.js podle data-domain na náhledech vypne odesílání a ukáže odkaz na produkci.
 
 src/privacy.mjs obsahuje CS/EN informace o skutečném zpracování; retention a retentionEn v site.config.json obsahují odsouhlasených nejvýše 12 měsíců od poslední komunikace. Tato informace sama nemaže externí e-maily ani exporty. Provozní kroky a limity jsou v SLUZBY-A-SPUSTENI.md.
 
@@ -86,3 +86,11 @@ Poštovní DNS ověřené 2. 11. 2026: SPF obsahuje Google Workspace i include:_
 Živý test z 2. 11. 2026 v 21:08 SEČ byl doručen za tři sekundy do Doručené pošty. SPF prošlo. Google v okamžiku přijetí ještě uváděl no key for signature pro cf2024-1 na watra.cz a DMARC FAIL, ačkoli veřejné DNS Googlu už vracelo nově doplněný DKIM i DMARC; pravděpodobnou příčinou je dříve uložená negativní odpověď v mezipaměti příjmu. Tato kontrola sama tedy nepotvrzuje dokončení propagace podpisu u přijímajícího serveru.
 
 Automatické zpracování uloženého syntetického kontaktu bylo ověřené 2. 11. 2026: upozornění dorazilo v 21:10 SEČ do Doručené pošty a stav v D1 přešel na sent. Nový časovač se může po nasazení podle dokumentace Cloudflare šířit až 15 minut.
+
+## Obnovení plné prezentace 16. 11. 2026
+
+Produkční režim je `full`. Schválený teaser se siluetou a jeho formulář zůstávají beze změny připravené v repozitáři. Stav před obnovením uchovává značka `archive/teaser-2026-11-16`.
+
+Rychlé skrytí prezentace: `npm run mode:teaser`, `npm run build`, změnu site.config.json uložit a odeslat do produkční větve `redesign`. Cloudflare Pages nasadí pouze teaser, informace o soukromí a potvrzení; produktové stránky přesměruje 302 a produktové fotografie nepublikuje. Opačný postup je `npm run mode:full`. Jde o veřejnou zástupnou stránku, nikoli přihlašování.
+
+Kontakty v obou režimech přijímá tentýž Worker a ukládá do stejné soukromé D1 databáze. Oznámení směřují na richard@watra.cz. Pro přepnutí se nemění Worker, DNS ani tajné klíče. Google tabulka zůstává nepřipojená.

@@ -67,14 +67,14 @@ test('pre-launch model pages describe both models without incomplete shopping ma
 });
 
 test('blank integrations never publish a working form or fake contacts',()=>{
-  const html=render('cs','contact',{...config,email:'',phone:'',whatsapp:'',formspreeId:'',privacyApproved:false});
+  const html=render('cs','contact',{...config,email:'',phone:'',whatsapp:'',fullFormEnabled:false,privacyApproved:false});
   assert.match(html,/data-ready="false"/);assert.match(html,/type="submit" disabled/);
   assert.ok(!html.includes('action="https://formspree.io'));
   assert.ok(!html.includes('mailto:'));assert.ok(!html.includes('wa.me/'));
 });
 test('configured form includes the actual endpoint and safely escapes operator data',()=>{
-  const html=render('en','contact',{...config,email:'hello@example.test',privacyApproved:true,formspreeId:'abcdefgh'});
-  assert.match(html,/action="https:\/\/formspree.io\/f\/abcdefgh" method="post"/);
+  const html=render('en','contact',{...config,email:'hello@example.test',privacyApproved:true,fullFormEnabled:true});
+  assert.match(html,/action="\/api\/watra\/enquiries" method="post"/);
   assert.match(html,/data-ready="true"/);assert.ok(!html.includes('type="submit" disabled'));
   assert.match(html,/data-clarity-mask="true"/);
   const privacy=render('en','privacy',{...config,operator:'<script>bad</script>'});assert.match(privacy,/&lt;script&gt;bad/);
@@ -92,7 +92,7 @@ test('preview hosts cannot be indexed and security headers exist',async()=>{
 test('active forms publish localized retention and identify their processor and withdrawal contact',()=>{
   for(const [lang,retention] of [['cs','12 měsíců'],['en','12 months']]){
     const html=render(lang,'privacy',{...config,privacyApproved:true});
-    assert.ok(html.includes(retention));assert.match(html,/Formspree, Inc\./);
+    assert.ok(html.includes(retention));assert.match(html,/Cloudflare/);assert.doesNotMatch(html,/Formspree|formspree\.io/);
     assert.match(html,/mailto:richard@watra.cz/);assert.match(html,/https:\/\/uoou.gov.cz\//);
     assert.doesNotMatch(html,/class="form-notice"/);
     if(lang==='en')assert.ok(!html.includes('Kontakty na zájemce'));

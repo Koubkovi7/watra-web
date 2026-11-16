@@ -7,7 +7,7 @@ const code=await readFile('public/launch.js','utf8');
 const config=JSON.parse(await readFile('site.config.json','utf8'));
 const element=(extra={})=>({handlers:{},hidden:false,disabled:false,textContent:'Send',value:'',checked:false,
   addEventListener(k,v){this.handlers[k]=v;},setAttribute(k,v){this[k]=v;},getAttribute(k){return this[k];},focus(){this.focused=true;},...extra});
-function client({ready=true,consent=true,valid=true,endpoint='https://formspree.io/f/testform',response={ok:true,json:async()=>({ok:true})},pending}={}){
+function client({ready=true,consent=true,valid=true,endpoint='/api/watra/enquiries',response={ok:true,json:async()=>({ok:true})},pending}={}){
   const button=element(),status=element(),signup=element(),success=element({hidden:true}),successButton=element(),opener=element(),closer=element();
   const fields={consent:element({checked:consent}),honey:element(),email:element({value:'private@example.test'})};
   const form=element({dataset:{ready:String(ready)},action:endpoint,checkValidity:()=>valid,
@@ -22,14 +22,14 @@ function client({ready=true,consent=true,valid=true,endpoint='https://formspree.
     FormData:class{constructor(){this.values={email:fields.email.value};}set(k,v){this.values[k]=v;}},
     CustomEvent:class{constructor(type){this.type=type;}},
     fetch:async(url,options)=>{requests.push({url,options});return pending?await pending:response;}};
-  context.window=context;vm.runInNewContext(code,context);
+  context.window=context;context.WatraEnquiry={send:async(form,data)=>{requests.push({url:form.action,options:{body:data}});const r=pending?await pending:response;if(r.status===429)throw Error('rate-limit');if(!r.ok)throw Error('delivery');const result=await r.json();if(result?.ok!==true||result.errors)throw Error('delivery');return result;}};vm.runInNewContext(code,context);
   return {dialog,form,button,status,signup,success,opener,closer,fields,events,requests,document,
     submit:()=>form.handlers.submit({preventDefault(){}}),open:()=>opener.handlers.click({preventDefault(){}})};
 }
 
 test('localized homepage has a conditional sales date independent of certification and an honest fallback',()=>{
   for(const [lang,date] of [['cs','listopad 2026'],['en','November 2026']]){
-    const html=render(lang,'home',{...config,certificationExpected:'2027-01',launchExpected:'2026-11',formspreeId:'',privacyApproved:false});
+    const html=render(lang,'home',{...config,certificationExpected:'2027-01',launchExpected:'2026-11',fullFormEnabled:false,privacyApproved:false});
     assert.match(html,new RegExp('class="launch-date">'+date));
     assert.match(html,/id="launch-dialog"/);assert.match(html,/data-launch-open/);
     assert.match(html,/id="launch-form" data-ready="false"/);assert.match(html,/<fieldset disabled>/);
@@ -41,13 +41,13 @@ test('localized homepage has a conditional sales date independent of certificati
 });
 
 test('ready capture requires a validated endpoint and includes explicit consent and purpose',()=>{
-  const enabled={...config,privacyApproved:true,formspreeId:'testform'};
+  const enabled={...config,privacyApproved:true,fullFormEnabled:true};
   const html=render('en','home',enabled);
-  assert.match(html,/id="launch-form" data-ready="true" action="https:\/\/formspree.io\/f\/testform"/);
+  assert.match(html,/id="launch-form" data-ready="true" action="\/api\/watra\/enquiries"/);
   assert.match(html,/name="contact_consent" type="checkbox" value="yes" required/);
   assert.match(html,/name="lead_type" value="launch_notification"/);
   assert.match(html,/name="consent_text"/);assert.match(html,/name="consent_version"/);
-  assert.match(render('cs','home',{...enabled,formspreeId:'invalid/id'}),/data-ready="false"/);
+  assert.match(render('cs','home',{...enabled,turnstileSiteKey:''}),/data-ready="false"/);
 });
 
 test('popup opens only on request and restores focus and scrolling after closing',()=>{

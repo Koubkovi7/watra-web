@@ -1,3 +1,4 @@
+import {formReady} from './form-intake.mjs';
 import {formDomainAttribute,formDomainNotice} from './form-domain.mjs';
 const pick=(l,cs,en)=>l==='cs'?cs:en;
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -5,7 +6,7 @@ export const launchDate=c=>c.launchExpected||'2026-11';
 export const launchMonth=(l,c,year=true)=>new Intl.DateTimeFormat(l==='cs'?'cs-CZ':'en-GB',{month:'long',...(year?{year:'numeric'}:{}),timeZone:'UTC'}).format(new Date(launchDate(c)+'-01T00:00:00Z'));
 const contact=l=>l==='cs'?'/cs/kontakt/':'/en/contact/';
 const privacy=l=>l==='cs'?'/cs/ochrana-udaju/':'/en/privacy/';
-export const launchReady=c=>!!(c.privacyApproved&&c.email&&/^[a-z0-9]+$/i.test(c.formspreeId||''));
+export const launchReady=formReady;
 export const launchCTA=(l,cls='button')=>`<a class="${cls}" href="${contact(l)}?type=launch" data-launch-open aria-haspopup="dialog" aria-controls="launch-dialog">${pick(l,'Chci vědět o spuštění','Notify me when sales begin')}</a>`;
 export const launchTopbar=(l,c)=>`<div class="launch-topline"><span><span class="dot" aria-hidden="true"></span>${pick(l,'Certifikace probíhá','Certification in progress')}</span><span>${pick(l,'Oficiální prodej plánujeme na','Official sales are planned for')} <strong>${launchMonth(l,c)}</strong></span></div>`;
 export const launchHero=(l,c)=>`<div class="launch-hero-note"><p>${pick(l,'Certifikace probíhá. Prodej plánujeme na','Certification is in progress. Sales are planned for')}</p><p class="launch-date">${launchMonth(l,c)}.</p><p class="small">${pick(l,'Zahájení prodeje závisí na úspěšném dokončení certifikace. Termín se může změnit.','Sales will begin after successful certification. The planned date may change.')}</p></div>`;
@@ -27,7 +28,7 @@ export function launchDialog(l,c){
           <p class="launch-sale-date">${pick(l,'Plánovaný prodej:','Planned sales launch:')} ${launchMonth(l,c)}</p>
           <p class="launch-cert-note">${pick(l,'Certifikace právě probíhá. Prodej zahájíme po jejím úspěšném dokončení. Termín se může změnit.','Certification is in progress. Sales will begin after successful certification. The planned date may change.')}</p>
           ${!ready?`<div class="launch-unavailable" role="note">${pick(l,'Automatické přihlášení připravujeme. Zájem nám zatím můžete napsat přímo:','Email signup is coming soon. For now, tell us about your interest directly:')} ${mail||`<a href="${contact(l)}">${pick(l,'Kontakt','Contact')}</a>`}</div>`:''}
-          <form id="launch-form" data-ready="${ready}" ${ready?`action="https://formspree.io/f/${escape(c.formspreeId)}" method="post"`:''}${formDomainAttribute(c)}>
+          <form id="launch-form" data-ready="${ready}" ${ready?`action="/api/watra/enquiries" method="post" data-sitekey="${escape(c.turnstileSiteKey)}"`:''}${formDomainAttribute(c)}>
             ${formDomainNotice(l,c,'home')}
             <fieldset ${!ready?'disabled':''}>
               <label for="launch-email">${pick(l,'Váš e-mail','Your email')} <span>*</span></label>

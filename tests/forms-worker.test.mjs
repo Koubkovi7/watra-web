@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {render} from '../src/pages.mjs';
 import {DatabaseSync} from 'node:sqlite';
 import {readFile} from 'node:fs/promises';
 import {handleRequest} from '../services/forms/worker.mjs';
@@ -155,4 +156,23 @@ test('mail delivery test requires private authentication and always targets the 
   assert.equal((await handleRequest(make(false),c.env)).status,401);assert.equal(messages.length,0);
   assert.equal((await handleRequest(make(true),c.env)).status,200);assert.equal(messages.length,1);
   assert.equal(messages[0].to,'richard@watra.cz');assert.match(messages[0].subject,/\[TEST\]/);
+});
+
+
+test('restored contact and launch forms are accepted and stored in both languages',async()=>{
+  for(const language of ['cs','en']) for(const page of ['contact','home']){
+    const c=context();
+    const html=render(language,page,{...config,fullFormEnabled:true});
+    const id=page==='contact'?'interest-form':'launch-form';
+    const form=html.match(new RegExp('<form id="'+id+'"[\\s\\S]*?</form>'))[0];
+    assert.match(form,/action="\/api\/watra\/enquiries"/);
+    assert.match(form,/data-sitekey="0x/);
+    const data={email:'visitor@example.test',phone:'+420 721 123 456',name:'Test visitor',lead_type:'customer','cf-turnstile-response':'one-use-test-token',_request_id:crypto.randomUUID()};
+    for(const input of form.matchAll(/<input type="hidden" name="([^"]+)" value="([^"]*)"/g))data[input[1]]=input[2];
+    if(page==='home')data.contact_consent='yes';
+    const response=await c.send(data);assert.equal(response.status,200,language+page);
+    const payload=JSON.parse(c.DB.sql.prepare('SELECT payload FROM enquiries').get().payload);
+    assert.equal(payload.language,language);
+    assert.equal(payload.lead_type,page==='home'?'launch_notification':'customer');
+  }
 });

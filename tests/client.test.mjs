@@ -16,7 +16,7 @@ async function client({host='watra.cz',stored,ids={},formReady,reply={ok:true},h
   let sent=0,reloaded=0;
   const fields={lead_type:element({value:'manufacturer'}),model:element({value:modelValue}),_gotcha:element(),submit:element(),status:element(),notice:element(),company:element({querySelectorAll:()=>[]})};
   const form=formReady===undefined?null:element({
-    dataset:{ready:String(formReady),domain:formDomain},action:'https://formspree.io/f/abcdefgh',checkValidity:()=>true,reset(){this.didReset=true;},
+    dataset:{ready:String(formReady),domain:formDomain},action:'/api/watra/enquiries',checkValidity:()=>true,reset(){this.didReset=true;},
     querySelector:s=>s.includes('lead_type')?fields.lead_type:s.includes('model')?fields.model:s.includes('company-fields')?fields.company:s.includes('_gotcha')?fields._gotcha:s.includes('submit')?fields.submit:s.includes('data-form-domain-note')?fields.notice:null,
     querySelectorAll:()=>[fields.lead_type,fields.model,fields._gotcha,fields.submit]
   });
@@ -34,7 +34,7 @@ async function client({host='watra.cz',stored,ids={},formReady,reply={ok:true},h
     FormData:class{constructor(){this.values={};}set(k,v){this.values[k]=v;}},
     fetch:async url=>url==='/site-config.json'?{ok:true,json:async()=>({analyticsHosts:['watra.cz'],...ids})}:(sent++,{ok:httpOK,status:httpStatus,json:async()=>reply})
   };
-  context.window=context;vm.runInNewContext(code,context);await tick();
+  context.window=context;context.WatraEnquiry={send:async()=>{sent++;if(httpStatus===429)throw Error('rate-limit');if(!httpOK||reply?.ok!==true||reply.errors)throw Error('delivery');return reply;}};vm.runInNewContext(code,context);await tick();
   return {context,scripts,dialog,buttons,settings,analytics,marketing,form,fields,storage,documentEvents,sent:()=>sent,reloaded:()=>reloaded,
     submit:async()=>{await form.handlers.submit({preventDefault(){}});await tick();}};
 }

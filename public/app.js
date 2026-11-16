@@ -162,7 +162,7 @@
     e.preventDefault();
     if(busy||complete||form.dataset.ready!=='true'||!form.checkValidity()) return;
     const endpoint=form.getAttribute('action');
-    if(!/^https:\/\/formspree\.io\/f\/[a-zA-Z0-9]+$/.test(endpoint)) return;
+    if(endpoint!=='/api/watra/enquiries'||!window.WatraEnquiry) return;
     if($('[name=_gotcha]',form).value) return;
     busy=true;
     const button=$('[type=submit]',form), status=$('#form-status'), original=button.innerHTML;
@@ -172,21 +172,17 @@
     if(consent.analytics) {
       try {const saved=JSON.parse(sessionStorage.getItem('watra_campaign')||'{}');for(const k of campaignKeys) if((k.startsWith('utm_')||consent.marketing)&&safeValue(saved[k])) data.set(k,saved[k]);} catch {}
     }
-    const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),20000);
     try {
-      const r=await fetch(endpoint,{method:'POST',body:data,headers:{Accept:'application/json'},signal:controller.signal});
-      if(r.status===429) throw Error('rate-limit');
-      if(!r.ok) throw Error('response');
-      const result=await r.json();if(result?.errors || result?.ok!==true) throw Error('response');
+      await window.WatraEnquiry.send(form,data);
       complete=true;event('generate_lead',{lead_type:type.value,item_id:model.value==='IRIKON +e'?'irikon-e':model.value==='IRIKON'?'irikon':'undecided'});
       button.textContent=say('Odesláno','Sent');
       status.textContent=say('Děkujeme. Váš nezávazný zájem jsme přijali. Ozveme se na uvedený e-mail.','Thank you. We received your non-binding enquiry and will respond to the email address you provided.');
       form.reset();status.focus();
     } catch (error) {
       button.disabled=false;button.innerHTML=original;
-      status.textContent=say('Odeslání se nepodařilo potvrdit. Vyplněné údaje zůstaly zachované. Zkuste to za chvíli znovu nebo využijte uvedený e-mail. Pokud byl požadavek doručen navzdory chybě spojení, opakování může vytvořit druhou poptávku.','We could not confirm delivery. Your entries have been kept. Please try again shortly or use the email listed on this page. If delivery succeeded despite a connection error, retrying may create a second enquiry.');
+      status.textContent=say('Odeslání se nepodařilo potvrdit. Vyplněné údaje zůstaly zachované. Zkuste to za chvíli znovu nebo využijte uvedený e-mail.','We could not confirm delivery. Your entries have been kept. Please try again shortly or use the email listed on this page.');
       if(error.message==='rate-limit') status.textContent=say('Formulář právě dosáhl limitu příjmu. Údaje zůstaly vyplněné. Zkuste odeslání později nebo nám napište přímo e-mailem.','The form has reached its submission limit. Your entries have been kept. Please try again later or contact us directly by email.');
       status.focus();
-    } finally {clearTimeout(timer);finishLoading();busy=false;}
+    } finally {finishLoading();busy=false;}
   });
 })();
