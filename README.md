@@ -35,7 +35,7 @@ Testy ověřují lokalizované cesty a odkazy, metadata, přesměrování, ochra
 
 ## Zahájení prodeje a upozornění e-mailem
 
-Plán prodeje má samostatné nastavení launchExpected (YYYY-MM), oddělené od certificationExpected. Obě hodnoty jsou nyní listopad 2026. Homepage výslovně podmiňuje zahájení prodeje úspěšnou certifikací a uvádí možnost změny termínu.
+Plán prodeje má samostatné nastavení launchExpected (YYYY-MM nebo YYYY-spring), oddělené od certificationExpected. Aktuálně je 2027-spring, tedy jaro 2027 / spring 2027. Veřejné informace o dostupnosti uvádějí termín prodeje a podmínku úspěšné certifikace, bez příslibu konkrétního měsíce jejího dokončení. Homepage výslovně podmiňuje zahájení prodeje úspěšnou certifikací a uvádí možnost změny termínu.
 
 Okno se nikdy neotevírá automaticky. Bez JavaScriptu odkazy vedou na kontaktní stránku. Aktivace příjmu vyžaduje fullFormEnabled, veřejný turnstileSiteKey, email a dokončené informace o zpracování údajů (privacyApproved). Do té doby jsou pole vypnutá a okno nabízí přímý e-mail.
 

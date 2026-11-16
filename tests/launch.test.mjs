@@ -28,8 +28,8 @@ function client({ready=true,consent=true,valid=true,endpoint='/api/watra/enquiri
 }
 
 test('localized homepage has a conditional sales date independent of certification and an honest fallback',()=>{
-  for(const [lang,date] of [['cs','listopad 2026'],['en','November 2026']]){
-    const html=render(lang,'home',{...config,certificationExpected:'2027-01',launchExpected:'2026-11',fullFormEnabled:false,privacyApproved:false});
+  for(const [lang,date] of [['cs','jaro 2027'],['en','spring 2027']]){
+    const html=render(lang,'home',{...config,certificationExpected:'2027-01',launchExpected:'2027-spring',fullFormEnabled:false,privacyApproved:false});
     assert.match(html,new RegExp('class="launch-date">'+date));
     assert.match(html,/id="launch-dialog"/);assert.match(html,/data-launch-open/);
     assert.match(html,/id="launch-form" data-ready="false"/);assert.match(html,/<fieldset disabled>/);

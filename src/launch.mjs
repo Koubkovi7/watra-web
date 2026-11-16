@@ -2,8 +2,12 @@ import {formReady} from './form-intake.mjs';
 import {formDomainAttribute,formDomainNotice} from './form-domain.mjs';
 const pick=(l,cs,en)=>l==='cs'?cs:en;
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-export const launchDate=c=>c.launchExpected||'2026-11';
-export const launchMonth=(l,c,year=true)=>new Intl.DateTimeFormat(l==='cs'?'cs-CZ':'en-GB',{month:'long',...(year?{year:'numeric'}:{}),timeZone:'UTC'}).format(new Date(launchDate(c)+'-01T00:00:00Z'));
+export const launchDate=c=>c.launchExpected||'2027-spring';
+export const launchMonth=(l,c,year=true)=>{
+  const date=launchDate(c);
+  if(/^\d{4}-spring$/.test(date)) return pick(l,'jaro','spring')+(year?' '+date.slice(0,4):'');
+  return new Intl.DateTimeFormat(l==='cs'?'cs-CZ':'en-GB',{month:'long',...(year?{year:'numeric'}:{}),timeZone:'UTC'}).format(new Date(date+'-01T00:00:00Z'));
+};
 const contact=l=>l==='cs'?'/cs/kontakt/':'/en/contact/';
 const privacy=l=>l==='cs'?'/cs/ochrana-udaju/':'/en/privacy/';
 export const launchReady=formReady;
