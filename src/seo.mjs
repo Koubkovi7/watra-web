@@ -1,6 +1,7 @@
 // Page-specific search snippets; product status stays in the existing visible content.
 const metadata={
   cs:{
+    configurator:{title:'Konfigurátor sauny – vejdou se kamna WATRA k vám?',description:'Zadejte rozměry sauny, postavte do ní kamna WATRA IRIKON a lavice. Uvidíte bezpečnou zónu kolem kamen, objem sauny a kolik se vás vejde. Projděte se po sauně ve 3D.'},
     models:{title:'Saunová kamna WATRA – porovnání IRIKON a IRIKON +e',description:'Porovnejte saunová kamna na dřevo IRIKON a hybridní saunová kamna na elektřinu a dřevo IRIKON +e: ceny, režimy vytápění a orientační nahřátí.'},
     hybrid:{title:'Hybridní saunová kamna na elektřinu a dřevo – WATRA',description:'Jak fungují saunová kamna na dřevo a elektřinu WATRA IRIKON +e? Nezávislé vytápění, rychlejší nahřátí a elektrický dotop při dohořívání dřeva.'},
     makers:{title:'Hybridní saunová kamna WATRA pro výrobce saun',description:'Česká saunová kamna na elektřinu a dřevo pro vaše saunové projekty. Seznamte se s IRIKON +e a možnostmi spolupráce s WATRA.'},
@@ -22,6 +23,7 @@ const metadata={
     }
   },
   en:{
+    configurator:{title:'Sauna configurator – will a WATRA heater fit?',description:'Enter the size of your sauna and place a WATRA IRIKON heater and benches in it. See the safe zone around the heater, the sauna volume and how many people fit. Walk around your sauna in 3D.'},
     project:{
       title:'The WATRA story – how the IRIKON hybrid sauna heater began',
       description:'From building a family sauna to a wood-fired and electric hybrid heater. Richard Koubek tells the WATRA story and explains the meaning behind the name IRIKON.'

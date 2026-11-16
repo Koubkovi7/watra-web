@@ -85,7 +85,7 @@ test('preview hosts cannot be indexed and security headers exist',async()=>{
   assert.match(headers,/https:\/\/:version.:project.pages.dev\/\*\s+X-Robots-Tag: noindex/);
   assert.match(headers,/frame-ancestors 'none'/);
   const sitemap=await readFile('dist/sitemap.xml','utf8');
-  assert.equal((sitemap.match(/<url>/g)||[]).length,28);
+  assert.equal((sitemap.match(/<url>/g)||[]).length,30);
   assert.ok(!sitemap.includes('dekujeme'));assert.ok(!sitemap.includes('404'));
 });
 

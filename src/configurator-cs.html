@@ -1,0 +1,182 @@
+<div class="wk">
+<section class="wk-hero wrap">
+  <p class="eyebrow">WATRA / Konfigurátor sauny<span class="wk-new">nové</span></p>
+  <h1>Vejdou se k vám?<br><em>Postavte si saunu.</em></h1>
+  <p class="lead">Zadejte rozměry své sauny a postavte do ní kamna IRIKON a lavice. Hned uvidíte, jestli kamna zůstanou v bezpečné vzdálenosti, kolik lidí se vejde a jak bude sauna vypadat. Projděte se po ní, nebo si sedněte na horní lavici.</p>
+  <div class="wk-presets" role="group" aria-label="Začít z hotové sauny">
+    <span class="wk-presets-l">Začít z hotové:</span>
+    <button class="wk-chip" type="button" data-preset="mala">Domácí 2 × 2 m</button>
+    <button class="wk-chip" type="button" data-preset="zahrada">Zahradní s oknem</button>
+    <button class="wk-chip" type="button" data-preset="dolniL">Horní vzadu, dolní do L</button>
+    <button class="wk-chip" type="button" data-preset="penzion">Větší, horní do L</button>
+    <button class="wk-chip ghost" type="button" data-preset="reset">Začít znovu</button>
+  </div>
+</section>
+
+<section class="wrap wk-app" aria-label="Konfigurátor sauny">
+  <div class="wk-panel">
+    <details class="wk-group" data-sec="sauna" open>
+      <summary><h2><span>1</span>Sauna</h2><output class="wk-sum" id="wk-sum-sauna"></output></summary>
+      <div class="wk-gbody">
+      <p class="wk-help">Vnitřní rozměry, bez obložení.</p>
+      <div class="wk-row"><label for="wk-w">Šířka</label><input id="wk-w" type="range" min="120" max="400" step="5" data-k="w" aria-label="Šířka sauny"><span class="wk-num"><input type="number" min="120" max="400" step="5" data-k="w" aria-label="Šířka v cm" inputmode="numeric"><i>cm</i></span></div>
+      <div class="wk-row"><label for="wk-d">Hloubka</label><input id="wk-d" type="range" min="120" max="400" step="5" data-k="d" aria-label="Hloubka sauny"><span class="wk-num"><input type="number" min="120" max="400" step="5" data-k="d" aria-label="Hloubka v cm" inputmode="numeric"><i>cm</i></span></div>
+      <div class="wk-row"><label for="wk-h">Výška</label><input id="wk-h" type="range" min="180" max="260" step="5" data-k="h" aria-label="Výška sauny"><span class="wk-num"><input type="number" min="180" max="260" step="5" data-k="h" aria-label="Výška v cm" inputmode="numeric"><i>cm</i></span></div>
+      <div class="wk-field"><span>Stěny</span>
+        <div class="wk-seg" role="group" aria-label="Stěny sauny"><button type="button" data-set="mw" data-val="wood">Dřevo, zateplené</button><button type="button" data-set="mw" data-val="masonry">Zdivo bez izolace</button></div></div>
+      </div>
+    </details>
+
+    <details class="wk-group" data-sec="kamna">
+      <summary><h2><span>2</span>Kamna</h2><output class="wk-sum" id="wk-sum-kamna"></output></summary>
+      <div class="wk-gbody">
+      <div class="wk-model" role="group" aria-label="Model kamen">
+        <button type="button" data-model="wood"><strong>IRIKON</strong><small>Dřevo · 11 kW</small></button>
+        <button type="button" data-model="e"><strong>IRIKON +e</strong><small>Dřevo + elektřina 9 kW</small></button>
+      </div>
+      <div class="wk-field"><span>U stěny</span>
+        <div class="wk-seg" role="group" aria-label="Kamna stojí u stěny"><button type="button" data-set="sw" data-val="left">vlevo</button><button type="button" data-set="sw" data-val="back">vzadu</button><button type="button" data-set="sw" data-val="right">vpravo</button><button type="button" data-set="sw" data-val="front">u dveří</button></div></div>
+      <div class="wk-row"><label for="wk-sp">Posun</label><input id="wk-sp" type="range" min="0" max="100" step="1" data-k="sp"><output id="wk-spo"></output></div>
+      <div class="wk-field"><span>Natočení</span>
+        <div class="wk-rotrow"><button type="button" class="wk-rotb" id="wk-rotb" aria-label="Otočit kamna o 90°"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M15.5 9.5A5.6 5.6 0 1 1 13.6 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M14.4 1.8l.3 4.1-4.1.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Otočit o 90°</button><output id="wk-roto"></output></div></div>
+      <p class="wk-help">Kamna můžete v půdorysu chytit a přetáhnout. Klikněte na ně (v půdorysu i ve 3D) a šipkou ⟳ je otočíte, stejně jako klávesou R.</p>
+      <div class="wk-acc">
+        <p class="wk-acc-h"><strong>Tepelné štíty</strong><em>příslušenství · 1 000 Kč/ks</em></p>
+        <div class="wk-seg" role="group" aria-label="Počet tepelných štítů"><button type="button" data-set="sh" data-val="0">bez štítů</button><button type="button" data-set="sh" data-val="1">1 štít</button><button type="button" data-set="sh" data-val="2">2 štíty</button><button type="button" data-set="sh" data-val="3">3 štíty</button></div>
+        <small>Plech na boku nebo za zády kamen zkrátí odstup té strany od stěny na polovinu (16 → 8 cm), kamna pak mohou stát blíž ke stěně. Štíty přijdou na strany nejblíž ke stěně.</small>
+      </div>
+      </div>
+    </details>
+
+    <details class="wk-group" data-sec="lavice">
+      <summary><h2><span>3</span>Lavice</h2><output class="wk-sum" id="wk-sum-lavice"></output></summary>
+      <div class="wk-gbody">
+      <div class="wk-field"><span>Horní lavice</span>
+        <div class="wk-seg" role="group" aria-label="Horní lavice u stěn">
+          <label class="wk-tog" data-wall="back"><input type="checkbox" data-k="ub"><span>vzadu</span></label>
+          <label class="wk-tog" data-wall="left"><input type="checkbox" data-k="ul"><span>vlevo</span></label>
+          <label class="wk-tog" data-wall="right"><input type="checkbox" data-k="ur"><span>vpravo</span></label>
+        </div></div>
+      <div class="wk-field"><span>Dolní lavice</span>
+        <div class="wk-seg" role="group" aria-label="Dolní lavice u stěn">
+          <label class="wk-tog" data-wall="back"><input type="checkbox" data-k="lb"><span>vzadu</span></label>
+          <label class="wk-tog" data-wall="left"><input type="checkbox" data-k="ll"><span>vlevo</span></label>
+          <label class="wk-tog" data-wall="right"><input type="checkbox" data-k="lr"><span>vpravo</span></label>
+        </div></div>
+      <p class="wk-help">Dolní lavice stojí před horní. Kde horní není, stojí dolní sama u stěny, třeba horní jen vzadu a dolní do L.</p>
+      </div>
+    </details>
+
+    <details class="wk-group" data-sec="dvere">
+      <summary><h2><span>4</span>Dveře a okno</h2><output class="wk-sum" id="wk-sum-dvere"></output></summary>
+      <div class="wk-gbody">
+      <div class="wk-field"><span>Dveře</span>
+        <div class="wk-seg" role="group" aria-label="Dveře ve stěně"><button type="button" data-set="dw" data-val="front">vpředu</button><button type="button" data-set="dw" data-val="left">vlevo</button><button type="button" data-set="dw" data-val="right">vpravo</button><button type="button" data-set="dw" data-val="back">vzadu</button></div></div>
+      <div class="wk-row"><label for="wk-dp">Posun</label><input id="wk-dp" type="range" min="0" max="100" step="1" data-k="dp"><output id="wk-dpo"></output></div>
+      <label class="wk-check"><input type="checkbox" data-k="dg">Skleněné dveře</label>
+      <div class="wk-field"><span>Okno</span>
+        <div class="wk-seg" role="group" aria-label="Okno"><button type="button" data-set="win" data-val="none">bez okna</button><button type="button" data-set="win" data-val="small">malé</button><button type="button" data-set="win" data-val="big">velké</button><button type="button" data-set="win" data-val="wall">prosklená stěna</button></div></div>
+      <div class="wk-field" id="wk-ww-row"><span>Okno ve stěně</span>
+        <div class="wk-seg" role="group" aria-label="Okno ve stěně"><button type="button" data-set="ww" data-val="left">vlevo</button><button type="button" data-set="ww" data-val="back">vzadu</button><button type="button" data-set="ww" data-val="right">vpravo</button><button type="button" data-set="ww" data-val="front">vpředu</button></div></div>
+      <p class="wk-help">Větrací otvory se umístí samy podle kamen: přívod vzduchu za kamny, cirkulace a uzavíratelné větrání na protější stěně.</p>
+      </div>
+    </details>
+    <a class="wk-tocheck" href="#wk-report">Celá kontrola sauny a co dál ↓</a>
+  </div>
+
+  <div class="wk-col">
+    <div class="wk-sticky">
+      <div class="wk-viewer" id="wk-viewer">
+        <div class="wk-bar">
+          <p class="wk-summary" id="wk-summary" aria-live="polite"></p>
+          <span class="sp"></span>
+          <div class="wk-tabs" role="tablist" aria-label="Pohled">
+            <button type="button" role="tab" aria-selected="true" data-wk-tab="3d">3D</button>
+            <button type="button" role="tab" aria-selected="false" data-wk-tab="plan">Půdorys</button>
+          </div>
+          <button class="wk-icon" type="button" id="wk-full" aria-label="Na celou obrazovku" title="Na celou obrazovku"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8V3h5M12 3h5v5M17 12v5h-5M8 17H3v-5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>
+        </div>
+        <div class="wk-alert" id="wk-alert" hidden></div>
+        <div class="wk-stage">
+          <div id="wk-3dwrap">
+            <div id="wk-3d"></div>
+            <div class="wk-modes" role="group" aria-label="Pohled ve 3D">
+              <button type="button" data-wk-view="orbit" aria-pressed="true">Z dálky</button>
+              <button type="button" data-wk-view="walk" aria-pressed="false">Projít se</button>
+              <button type="button" data-wk-view="sit" aria-pressed="false">Sednout si</button>
+            </div>
+            <div class="wk-fx" role="group" aria-label="Čím topíte (jen vizuálně)">
+              <button type="button" data-wk-fx="wood">Dřevo</button>
+              <button type="button" data-wk-fx="el">Elektřina</button>
+              <button type="button" data-wk-fx="both">Obojí</button>
+            </div>
+            <div class="wk-toggles" role="group" aria-label="Zobrazit">
+              <button type="button" data-toggle="zone" aria-pressed="true">Bezpečná zóna</button>
+              <button type="button" data-toggle="ppl" aria-pressed="false">Kolik se nás vejde</button>
+            </div>
+            <button type="button" class="wk-mini" id="wk-mini" aria-label="Otevřít půdorys" title="Půdorys"></button>
+            <p id="wk-hint"></p>
+          </div>
+          <button type="button" class="wk-rot" id="wk-rot" hidden aria-label="Otočit kamna o 90°" title="Otočit kamna o 90° (R)"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M15.5 9.5A5.6 5.6 0 1 1 13.6 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M14.4 1.8l.3 4.1-4.1.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div id="wk-planwrap" hidden><div id="wk-plan"></div><p class="wk-plan-legend"><i class="lz"></i>bezpečná zóna <i class="ls"></i>místo na přikládání <i class="le"></i>vstup <i class="lv1"></i>přívod vzduchu <i class="lv2"></i>cirkulace <i class="lv3"></i>větrání</p></div>
+        </div>
+        <div class="wk-foot">
+          <div class="wk-kpi"><span>Objem</span><strong id="wk-vol"></strong><small id="wk-vol-note"></small></div>
+          <div class="wk-kpi"><span>Vejde se</span><strong id="wk-seats"></strong><small id="wk-seats-note"></small></div>
+          <div class="wk-kpi"><span>Kamna</span><strong id="wk-model"></strong><small id="wk-model-note"></small></div>
+          <a class="button wk-send" href="/cs/kontakt/?type=customer">Poslat návrh</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap wk-report" id="wk-report">
+  <div class="wk-report-grid">
+    <div>
+      <p class="eyebrow">Kontrola vaší sauny</p>
+      <h2 class="wk-report-h" id="wk-report-h"></h2>
+      <ul id="wk-checks" aria-label="Kontrola sauny"></ul>
+    </div>
+    <div>
+      <p class="eyebrow">Na co myslet</p>
+      <ul id="wk-notes"></ul>
+      <p class="wk-honest"><strong>Orientační výpočet.</strong> Kamna WATRA jsou ve vývoji a certifikace probíhá. Odstup od stěn (asi 16 cm, strana s tepelným štítem polovina) je předběžný údaj WATRA. Odstup před dvířky, strop a doporučený objem sauny jsou zatím obvyklé hodnoty kamen na dřevo podobné velikosti. Vše potvrdí certifikace; před stavbou to ověříme s vámi a s kominíkem.</p>
+      <div class="wk-actions">
+        <a class="button wk-send" href="/cs/kontakt/?type=customer">Poslat návrh sauny WATRA</a>
+        <button class="button outline" type="button" id="wk-copy">Zkopírovat odkaz</button>
+      </div>
+      <p class="small" style="margin-top:12px">Odkaz obsahuje celou saunu. Můžete ho poslat i stavební firmě.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section wrap border-top">
+  <div class="wk-below">
+    <div>
+      <p class="eyebrow">Jak na to</p>
+      <h2>Od rozměrů<br><em>k vaší sauně.</em></h2>
+    </div>
+    <ol class="wk-how">
+      <li><strong>Změřte saunu zevnitř.</strong><br><span class="muted">Šířku, hloubku a výšku od podlahy ke stropu. U plánované sauny stačí rozměry z projektu.</span></li>
+      <li><strong>Umístěte kamna a lavice.</strong><br><span class="muted">Kamna obvykle stojí u stěny poblíž dveří, lavice naproti. Zlatá zóna ukazuje, kde nemá být nic hořlavého.</span></li>
+      <li><strong>Projděte se a sedněte si.</strong><br><span class="muted">Ve 3D zjistíte, jestli je dost místa na přikládání a jak blízko od lavice budete mít kamna.</span></li>
+      <li><strong>Pošlete nám návrh.</strong><br><span class="muted">Odkaz obsahuje celou saunu. Ozveme se a projdeme s vámi model, komín i elektro přípojku.</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="section wrap faq-section" style="padding-top:0">
+  <div class="section-head"><div><p class="eyebrow">Otázky a odpovědi</p><h2>Než začnete stavět.</h2></div></div>
+  <div class="faq-list" id="wk-faq">
+    <details><summary>Jak velkou saunu kamna IRIKON vytopí?<span aria-hidden="true">+</span></summary><p>Přesný rozsah objemu stanovíme po dokončení certifikace. Konfigurátor zatím počítá s obvyklým rozsahem kamen na dřevo podobného výkonu. Každý m² skla nebo nezateplené zdi se počítá, jako by sauna měla o 1,2 m³ víc.</p></details>
+    <details><summary>Jak daleko musí být kamna od stěny a od lavice?<span aria-hidden="true">+</span></summary><p>Předběžně počítáme asi s 16 cm od stěn. Tepelný štít je plech na boku nebo za zády kamen (příslušenství, 1 000 Kč/ks, až 3 kusy): s ním stačí u té strany zhruba polovina, kamna tak mohou stát blíž ke stěně. Od lavice a před dvířky platí plný odstup. Přesné hodnoty potvrdí certifikace a budou v návodu k instalaci.</p></details>
+    <details><summary>Co potřebuju na komín?<span aria-hidden="true">+</span></summary><p>Kouřové hrdlo kamen má průměr 115 mm a vede nahoru. Napojení na komín, prostup stropem a revizi spalinové cesty řeší kominík podle místních předpisů.</p></details>
+    <details><summary>Co potřebuje elektrická část IRIKON +e?<span aria-hidden="true">+</span></summary><p>Elektrická část má 3 × 3 kW a potřebuje třífázový přívod 400 V a externí saunový regulátor. U kamen s 9 kW se obvykle jistí 3 × 16 A; jištění a zapojení navrhne elektrikář. Samotnou elektřinou se obvykle vytápí sauna do 9 m³.</p></details>
+    <details><summary>Mám dřevěnou podlahu. Co pod kamna?<span aria-hidden="true">+</span></summary><p>Pod kamna na dřevo patří nehořlavá podložka s přesahem před dvířka a do stran, aby žhavý uhlík nedopadl na dřevo. Kamna s kameny váží asi 150 kg, podlaha to musí unést.</p></details>
+    <details><summary>Potřebuju revizi komína?<span aria-hidden="true">+</span></summary><p>Ano. Před prvním zátopem musí kominík udělat revizi spalinové cesty (vyhláška 34/2016 Sb.) a pak ji pravidelně čistit a kontrolovat.</p></details>
+    <details><summary>Jak saunu větrat?<span aria-hidden="true">+</span></summary><p>Konfigurátor umístí tři otvory: přívod vzduchu k hoření za kamny asi 35 cm nad podlahou, cirkulaci na protější stěně asi v 60 cm u dveří a uzavíratelné větrání úhlopříčně od kamen u stropu na vyvětrání po saunování nebo při přetopení. Přesné umístění u IRIKON upřesníme s návodem k instalaci.</p></details>
+  </div>
+</section>
+<p class="wk-credit wrap">Konfigurátor vytvořil <a href="https://www.honzasorm.cz/" target="_blank" rel="noopener">Honza Šorm</a></p>
+</div>

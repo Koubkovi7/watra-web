@@ -154,6 +154,9 @@
   const selectedModel=incomingModel==='IRIKON e'?'IRIKON +e':incomingModel;
   if(['customer','manufacturer','business','technical'].includes(selectedType)) type.value=selectedType;
   if(['IRIKON','IRIKON +e','undecided'].includes(selectedModel)) model.value=selectedModel;
+  // Konfigurátor sauny posílá popis sauny a odkaz na ni v ?sauna= → předvyplnit zprávu (jen když je prázdná).
+  const sauna=incoming.get('sauna'), message=$('[name=message]',form);
+  if(sauna&&message&&!message.value) message.value=sauna.slice(0,1500);
   const updateCompany=()=>{company.hidden=!['manufacturer','business'].includes(type.value);$$('input',company).forEach(i=>i.disabled=company.hidden);};
   updateCompany();type.addEventListener('change',updateCompany);
   let started=false, busy=false, complete=false;
