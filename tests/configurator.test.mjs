@@ -25,6 +25,8 @@ test('design is sent from the configurator through the site enquiry intake, with
     assert.match(html,/data-form-domain-note hidden/,'preview hosts show a notice instead of sending');
     assert.match(html,/<dialog class="wk-dlg wk-sheetdlg" id="wk-sheet-dlg"/);
     for(const n of ['name','email','phone','note','_gotcha']) assert.match(html,new RegExp('name="'+n+'"'));
+    assert.match(html,/data-wk-pdf/,'drawing downloads as a PDF file');
+    assert.match(html,/id="wk-vol-i"[^>]*aria-describedby="wk-vol-tip"/,'volume allowance is explained');
   }
   const js=await readFile('public/konfigurator.js','utf8');
   assert.ok(js.includes("data.set('lead_type', 'customer')")&&js.includes("data.set('source_page', EN ? '/en/contact/' : '/cs/kontakt/')"),'worker accepts only contact source pages');

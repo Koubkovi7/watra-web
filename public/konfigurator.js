@@ -244,6 +244,15 @@ function ventsFor(L) {
         {kind: 'air', wall: opp, u: free(opp, au, ah, 20, 12), z: ah, w: 20, h: 12, name: tr('větrání, uzavíratelné (úhlopříčně od kamen u stropu)', 'closable ventilation vent (diagonally opposite the heater, near the ceiling)')},
   ];
 }
+// orientační odhad nahřátí (Říša 17. 11.: „budí to pocit, že je to nedosažitelné“): doba roste zhruba úměrně objemu pro kamna;
+// dosažitelnost = ustálený přírůstek teploty při plném výkonu proti ztrátám (větrání 6× za hodinu, zateplené stěny U 0,35,
+// jednoduché sklo U 5,5, nezateplené zdivo U 2 W/m²K). Typické předpoklady, ne měření.
+function heatReach(L, kW) {
+  const A = 2 * (S.w * S.d + S.w * S.h + S.d * S.h) / 1e4, gl = L.glass, ms = L.masonry;
+  const loss = 0.335 * 6 * L.V + 0.35 * Math.max(0, A - gl - ms) + 5.5 * gl + 2 * ms;  // W/K
+  const dT = kW * 1000 / loss;
+  return {dT, ok: dT >= 85};
+}
 function checks(L) {
   const C = clr(), st = L.stove, room = {x0: 0, x1: S.w, y0: 0, y1: S.d}, out = [];
     const add = (lvl, title, text, zone = 0) => { out.push({lvl, title, text, zone: !!zone}); if (lvl === 'bad') L.bad++; if (lvl === 'warn') L.warn++; };
@@ -298,11 +307,21 @@ function checks(L) {
   const v = D_.vol;
   if (v && v.min) {
         if (L.Veff < v.min) add('warn', tr('Na tak malou saunu je to hodně tepla', 'A lot of heat for such a small sauna'), tr(`Sauna má ${fm3(L.Veff)}, ${v.status} rozsah pro kamna této velikosti je ${nf0.format(v.min)}–${nf0.format(v.max)} m³. Probereme s vámi.`, `The sauna has ${fm3(L.Veff)}; the ${v.status} range for a heater of this size is ${nf0.format(v.min)}–${nf0.format(v.max)} m³. We will discuss it with you.`));
-        else if (L.Veff > v.max) add('warn', tr('Velká sauna', 'Large sauna'), tr(`Sauna má ${fm3(L.Veff)}, ${v.status} rozsah je ${nf0.format(v.min)}–${nf0.format(v.max)} m³. Kamna by se dlouho nahřívala.`, `The sauna has ${fm3(L.Veff)}; the ${v.status} range is ${nf0.format(v.min)}–${nf0.format(v.max)} m³. The heater would take long to warm it up.`));
+        else if (L.Veff > v.max) {
+      const pct = Math.max(1, Math.round((L.Veff / v.max - 1) * 100)), hx = heatReach(L, 11), el = D_.models[S.m].electric;
+      add(hx.ok && pct <= 25 ? 'info' : 'warn', tr('Větší sauna: nahřátí potrvá déle', 'Larger sauna: warming up takes longer'),
+        tr(`Pro výběr kamen má sauna ${fm3(L.Veff)}, ${v.status} rozsah je ${nf0.format(v.min)}–${nf0.format(v.max)} m³. ${hx.ok ? `Kamna ji vytopí, jen nahřátí potrvá odhadem asi o ${pct} % déle než u sauny ${nf0.format(v.max)} m³ (doba roste zhruba úměrně objemu).` : 'Při takových ztrátách kamna nemusí udržet 80–90 °C. Pomůže zateplit stěny nebo zmenšit prosklení.'}${el ? ' S dřevem a elektřinou současně je nahřátí výrazně rychlejší.' : ''}`,
+          `For heater sizing the sauna has ${fm3(L.Veff)}; the ${v.status} range is ${nf0.format(v.min)}–${nf0.format(v.max)} m³. ${hx.ok ? `The heater will heat it, warming up just takes roughly ${pct} % longer than in a ${nf0.format(v.max)} m³ sauna (the time grows roughly with the volume).` : 'With such heat losses the heater may not hold 80–90 °C. Insulating the walls or less glass will help.'}${el ? ' Using wood and electricity together makes warming up much faster.' : ''}`));
+    }
         else add('ok', tr('Objem sedí', 'The volume fits'), tr(`${fm3(L.Veff)} je v ${v.status === 'orientační' ? 'orientačním ' : ''}rozsahu ${nf0.format(v.min)}–${nf0.format(v.max)} m³.`, `${fm3(L.Veff)} is within the ${v.status} range of ${nf0.format(v.min)}–${nf0.format(v.max)} m³.`));
   }
   // 7) samotná elektřina (IRIKON +e): obvykle 1 kW na 1 m³ výpočtového objemu
-    if (D_.models[S.m].electric && D_.elPerM3 && L.Veff > 9 / D_.elPerM3) add('info', tr('Na samotnou elektřinu je sauna větší', 'Larger than electricity alone can heat'), tr(`Elektřinou 9 kW se obvykle vytápí sauna do ${nf0.format(9 / D_.elPerM3)} m³. Ve vaší sauně (${fm3(L.Veff)}) se elektřina hodí hlavně k nahřívání spolu se dřevem a k udržování teploty.`, `9 kW of electricity usually heats a sauna up to ${nf0.format(9 / D_.elPerM3)} m³. In your sauna (${fm3(L.Veff)}) electricity is mainly useful for warming up together with wood and for keeping the temperature.`));
+    if (D_.models[S.m].electric && D_.elPerM3 && L.Veff > 9 / D_.elPerM3) {
+    const lim = 9 / D_.elPerM3, pct = Math.max(1, Math.round((L.Veff / lim - 1) * 100)), hx = heatReach(L, 9);
+    add('info', tr('Samotná elektřina nahřívá pomaleji', 'Electricity alone warms up more slowly'),
+      tr(`Elektřinou 9 kW se obvykle vytápí sauna do ${nf0.format(lim)} m³. ${hx.ok ? `Vaši saunu (${fm3(L.Veff)}) samotná elektřina nahřeje odhadem asi o ${pct} % pomaleji, udržet teplotu zvládne.` : `Vaši saunu (${fm3(L.Veff)}) samotná elektřina nemusí udržet na 80–90 °C, topte dřevem nebo oběma zdroji.`} Nejrychlejší je souběh dřeva a elektřiny: při měření prototypu ve stejné sauně 42 min proti 93 min jen elektřinou a 105 min jen dřevem.`,
+        `9 kW of electricity usually heats a sauna up to ${nf0.format(lim)} m³. ${hx.ok ? `Electricity alone will warm your sauna (${fm3(L.Veff)}) roughly ${pct} % more slowly and can hold the temperature.` : `Electricity alone may not hold your sauna (${fm3(L.Veff)}) at 80–90 °C; heat with wood or both sources.`} Wood and electricity together are fastest: in the prototype test in the same sauna, 42 min versus 93 min with electricity only and 105 min with wood only.`));
+  }
   // 8) větrání: umístěné samo
     if (L.vents && L.vents.length) add('ok', tr('Větrání je navržené', 'Ventilation is planned'), tr('Tři otvory podle kamen: ', 'Three vents placed by the heater: ') + L.vents.map(v => v.name).join(', ') + tr('. Umísťují se samy.', '. They are placed automatically.'));
   L.checks = out;
@@ -981,6 +1000,8 @@ function renderResult(L) {
   // čísla dole v náhledu
   set('#wk-vol', fm3(L.V));
     set('#wk-vol-note', L.Veff - L.V > .05 ? tr(`počítá se jako ${fm3(L.Veff)}`, `counts as ${fm3(L.Veff)}`) : tr(`podlaha ${nf1.format(S.w * S.d / 1e4)} m²`, `floor ${nf1.format(S.w * S.d / 1e4)} m²`));
+  { const vi = $('#wk-vol-i'), tip = $('#wk-vol-tip'), extra = L.Veff - L.V > .05;
+    if (vi && tip) { vi.hidden = !extra; vi.closest('.wk-kpi').classList.toggle('has-tip', extra); tip.textContent = extra ? volExplain(L) : ''; if (!extra) tip.classList.remove('open'); } }
   set('#wk-seats', L.seats ? lidi(L.seats) : '—');
     set('#wk-seats-note', L.seats ? tr(`vsedě${L.lie ? `, ${L.lie > 1 ? L.lie + ' si lehnou' : '1 si lehne'}` : ''}`, `seated${L.lie ? `, ${L.lie} can lie down` : ''}`) : tr('přidejte lavici', 'add a bench'));
   set('#wk-model', m.name);
@@ -1159,7 +1180,7 @@ function bindUI() {
   const mini = $('#wk-mini'); if (mini) mini.addEventListener('click', () => setTab('plan'));
   const c3 = $('#wk-3d'); if (c3) c3.addEventListener('pointerdown', () => setTimeout(hideHint, 900));
   $$('.wk-send').forEach(a => a.addEventListener('click', e => { const L = LAST; track('configurator_send', {sauna_m3: L ? +L.V.toFixed(1) : null, configurator_ok: L ? !L.bad && !L.warn : null}); if (openSend()) e.preventDefault(); }));
-  bindSend();
+  bindSend(); bindPdfTip();
   const copy = $('#wk-copy');
     if (copy) copy.addEventListener('click', async () => { track('configurator_share'); try { await navigator.clipboard.writeText(location.href); toast(tr('Odkaz na vaši saunu je zkopírovaný.', 'The link to your sauna has been copied.')); } catch (e) { toast(tr('Zkopírujte adresu stránky, je v ní celá sauna.', 'Copy the page address; it contains your whole sauna.')); } });
   const full = $('#wk-full');
@@ -1247,7 +1268,8 @@ function sheetPlan(L, compact = false) {
       txt(cx, cy + 2.2, s, `class="bt" text-anchor="middle"${side ? ` transform="rotate(-90 ${cx} ${cy})"` : ''}`);
     }
     // čísla větracích otvorů (vysvětlení v tabulce)
-    vents.forEach((v, i) => { const p = wallPt(v.wall, v.u, -T - 7); o.push(`<circle class="vn" cx="${p.x}" cy="${Y(p.y)}" r="4.5"/>`); txt(p.x, Y(p.y) + 2.2, String(i + 1), 'class="vnt" text-anchor="middle"'); });
+    const used = [];  // dva otvory ve stejném místě stěny (jeden nízko, druhý u stropu): čísla vedle sebe
+    vents.forEach((v, i) => { let uu = v.u; while (used.some(q => q.w === v.wall && Math.abs(q.u - uu) < 11)) uu += 11; used.push({w: v.wall, u: uu}); const p = wallPt(v.wall, uu, -T - 7); o.push(`<circle class="vn" cx="${p.x}" cy="${Y(p.y)}" r="4.5"/>`); txt(p.x, Y(p.y) + 2.2, String(i + 1), 'class="vnt" text-anchor="middle"'); });
     // kóty: místnost, kamna k nejbližším stěnám, dveře od rohu
     dim(0, -T - 14, W, -T - 14, `${S.w}`);
     dim(-T - 14, 0, -T - 14, D, `${S.d}`);
@@ -1272,7 +1294,7 @@ function sheetRows(L) {
   const sh = [st.shK && sides.K, st.shL && sides.L, st.shR && sides.R].filter(Boolean);
   return [
     [tr('Vnitřní rozměry', 'Inside dimensions'), `${S.w} × ${S.d} × ${S.h} cm`],
-    [tr('Objem', 'Volume'), fm3(L.V) + (L.Veff - L.V > .05 ? tr(` (počítá se jako ${fm3(L.Veff)} kvůli ${L.masonry ? 'zdivu a sklu' : 'sklu'})`, ` (counts as ${fm3(L.Veff)} because of ${L.masonry ? 'masonry and glass' : 'glass'})`) : '')],
+    [tr('Objem', 'Volume'), fm3(L.V) + (L.Veff - L.V > .05 ? tr(` (pro výběr kamen ${fm3(L.Veff)}: +${nf1.format(D_.glassAdd)} m³ za každý m² ${L.masonry ? 'skla a nezatepleného zdiva' : 'skla'})`, ` (for heater sizing ${fm3(L.Veff)}: +${nf1.format(D_.glassAdd)} m³ per m² of ${L.masonry ? 'glass and uninsulated masonry' : 'glass'})`) : '')],
     [tr('Stěny', 'Walls'), S.mw === 'masonry' ? tr('zdivo bez izolace', 'uninsulated masonry') : tr('dřevo, zateplené', 'insulated timber')],
     [tr('Kamna', 'Heater'), `${m.name} · ${m.kw} · ${m.price} ${tr('vč. DPH', 'incl. VAT')}`],
     [tr('Umístění kamen', 'Heater position'), `${tr('u stěny', 'wall:')} ${WALL_CZ[S.sw]}, ${ROT_CZ[S.rot || 0]}${S.rot ? ` (${S.rot * 90}°)` : ''}; ${tr('k nejbližší stěně', 'nearest wall')} ${near} cm`],
@@ -1367,6 +1389,123 @@ function bindSend() {
         : tr('Návrh se nepodařilo odeslat. Zkuste to znovu, nebo použijte kontaktní formulář.', 'Your design could not be sent. Please try again or use the contact form.'), 'bad');
     } finally { btn.disabled = false; }
   });
+}
+
+/* ---------- PDF ke stažení (Říša 17. 11.: „tisk otevře přípravu tisku, lepší klasický download“) ----------
+   Bez knihoven (CSP webu beze změny): výkres se vykreslí do canvasu A4 na šířku (půdorys jako SVG obrázek se styly výkresu,
+   3D snímek, tabulka, nálezy) a zabalí do jednostránkového PDF s obrázkem JPEG. Když to prohlížeč neumí, otevře se tisk. */
+const loadImg = src => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(Error('img')); i.src = src; });
+let SVG_CSS = null;
+function sheetSvgCss() {  // SVG jako obrázek nevidí styly stránky → pravidla .ws-svg … z konfigurator.css se vloží do SVG
+  if (SVG_CSS !== null) return SVG_CSS;
+  const out = [];
+  for (const sh of document.styleSheets) { let rules; try { rules = sh.cssRules; } catch (e) { continue; } for (const r of rules || []) if (r.selectorText && r.selectorText.startsWith('.ws-svg ')) out.push(r.cssText); }
+  return (SVG_CSS = out.join(''));
+}
+function wrapLines(g, text, maxW) {
+  const lines = []; let line = '';
+  for (const w of String(text).split(' ')) { const t = line ? line + ' ' + w : w; if (line && g.measureText(t).width > maxW) { lines.push(line); line = w; } else line = t; }
+  if (line) lines.push(line);
+  return lines;
+}
+const drawLines = (g, lines, x, y, lh) => { lines.forEach((l, i) => g.fillText(l, x, y + i * lh)); return y + lines.length * lh; };
+async function sheetCanvas(L) {
+  const Wc = 2970, Hc = 2100, m = 120, c = document.createElement('canvas'); c.width = Wc; c.height = Hc;  // A4 na šířku, 10 px/mm
+  const g = c.getContext('2d'), F = (px, w = 400) => `${w} ${px}px Arial, Helvetica, sans-serif`;
+  g.fillStyle = '#fff'; g.fillRect(0, 0, Wc, Hc);
+  // hlavička
+  g.fillStyle = '#a8803c'; g.font = F(26, 700); g.fillText('W A T R A', m, m + 26);
+  g.fillStyle = '#1b1b1b'; g.font = F(62); g.fillText(tr('Návrh sauny', 'Sauna design'), m, m + 100);
+  g.fillStyle = '#555'; g.font = F(30); g.fillText(`${D_.models[S.m].name} · ${S.w} × ${S.d} × ${S.h} cm · ${new Date().toLocaleDateString(LOC)}`, m, m + 150);
+  const col = L.bad ? '#b23a26' : L.warn ? '#8a6100' : '#3c7a2c', head = statusHead(L);
+  g.font = F(30); const tw = g.measureText(head).width;
+  g.strokeStyle = col; g.lineWidth = 3; g.strokeRect(Wc - m - tw - 48, m + 8, tw + 48, 66); g.fillStyle = col; g.fillText(head, Wc - m - tw - 24, m + 52);
+  g.fillStyle = '#1b1b1b'; g.fillRect(m, m + 182, Wc - 2 * m, 4);
+  const top = m + 230, colL = 1560, xR = m + colL + 80, wR = Wc - m - xR, foot = Hc - m - 120;
+  // půdorys s kótami
+  const svg = sheetPlan(L), vb = svg.match(/viewBox="([^"]+)"/)[1].split(' ').map(Number);
+  const sc = Math.min(colL / vb[2], (foot - top - 170) / vb[3]), pw = vb[2] * sc, ph = vb[3] * sc;
+  const s2 = svg.replace('<svg ', `<svg width="${Math.round(pw)}" height="${Math.round(ph)}" `).replace(/(<svg[^>]*>)/, `$1<style>${sheetSvgCss()}</style>`);
+  g.drawImage(await loadImg('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(s2)), m + (colL - pw) / 2, top, pw, ph);
+  let y = top + ph + 44; g.fillStyle = '#666'; g.font = F(24);
+  y = drawLines(g, wrapLines(g, tr('Půdorys, rozměry v cm. Kóty: místnost, kamna k nejbližším stěnám, dveře od rohu. Lavice: délka × hloubka · výška sedáku.', 'Floor plan, dimensions in cm: room, heater to the nearest walls, door from the corner. Benches: length × depth · seat height.'), colL), m, y, 32) + 14;
+  let lx = m; g.font = F(24);
+  for (const [lab, draw] of [[tr('bezpečná zóna', 'safe zone'), () => { g.fillStyle = 'rgba(201,162,79,.16)'; g.fillRect(lx, y - 20, 30, 20); g.setLineDash([6, 4]); g.strokeStyle = '#c9a24f'; g.lineWidth = 2; g.strokeRect(lx, y - 20, 30, 20); g.setLineDash([]); }],
+    [tr('místo na přikládání', 'space to load wood'), () => { g.setLineDash([4, 5]); g.strokeStyle = '#6f9a5f'; g.lineWidth = 2; g.strokeRect(lx, y - 20, 30, 20); g.setLineDash([]); }],
+    [tr('tepelný štít', 'heat shield'), () => { g.fillStyle = '#6d7372'; g.fillRect(lx, y - 20, 30, 20); }]]) {
+    draw(); g.fillStyle = '#444'; g.fillText(lab, lx + 42, y); lx += 42 + g.measureText(lab).width + 44;
+  }
+  // vpravo: 3D, tabulka, co doladit
+  let yR = top; const img = snap3d();
+  if (img) {
+    const im = await loadImg(img), h = Math.min(600, wR * im.height / im.width), shh = im.width * h / wR;
+    g.drawImage(im, 0, (im.height - shh) / 2, im.width, shh, xR, yR, wR, h); g.strokeStyle = '#ddd'; g.lineWidth = 2; g.strokeRect(xR, yR, wR, h); yR += h + 34;
+  }
+  const thW = 340;
+  for (const [k, v] of sheetRows(L)) {
+    g.font = F(24); const lines = wrapLines(g, v, wR - thW);
+    g.fillStyle = '#444'; g.font = F(24, 700); g.fillText(k, xR, yR + 24);
+    g.fillStyle = '#1b1b1b'; g.font = F(24); const yEnd = drawLines(g, lines, xR + thW, yR + 24, 31);
+    yR = yEnd + 2; g.fillStyle = '#e8e8e8'; g.fillRect(xR, yR, wR, 2); yR += 10;
+  }
+  for (const ch of L.checks.filter(x => x.lvl === 'bad' || x.lvl === 'warn')) {
+    g.font = F(23); const lines = wrapLines(g, ch.title + '. ' + ch.text, wR - 40), hh = lines.length * 30 + 22;
+    yR += 8; g.fillStyle = ch.lvl === 'bad' ? '#fbeeeb' : '#fbf6ea'; g.fillRect(xR, yR, wR, hh); g.fillStyle = ch.lvl === 'bad' ? '#b23a26' : '#c99a2e'; g.fillRect(xR, yR, 6, hh);
+    g.fillStyle = '#1b1b1b'; drawLines(g, lines, xR + 24, yR + 32, 30); yR += hh;
+  }
+  // patička
+  g.fillStyle = '#dddddd'; g.fillRect(m, foot, Wc - 2 * m, 2); g.fillStyle = '#666'; g.font = F(21);
+  const yf = drawLines(g, wrapLines(g, tr('Orientační návrh z konfigurátoru WATRA. Odstup od stěn je předběžný údaj WATRA, ostatní hodnoty jsou obvyklé pro kamna na dřevo podobné velikosti; vše potvrdí certifikace a návod k instalaci. Napojení na komín a elektro navrhne kominík a elektrikář.', 'Indicative design from the WATRA configurator. The wall clearance is a preliminary WATRA figure, other values are typical for wood-fired heaters of a similar size; certification and the installation manual will confirm everything. A chimney sweep and an electrician will design the flue and electrical connections.'), Wc - 2 * m), m, foot + 36, 28);
+  g.fillStyle = '#999'; g.fillText(designUrl(), m, yf + 2);
+  return c;
+}
+// jednostránkové PDF s obrázkem JPEG (A4 na šířku 842 × 595 pt), bez knihoven
+function pdfFromJpeg(jpg, w, h) {
+  const enc = new TextEncoder(), parts = [], offs = []; let len = 0;
+  const add = x => { const b = typeof x === 'string' ? enc.encode(x) : x; parts.push(b); len += b.length; };
+  const obj = (n, body) => { offs[n] = len; add(`${n} 0 obj\n${body}\nendobj\n`); };
+  add('%PDF-1.4\n%âãÏÓ\n');
+  obj(1, '<< /Type /Catalog /Pages 2 0 R >>');
+  obj(2, '<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
+  obj(3, '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 842 595] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>');
+  offs[4] = len; add(`4 0 obj\n<< /Type /XObject /Subtype /Image /Width ${w} /Height ${h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpg.length} >>\nstream\n`); add(jpg); add('\nendstream\nendobj\n');
+  const cs = 'q 842 0 0 595 0 0 cm /Im0 Do Q';
+  obj(5, `<< /Length ${cs.length} >>\nstream\n${cs}\nendstream`);
+  obj(6, `<< /Title (${EN ? 'WATRA sauna design' : 'WATRA navrh sauny'}) /Producer (WATRA configurator) >>`);
+  const xref = len;
+  add('xref\n0 7\n0000000000 65535 f \n' + [1, 2, 3, 4, 5, 6].map(n => String(offs[n]).padStart(10, '0') + ' 00000 n \n').join('') + `trailer\n<< /Size 7 /Root 1 0 R /Info 6 0 R >>\nstartxref\n${xref}\n%%EOF\n`);
+  return new Blob(parts, {type: 'application/pdf'});
+}
+async function downloadPdf(btn) {
+  if (!LAST) return;
+  const label = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = tr('Připravuji PDF…', 'Preparing PDF…'); }
+  try {
+    const c = await sheetCanvas(LAST), b64 = c.toDataURL('image/jpeg', .9).split(',')[1], bin = atob(b64), jpg = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) jpg[i] = bin.charCodeAt(i);
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(pdfFromJpeg(jpg, c.width, c.height));
+    a.download = tr('watra-navrh-sauny-', 'watra-sauna-design-') + `${S.w}x${S.d}x${S.h}.pdf`;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 5000);
+  } catch (e) {
+    openSheet(); printSheet();  // záloha: tisk z prohlížeče
+  } finally { if (btn) { btn.disabled = false; btn.textContent = label; } }
+}
+// „počítá se jako …“: vysvětlení přirážky za sklo a nezateplené zdivo (Říša 17. 11.)
+function volExplain(L) {
+  const a = L.glass + L.masonry, add = nf1.format(D_.glassAdd);
+  const parts = [L.glass > .05 && tr(`${nf1.format(L.glass)} m² skla`, `${nf1.format(L.glass)} m² of glass`), L.masonry > .05 && tr(`${nf1.format(L.masonry)} m² nezatepleného zdiva`, `${nf1.format(L.masonry)} m² of uninsulated masonry`)].filter(Boolean).join(tr(' a ', ' and '));
+  return tr(`Sklo a nezateplené zdivo odvádějí teplo rychleji než zateplené dřevěné stěny. Při výběru kamen se proto ke skutečnému objemu připočítává ${add} m³ za každý m² (pravidlo výrobců saunových kamen, např. Harvia). Vaše sauna: ${fm3(L.V)} + ${add} × ${nf1.format(a)} m² (${parts}) = ${fm3(L.Veff)}.`,
+    `Glass and uninsulated masonry lose heat faster than insulated timber walls. When choosing a heater, ${add} m³ is therefore added to the real volume for every m² (a rule used by sauna heater makers such as Harvia). Your sauna: ${fm3(L.V)} + ${add} × ${nf1.format(a)} m² (${parts}) = ${fm3(L.Veff)}.`);
+}
+function bindPdfTip() {
+  $$('[data-wk-pdf]').forEach(b => b.addEventListener('click', () => downloadPdf(b)));
+  const vi = $('#wk-vol-i'), tip = $('#wk-vol-tip');
+  if (vi && tip) {
+    vi.addEventListener('click', e => { e.stopPropagation(); tip.classList.toggle('open'); vi.setAttribute('aria-expanded', String(tip.classList.contains('open'))); });
+    document.addEventListener('click', e => { if (!e.target.closest('#wk-vol-tip')) { tip.classList.remove('open'); vi.setAttribute('aria-expanded', 'false'); } });
+  }
 }
 
 /* ---------- start ---------- */

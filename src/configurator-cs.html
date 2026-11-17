@@ -121,7 +121,7 @@
           <div id="wk-planwrap" hidden><div id="wk-plan"></div><p class="wk-plan-legend"><i class="lz"></i>bezpečná zóna <i class="ls"></i>místo na přikládání <i class="le"></i>vstup <i class="lv1"></i>přívod vzduchu <i class="lv2"></i>cirkulace <i class="lv3"></i>větrání</p></div>
         </div>
         <div class="wk-foot">
-          <div class="wk-kpi"><span>Objem</span><strong id="wk-vol"></strong><small id="wk-vol-note"></small></div>
+          <div class="wk-kpi"><span>Objem</span><strong id="wk-vol"></strong><small><span id="wk-vol-note"></span><button class="wk-info" type="button" id="wk-vol-i" aria-label="Proč „počítá se jako“?" aria-describedby="wk-vol-tip" aria-expanded="false" hidden>i</button></small><span class="wk-tip" id="wk-vol-tip" role="tooltip"></span></div>
           <div class="wk-kpi"><span>Vejde se</span><strong id="wk-seats"></strong><small id="wk-seats-note"></small></div>
           <div class="wk-kpi"><span>Kamna</span><strong id="wk-model"></strong><small id="wk-model-note"></small></div>
           <a class="button wk-send" href="/cs/kontakt/?type=customer">Poslat návrh</a>
@@ -201,12 +201,12 @@
     <div class="wk-sdone" id="wk-sdone" hidden>
       <p class="wk-sdone-h"><span aria-hidden="true">✓</span> Návrh je odeslaný.</p>
       <p>Děkujeme. Ozveme se na <strong id="wk-sdone-mail"></strong>. Výkres si můžete uložit i pro sebe.</p>
-      <div class="wk-sactions"><button type="button" class="button" data-wk-sheet>Stáhnout výkres (PDF)</button><button type="button" class="button outline" data-wk-close>Zavřít</button></div>
+      <div class="wk-sactions"><button type="button" class="button" data-wk-pdf>Stáhnout výkres (PDF)</button><button type="button" class="button outline" data-wk-close>Zavřít</button></div>
     </div>
   </div>
 </dialog>
 <dialog class="wk-dlg wk-sheetdlg" id="wk-sheet-dlg" aria-label="Výkres sauny">
-  <div class="wk-sheet-bar"><strong>Výkres sauny</strong><span class="sp"></span><button type="button" class="button" id="wk-print">Uložit PDF / tisk</button><button type="button" class="wk-dlg-x" data-wk-close aria-label="Zavřít"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button></div>
+  <div class="wk-sheet-bar"><strong>Výkres sauny</strong><span class="sp"></span><button type="button" class="button" data-wk-pdf>Stáhnout PDF</button><button type="button" class="button outline" id="wk-print">Tisk</button><button type="button" class="wk-dlg-x" data-wk-close aria-label="Zavřít"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button></div>
   <div class="wk-sheet" id="wk-sheet"></div>
 </dialog>
 <p class="wk-credit wrap">Konfigurátor vytvořil <a href="https://www.honzasorm.cz/" target="_blank" rel="noopener">Honza Šorm</a></p>

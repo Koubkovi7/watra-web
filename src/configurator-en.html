@@ -121,7 +121,7 @@
           <div id="wk-planwrap" hidden><div id="wk-plan"></div><p class="wk-plan-legend"><i class="lz"></i>safe zone <i class="ls"></i>space to load wood <i class="le"></i>entrance <i class="lv1"></i>air inlet <i class="lv2"></i>circulation <i class="lv3"></i>ventilation</p></div>
         </div>
         <div class="wk-foot">
-          <div class="wk-kpi"><span>Volume</span><strong id="wk-vol"></strong><small id="wk-vol-note"></small></div>
+          <div class="wk-kpi"><span>Volume</span><strong id="wk-vol"></strong><small><span id="wk-vol-note"></span><button class="wk-info" type="button" id="wk-vol-i" aria-label="Why “counts as”?" aria-describedby="wk-vol-tip" aria-expanded="false" hidden>i</button></small><span class="wk-tip" id="wk-vol-tip" role="tooltip"></span></div>
           <div class="wk-kpi"><span>Seats</span><strong id="wk-seats"></strong><small id="wk-seats-note"></small></div>
           <div class="wk-kpi"><span>Heater</span><strong id="wk-model"></strong><small id="wk-model-note"></small></div>
           <a class="button wk-send" href="/en/contact/?type=customer">Send my sauna</a>
@@ -201,12 +201,12 @@
     <div class="wk-sdone" id="wk-sdone" hidden>
       <p class="wk-sdone-h"><span aria-hidden="true">✓</span> Your design has been sent.</p>
       <p>Thank you. We will get back to you at <strong id="wk-sdone-mail"></strong>. You can also save the drawing for yourself.</p>
-      <div class="wk-sactions"><button type="button" class="button" data-wk-sheet>Download the drawing (PDF)</button><button type="button" class="button outline" data-wk-close>Close</button></div>
+      <div class="wk-sactions"><button type="button" class="button" data-wk-pdf>Download the drawing (PDF)</button><button type="button" class="button outline" data-wk-close>Close</button></div>
     </div>
   </div>
 </dialog>
 <dialog class="wk-dlg wk-sheetdlg" id="wk-sheet-dlg" aria-label="Sauna drawing">
-  <div class="wk-sheet-bar"><strong>Sauna drawing</strong><span class="sp"></span><button type="button" class="button" id="wk-print">Save PDF / print</button><button type="button" class="wk-dlg-x" data-wk-close aria-label="Close"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button></div>
+  <div class="wk-sheet-bar"><strong>Sauna drawing</strong><span class="sp"></span><button type="button" class="button" data-wk-pdf>Download PDF</button><button type="button" class="button outline" id="wk-print">Print</button><button type="button" class="wk-dlg-x" data-wk-close aria-label="Close"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button></div>
   <div class="wk-sheet" id="wk-sheet"></div>
 </dialog>
 <p class="wk-credit wrap">Configurator by <a href="https://www.honzasorm.cz/" target="_blank" rel="noopener">Honza Šorm</a></p>
