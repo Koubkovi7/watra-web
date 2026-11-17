@@ -215,8 +215,8 @@ function stovePlace(C) {
 function shieldRects(st) { return st.shields || []; }
 
 // větrání (Říša 16. 11.): umístí se samo podle kamen, zákazník s ním nehýbe.
-// přívod vzduchu k hoření: na stěně za kamny v ose kamen, 30–40 cm nad podlahou; cirkulace: protější stěna ve výšce asi 60 cm,
-// u dveří; větrání (uzavíratelné, při přetopení a po saunování): protější stěna, úhlopříčně od kamen u stropu.
+// přívod vzduchu k hoření: na stěně za kamny v ose kamen, 30–40 cm nad podlahou, ⌀ 100 mm; cirkulace: protější stěna naproti
+// kamnům, 60 cm nad podlahou; větrání (uzavíratelné, při přetopení a po saunování): protější stěna, úhlopříčně od kamen u stropu.
 const OPP = {left: 'right', right: 'left', back: 'front', front: 'back'};
 function ventsFor(L) {
   const st = L.stove, opp = OPP[st.wall], oLen = wallLen(opp), d = L.door;
@@ -231,22 +231,18 @@ function ventsFor(L) {
     return cand.length ? cand.sort((a, b) => Math.abs(a - u) - Math.abs(b - u))[0] : u;
   };
   const su = (st.wall === 'left' || st.wall === 'right') ? st.center.y : st.center.x;  // osa kamen podél jejich stěny
-  let cu;  // cirkulace u dveří
-  if (d.wall === opp) cu = d.u1 + 28 <= oLen - 16 ? d.u1 + 28 : d.u0 - 28;
-  else {
-    const dp = wallPt(d.wall, (d.u0 + d.u1) / 2, 0), e0 = wallPt(opp, 0, 0), e1 = wallPt(opp, oLen, 0);
-    cu = Math.hypot(e0.x - dp.x, e0.y - dp.y) <= Math.hypot(e1.x - dp.x, e1.y - dp.y) ? 30 : oLen - 30;
-  }
+  const cu = su;  // cirkulace: protější stěna naproti kamnům (Říša 17. 11.), 60 cm nad podlahou
   const au = su < wallLen(st.wall) / 2 ? oLen - 30 : 30, ah = Math.max(150, S.h - 22);
   return [
-        {kind: 'supply', wall: st.wall, u: free(st.wall, su, 35, 15, 10), z: 35, w: 15, h: 10, name: tr('přívod vzduchu k hoření (za kamny, 35 cm nad podlahou)', 'combustion air inlet (behind the heater, 35 cm above the floor)')},
-        {kind: 'circ', wall: opp, u: free(opp, cu, 60, 15, 10), z: 60, w: 15, h: 10, name: tr('cirkulace vzduchu (protější stěna, 60 cm, u dveří)', 'air circulation vent (opposite wall, 60 cm, by the door)')},
+        {kind: 'supply', wall: st.wall, u: free(st.wall, su, 35, 10, 10), z: 35, w: 10, h: 10, round: true, name: tr('přívod vzduchu k hoření (za kamny v ose, 35 cm nad podlahou, ⌀ 100 mm)', 'combustion air inlet (behind the heater in its axis, 35 cm above the floor, ⌀ 100 mm)')},
+        {kind: 'circ', wall: opp, u: free(opp, cu, 60, 15, 10), z: 60, w: 15, h: 10, name: tr('cirkulace vzduchu (protější stěna naproti kamnům, 60 cm nad podlahou)', 'air circulation vent (opposite wall facing the heater, 60 cm above the floor)')},
         {kind: 'air', wall: opp, u: free(opp, au, ah, 20, 12), z: ah, w: 20, h: 12, name: tr('větrání, uzavíratelné (úhlopříčně od kamen u stropu)', 'closable ventilation vent (diagonally opposite the heater, near the ceiling)')},
   ];
 }
 // orientační odhad nahřátí (Říša 17. 11.: „budí to pocit, že je to nedosažitelné“): doba roste zhruba úměrně objemu pro kamna;
 // dosažitelnost = ustálený přírůstek teploty při plném výkonu proti ztrátám (větrání 6× za hodinu, zateplené stěny U 0,35,
 // jednoduché sklo U 5,5, nezateplené zdivo U 2 W/m²K). Typické předpoklady, ne měření.
+const longer = pct => pct < 100 ? tr(`asi o ${pct} % déle`, `roughly ${pct} % longer`) : tr(`asi ${nf1.format(1 + pct / 100)}× déle`, `roughly ${nf1.format(1 + pct / 100)}× longer`);
 function heatReach(L, kW) {
   const A = 2 * (S.w * S.d + S.w * S.h + S.d * S.h) / 1e4, gl = L.glass, ms = L.masonry;
   const loss = 0.335 * 6 * L.V + 0.35 * Math.max(0, A - gl - ms) + 5.5 * gl + 2 * ms;  // W/K
@@ -310,8 +306,8 @@ function checks(L) {
         else if (L.Veff > v.max) {
       const pct = Math.max(1, Math.round((L.Veff / v.max - 1) * 100)), hx = heatReach(L, 11), el = D_.models[S.m].electric;
       add(hx.ok && pct <= 25 ? 'info' : 'warn', tr('Větší sauna: nahřátí potrvá déle', 'Larger sauna: warming up takes longer'),
-        tr(`Pro výběr kamen má sauna ${fm3(L.Veff)}, ${v.status} rozsah je ${nf0.format(v.min)}–${nf0.format(v.max)} m³. ${hx.ok ? `Kamna ji vytopí, jen nahřátí potrvá odhadem asi o ${pct} % déle než u sauny ${nf0.format(v.max)} m³ (doba roste zhruba úměrně objemu).` : 'Při takových ztrátách kamna nemusí udržet 80–90 °C. Pomůže zateplit stěny nebo zmenšit prosklení.'}${el ? ' S dřevem a elektřinou současně je nahřátí výrazně rychlejší.' : ''}`,
-          `For heater sizing the sauna has ${fm3(L.Veff)}; the ${v.status} range is ${nf0.format(v.min)}–${nf0.format(v.max)} m³. ${hx.ok ? `The heater will heat it, warming up just takes roughly ${pct} % longer than in a ${nf0.format(v.max)} m³ sauna (the time grows roughly with the volume).` : 'With such heat losses the heater may not hold 80–90 °C. Insulating the walls or less glass will help.'}${el ? ' Using wood and electricity together makes warming up much faster.' : ''}`));
+        tr(`Pro výběr kamen má sauna ${fm3(L.Veff)}, ${v.status} rozsah je ${nf0.format(v.min)}–${nf0.format(v.max)} m³. ${hx.ok ? `Kamna ji vytopí, jen nahřátí potrvá odhadem ${longer(pct)} než u sauny ${nf0.format(v.max)} m³ (doba roste zhruba úměrně objemu).` : 'Při takových ztrátách kamna nemusí udržet 80–90 °C. Pomůže zateplit stěny nebo zmenšit prosklení.'}${el ? ' S dřevem a elektřinou současně je nahřátí výrazně rychlejší.' : ''}`,
+          `For heater sizing the sauna has ${fm3(L.Veff)}; the ${v.status} range is ${nf0.format(v.min)}–${nf0.format(v.max)} m³. ${hx.ok ? `The heater will heat it, warming up just takes ${longer(pct)} than in a ${nf0.format(v.max)} m³ sauna (the time grows roughly with the volume).` : 'With such heat losses the heater may not hold 80–90 °C. Insulating the walls or less glass will help.'}${el ? ' Using wood and electricity together makes warming up much faster.' : ''}`));
     }
         else add('ok', tr('Objem sedí', 'The volume fits'), tr(`${fm3(L.Veff)} je v ${v.status === 'orientační' ? 'orientačním ' : ''}rozsahu ${nf0.format(v.min)}–${nf0.format(v.max)} m³.`, `${fm3(L.Veff)} is within the ${v.status} range of ${nf0.format(v.min)}–${nf0.format(v.max)} m³.`));
   }
@@ -319,8 +315,8 @@ function checks(L) {
     if (D_.models[S.m].electric && D_.elPerM3 && L.Veff > 9 / D_.elPerM3) {
     const lim = 9 / D_.elPerM3, pct = Math.max(1, Math.round((L.Veff / lim - 1) * 100)), hx = heatReach(L, 9);
     add('info', tr('Samotná elektřina nahřívá pomaleji', 'Electricity alone warms up more slowly'),
-      tr(`Elektřinou 9 kW se obvykle vytápí sauna do ${nf0.format(lim)} m³. ${hx.ok ? `Vaši saunu (${fm3(L.Veff)}) samotná elektřina nahřeje odhadem asi o ${pct} % pomaleji, udržet teplotu zvládne.` : `Vaši saunu (${fm3(L.Veff)}) samotná elektřina nemusí udržet na 80–90 °C, topte dřevem nebo oběma zdroji.`} Nejrychlejší je souběh dřeva a elektřiny: při měření prototypu ve stejné sauně 42 min proti 93 min jen elektřinou a 105 min jen dřevem.`,
-        `9 kW of electricity usually heats a sauna up to ${nf0.format(lim)} m³. ${hx.ok ? `Electricity alone will warm your sauna (${fm3(L.Veff)}) roughly ${pct} % more slowly and can hold the temperature.` : `Electricity alone may not hold your sauna (${fm3(L.Veff)}) at 80–90 °C; heat with wood or both sources.`} Wood and electricity together are fastest: in the prototype test in the same sauna, 42 min versus 93 min with electricity only and 105 min with wood only.`));
+      tr(`Elektřinou 9 kW se obvykle vytápí sauna do ${nf0.format(lim)} m³. ${hx.ok ? `Vaši saunu (${fm3(L.Veff)}) samotná elektřina nahřeje a teplotu udrží, jen to potrvá odhadem ${longer(pct)}.` : `Vaši saunu (${fm3(L.Veff)}) samotná elektřina nemusí udržet na 80–90 °C, topte dřevem nebo oběma zdroji.`} Nejrychlejší je souběh dřeva a elektřiny.`,
+        `9 kW of electricity usually heats a sauna up to ${nf0.format(lim)} m³. ${hx.ok ? `Electricity alone will heat your sauna (${fm3(L.Veff)}) and hold the temperature, it just takes ${longer(pct)}.` : `Electricity alone may not hold your sauna (${fm3(L.Veff)}) at 80–90 °C; heat with wood or both sources.`} Wood and electricity together are fastest.`));
   }
   // 8) větrání: umístěné samo
     if (L.vents && L.vents.length) add('ok', tr('Větrání je navržené', 'Ventilation is planned'), tr('Tři otvory podle kamen: ', 'Three vents placed by the heater: ') + L.vents.map(v => v.name).join(', ') + tr('. Umísťují se samy.', '. They are placed automatically.'));
@@ -702,6 +698,12 @@ function build3d(L) {
   R3.vents = [];
   for (const v of L.vents || []) {
     const p = wallPt(v.wall, v.u, .9), vg = new THREE.Group();
+    if (v.round) {  // kulatá mřížka ⌀ 100 mm
+      const fr = new THREE.Mesh(new THREE.CylinderGeometry(v.w / 2 + 1.5, v.w / 2 + 1.5, 1.2, 28), M.ventFrame); fr.rotation.x = Math.PI / 2; vg.add(fr);
+      for (const yy of [-2.6, 0, 2.6]) { const sl = new THREE.Mesh(new THREE.BoxGeometry(2 * Math.sqrt(Math.max(1, 25 - yy * yy)) - 1, .9, 1.6), M.ventSlat); sl.position.set(0, yy, .3); vg.add(sl); }
+      vg.position.set(X(p.x), v.z, Z(p.y)); vg.rotation.y = {back: 0, front: Math.PI, left: Math.PI / 2, right: -Math.PI / 2}[v.wall];
+      G.add(vg); R3.vents.push({obj: vg, wall: v.wall}); continue;
+    }
     vg.add(new THREE.Mesh(new THREE.BoxGeometry(v.w + 3, v.h + 3, 1.2), M.ventFrame));
     for (let i = 0; i < 4; i++) { const sl = new THREE.Mesh(new THREE.BoxGeometry(v.w - 2, .9, 1.6), M.ventSlat); sl.position.set(0, -v.h / 2 + 1.5 + (v.h - 3) * i / 3, .3); vg.add(sl); }
     if (v.kind === 'air') { const kb = new THREE.Mesh(new THREE.BoxGeometry(3.2, 2.2, 2.4), M.steelEdge); kb.position.set(v.w / 2 - 2.5, 0, 1.3); vg.add(kb); }
@@ -1219,7 +1221,7 @@ function designText(L) {
     `My sauna from the configurator: ${S.w} × ${S.d} × ${S.h} cm (${nf1.format(L.V)} m³), ${m.name} ${WALL_CZ[S.sw]}, benches: ${benchCz(L)}, ${L.door.glass ? 'glass' : 'wooden'} door${L.win ? ', window' : ''}${S.rot ? `, heater rotated by ${S.rot * 90}°` : ''}${S.sh ? `, ${S.sh} heat shield${S.sh > 1 ? 's' : ''} (${S.sh} × CZK 1,000)` : ''}.`);
 }
 const statusHead = L => L.bad ? tr('Takhle to nepůjde', 'This won’t work') : L.warn ? tr(`Jde to, ${L.warn === 1 ? 'jedna věc' : L.warn + ' věci'} k doladění`, `It works, ${L.warn === 1 ? 'one thing' : L.warn + ' things'} to fine-tune`) : tr('Kamna se vejdou', 'The heater fits');
-const VENT_SHORT = () => ({supply: tr('přívod vzduchu k hoření', 'combustion air inlet'), circ: tr('cirkulace', 'circulation'), air: tr('větrání (uzavíratelné)', 'ventilation (closable)')});
+const VENT_SHORT = () => ({supply: tr('přívod vzduchu k hoření ⌀ 100 mm', 'combustion air inlet ⌀ 100 mm'), circ: tr('cirkulace', 'circulation'), air: tr('větrání (uzavíratelné)', 'ventilation (closable)')});
 
 // půdorys s kótami pro výkres (světlý, na papír); compact = malý náhled v okně odeslání (bez kót a popisků)
 function sheetPlan(L, compact = false) {
