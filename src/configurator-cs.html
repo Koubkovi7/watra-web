@@ -75,9 +75,27 @@
       <div class="wk-row"><label for="wk-dp">Posun</label><input id="wk-dp" type="range" min="0" max="100" step="1" data-k="dp"><output id="wk-dpo"></output></div>
       <label class="wk-check"><input type="checkbox" data-k="dg">Skleněné dveře</label>
       <div class="wk-field"><span>Okno</span>
-        <div class="wk-seg" role="group" aria-label="Okno"><button type="button" data-set="win" data-val="none">bez okna</button><button type="button" data-set="win" data-val="small">malé</button><button type="button" data-set="win" data-val="big">velké</button><button type="button" data-set="win" data-val="wall">prosklená stěna</button></div></div>
-      <div class="wk-field" id="wk-ww-row"><span>Okno ve stěně</span>
-        <div class="wk-seg" role="group" aria-label="Okno ve stěně"><button type="button" data-set="ww" data-val="left">vlevo</button><button type="button" data-set="ww" data-val="back">vzadu</button><button type="button" data-set="ww" data-val="right">vpravo</button><button type="button" data-set="ww" data-val="front">vpředu</button></div></div>
+        <div class="wk-seg" role="group" aria-label="Okno"><button type="button" data-set="o1" data-val="0">bez okna</button><button type="button" data-set="o1" data-val="1">s oknem</button></div></div>
+      <div class="wk-winbox" id="wk-w1">
+        <div class="wk-field"><span>Ve stěně</span>
+          <div class="wk-seg" role="group" aria-label="Okno 1: Ve stěně"><button type="button" data-set="o1w" data-val="left">vlevo</button><button type="button" data-set="o1w" data-val="back">vzadu</button><button type="button" data-set="o1w" data-val="right">vpravo</button><button type="button" data-set="o1w" data-val="front">vpředu</button></div></div>
+        <div class="wk-row"><label for="wk-o1x">Posun</label><input id="wk-o1x" type="range" min="0" max="100" step="1" data-k="o1x" aria-label="Okno 1: Posun"><output id="wk-o1xo"></output></div>
+        <div class="wk-row"><label for="wk-o1s">Šířka</label><input id="wk-o1s" type="range" min="30" max="400" step="5" data-k="o1s" aria-label="Okno 1: Šířka"><span class="wk-num"><input type="number" min="30" max="400" step="5" data-k="o1s" aria-label="Okno 1: Šířka v cm" inputmode="numeric"><i>cm</i></span></div>
+        <div class="wk-row"><label for="wk-o1v">Výška</label><input id="wk-o1v" type="range" min="20" max="240" step="5" data-k="o1v" aria-label="Okno 1: Výška"><span class="wk-num"><input type="number" min="20" max="240" step="5" data-k="o1v" aria-label="Okno 1: Výška v cm" inputmode="numeric"><i>cm</i></span></div>
+        <div class="wk-row"><label for="wk-o1p">Od podlahy</label><input id="wk-o1p" type="range" min="0" max="230" step="5" data-k="o1p" aria-label="Okno 1: Od podlahy"><span class="wk-num"><input type="number" min="0" max="230" step="5" data-k="o1p" aria-label="Okno 1: Od podlahy v cm" inputmode="numeric"><i>cm</i></span></div>
+        <div class="wk-winp"><button type="button" class="wk-chip" data-winp="1:small">malé 50 × 50</button><button type="button" class="wk-chip" data-winp="1:big">velké 120 × 80</button><button type="button" class="wk-chip" data-winp="1:wall">prosklená stěna</button></div>
+      </div>
+      <button type="button" class="wk-addwin" id="wk-w2add" data-set="o2" data-val="1">+ Přidat další okno</button>
+      <div class="wk-winbox" id="wk-w2" hidden>
+        <p class="wk-winh"><strong>Okno 2</strong><button type="button" class="wk-link" data-set="o2" data-val="0">Odebrat</button></p>
+        <div class="wk-field"><span>Ve stěně</span>
+          <div class="wk-seg" role="group" aria-label="Okno 2: Ve stěně"><button type="button" data-set="o2w" data-val="left">vlevo</button><button type="button" data-set="o2w" data-val="back">vzadu</button><button type="button" data-set="o2w" data-val="right">vpravo</button><button type="button" data-set="o2w" data-val="front">vpředu</button></div></div>
+        <div class="wk-row"><label for="wk-o2x">Posun</label><input id="wk-o2x" type="range" min="0" max="100" step="1" data-k="o2x" aria-label="Okno 2: Posun"><output id="wk-o2xo"></output></div>
+        <div class="wk-row"><label for="wk-o2s">Šířka</label><input id="wk-o2s" type="range" min="30" max="400" step="5" data-k="o2s" aria-label="Okno 2: Šířka"><span class="wk-num"><input type="number" min="30" max="400" step="5" data-k="o2s" aria-label="Okno 2: Šířka v cm" inputmode="numeric"><i>cm</i></span></div>
+        <div class="wk-row"><label for="wk-o2v">Výška</label><input id="wk-o2v" type="range" min="20" max="240" step="5" data-k="o2v" aria-label="Okno 2: Výška"><span class="wk-num"><input type="number" min="20" max="240" step="5" data-k="o2v" aria-label="Okno 2: Výška v cm" inputmode="numeric"><i>cm</i></span></div>
+        <div class="wk-row"><label for="wk-o2p">Od podlahy</label><input id="wk-o2p" type="range" min="0" max="230" step="5" data-k="o2p" aria-label="Okno 2: Od podlahy"><span class="wk-num"><input type="number" min="0" max="230" step="5" data-k="o2p" aria-label="Okno 2: Od podlahy v cm" inputmode="numeric"><i>cm</i></span></div>
+        <div class="wk-winp"><button type="button" class="wk-chip" data-winp="2:small">malé 50 × 50</button><button type="button" class="wk-chip" data-winp="2:big">velké 120 × 80</button><button type="button" class="wk-chip" data-winp="2:wall">prosklená stěna</button></div>
+      </div>
       <p class="wk-help">Větrací otvory se umístí samy podle kamen: přívod vzduchu za kamny, cirkulace a uzavíratelné větrání na protější stěně.</p>
       </div>
     </details>

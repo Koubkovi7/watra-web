@@ -75,9 +75,27 @@
       <div class="wk-row"><label for="wk-dp">Position</label><input id="wk-dp" type="range" min="0" max="100" step="1" data-k="dp"><output id="wk-dpo"></output></div>
       <label class="wk-check"><input type="checkbox" data-k="dg">Glass door</label>
       <div class="wk-field"><span>Window</span>
-        <div class="wk-seg" role="group" aria-label="Window"><button type="button" data-set="win" data-val="none">no window</button><button type="button" data-set="win" data-val="small">small</button><button type="button" data-set="win" data-val="big">large</button><button type="button" data-set="win" data-val="wall">glass wall</button></div></div>
-      <div class="wk-field" id="wk-ww-row"><span>Window wall</span>
-        <div class="wk-seg" role="group" aria-label="Window in the wall"><button type="button" data-set="ww" data-val="left">left</button><button type="button" data-set="ww" data-val="back">back</button><button type="button" data-set="ww" data-val="right">right</button><button type="button" data-set="ww" data-val="front">front</button></div></div>
+        <div class="wk-seg" role="group" aria-label="Window"><button type="button" data-set="o1" data-val="0">no window</button><button type="button" data-set="o1" data-val="1">window</button></div></div>
+      <div class="wk-winbox" id="wk-w1">
+        <div class="wk-field"><span>Wall</span>
+          <div class="wk-seg" role="group" aria-label="Window 1: Wall"><button type="button" data-set="o1w" data-val="left">left</button><button type="button" data-set="o1w" data-val="back">back</button><button type="button" data-set="o1w" data-val="right">right</button><button type="button" data-set="o1w" data-val="front">front</button></div></div>
+        <div class="wk-row"><label for="wk-o1x">Position</label><input id="wk-o1x" type="range" min="0" max="100" step="1" data-k="o1x" aria-label="Window 1: Position"><output id="wk-o1xo"></output></div>
+        <div class="wk-row"><label for="wk-o1s">Width</label><input id="wk-o1s" type="range" min="30" max="400" step="5" data-k="o1s" aria-label="Window 1: Width"><span class="wk-num"><input type="number" min="30" max="400" step="5" data-k="o1s" aria-label="Window 1: Width in cm" inputmode="numeric"><i>cm</i></span></div>
+        <div class="wk-row"><label for="wk-o1v">Height</label><input id="wk-o1v" type="range" min="20" max="240" step="5" data-k="o1v" aria-label="Window 1: Height"><span class="wk-num"><input type="number" min="20" max="240" step="5" data-k="o1v" aria-label="Window 1: Height in cm" inputmode="numeric"><i>cm</i></span></div>
+        <div class="wk-row"><label for="wk-o1p">Above floor</label><input id="wk-o1p" type="range" min="0" max="230" step="5" data-k="o1p" aria-label="Window 1: Above floor"><span class="wk-num"><input type="number" min="0" max="230" step="5" data-k="o1p" aria-label="Window 1: Above floor in cm" inputmode="numeric"><i>cm</i></span></div>
+        <div class="wk-winp"><button type="button" class="wk-chip" data-winp="1:small">small 50 × 50</button><button type="button" class="wk-chip" data-winp="1:big">large 120 × 80</button><button type="button" class="wk-chip" data-winp="1:wall">glass wall</button></div>
+      </div>
+      <button type="button" class="wk-addwin" id="wk-w2add" data-set="o2" data-val="1">+ Add another window</button>
+      <div class="wk-winbox" id="wk-w2" hidden>
+        <p class="wk-winh"><strong>Window 2</strong><button type="button" class="wk-link" data-set="o2" data-val="0">Remove</button></p>
+        <div class="wk-field"><span>Wall</span>
+          <div class="wk-seg" role="group" aria-label="Window 2: Wall"><button type="button" data-set="o2w" data-val="left">left</button><button type="button" data-set="o2w" data-val="back">back</button><button type="button" data-set="o2w" data-val="right">right</button><button type="button" data-set="o2w" data-val="front">front</button></div></div>
+        <div class="wk-row"><label for="wk-o2x">Position</label><input id="wk-o2x" type="range" min="0" max="100" step="1" data-k="o2x" aria-label="Window 2: Position"><output id="wk-o2xo"></output></div>
+        <div class="wk-row"><label for="wk-o2s">Width</label><input id="wk-o2s" type="range" min="30" max="400" step="5" data-k="o2s" aria-label="Window 2: Width"><span class="wk-num"><input type="number" min="30" max="400" step="5" data-k="o2s" aria-label="Window 2: Width in cm" inputmode="numeric"><i>cm</i></span></div>
+        <div class="wk-row"><label for="wk-o2v">Height</label><input id="wk-o2v" type="range" min="20" max="240" step="5" data-k="o2v" aria-label="Window 2: Height"><span class="wk-num"><input type="number" min="20" max="240" step="5" data-k="o2v" aria-label="Window 2: Height in cm" inputmode="numeric"><i>cm</i></span></div>
+        <div class="wk-row"><label for="wk-o2p">Above floor</label><input id="wk-o2p" type="range" min="0" max="230" step="5" data-k="o2p" aria-label="Window 2: Above floor"><span class="wk-num"><input type="number" min="0" max="230" step="5" data-k="o2p" aria-label="Window 2: Above floor in cm" inputmode="numeric"><i>cm</i></span></div>
+        <div class="wk-winp"><button type="button" class="wk-chip" data-winp="2:small">small 50 × 50</button><button type="button" class="wk-chip" data-winp="2:big">large 120 × 80</button><button type="button" class="wk-chip" data-winp="2:wall">glass wall</button></div>
+      </div>
       <p class="wk-help">The vents are placed automatically around the heater: air inlet behind the heater, circulation and a closable vent on the opposite wall.</p>
       </div>
     </details>

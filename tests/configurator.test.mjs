@@ -26,6 +26,8 @@ test('design is sent from the configurator through the site enquiry intake, with
     assert.match(html,/<dialog class="wk-dlg wk-sheetdlg" id="wk-sheet-dlg"/);
     for(const n of ['name','email','phone','note','_gotcha']) assert.match(html,new RegExp('name="'+n+'"'));
     assert.match(html,/data-wk-pdf/,'drawing downloads as a PDF file');
+    for(const k of ['o1x','o1s','o1v','o1p','o2x','o2s','o2v','o2p']) assert.match(html,new RegExp('data-k="'+k+'"'),'window control '+k);
+    assert.match(html,/id="wk-w2add"/,'second window can be added');
     assert.match(html,/id="wk-vol-i"[^>]*aria-describedby="wk-vol-tip"/,'volume allowance is explained');
   }
   const js=await readFile('public/konfigurator.js','utf8');
@@ -51,5 +53,6 @@ test('configurator script respects analytics consent and the page language',asyn
   assert.match(js,/localStorage\.getItem\('watra_consent'\)/);
   assert.match(js,/document\.documentElement\.lang/);
   assert.ok(js.includes("tr('/cs/kontakt/', '/en/contact/')"));
-  assert.match(js,/const HASH_ENUM = \{sw: WALLS4, dw: WALLS4, ww: WALLS4, win:/,'unknown values in a shared link fall back to defaults');
+  assert.match(js,/const HASH_ENUM = \{sw: WALLS4, dw: WALLS4, o1w: WALLS4, o2w: WALLS4,/,'unknown values in a shared link fall back to defaults');
+  assert.ok(js.includes("if (q.has('win') || q.has('ww'))"),'old window links still work');
 });

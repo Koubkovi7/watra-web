@@ -352,6 +352,18 @@
   body.wk-print .ws-issues{font-size:10.5px}
   body.wk-print .ws-foot{font-size:9px;margin-top:8px}
 }
+/* okna: až dvě, každé s posunem a rozměry */
+.wk-winbox{border-left:2px solid var(--line);padding:2px 0 6px 12px;margin:6px 0 10px}
+.wk-winbox[hidden]{display:none}
+.wk-winbox .wk-row{grid-template-columns:78px minmax(0,1fr) 84px}
+.wk-winh{display:flex;justify-content:space-between;align-items:center;margin:2px 0 6px;font-size:13px}
+.wk-winh strong{font-weight:400;color:var(--text);letter-spacing:.5px}
+.wk-winp{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.wk-winp .wk-chip{font-size:12px;padding:5px 10px}
+.wk-addwin{display:block;width:100%;margin:2px 0 12px;padding:9px 12px;background:transparent;border:1px dashed var(--btn);color:var(--gold);font-size:13px;cursor:pointer;text-align:left}
+.wk-addwin:hover{border-color:var(--gold)}
+.wk-addwin[hidden]{display:none}
+@media(max-width:1100px){.wk-winbox .wk-row{grid-template-columns:72px minmax(0,1fr) 80px}}
 /* nápověda ⓘ u objemu */
 .wk-kpi{position:relative}
 .wk-info{display:inline-grid;place-items:center;width:17px;height:17px;margin-left:6px;padding:0;border-radius:50%;border:1px solid var(--gold);background:transparent;color:var(--gold);font:italic 700 11px/1 Georgia,serif;cursor:help;vertical-align:1px}

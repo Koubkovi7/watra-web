@@ -48,7 +48,7 @@ const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const WALL_CZ = EN ? {left: 'left', right: 'right', back: 'back', front: 'by the door'} : {left: 'vlevo', right: 'vpravo', back: 'vzadu', front: 'u dveří'};
 
 /* ---------- stav (sdílí se v adrese za #) ---------- */
-const DEF = {w: 230, d: 210, h: 215, m: 'e', sw: 'left', sp: 25, ub: 1, ul: 0, ur: 0, lb: 1, ll: 0, lr: 0, dw: 'front', dp: 75, dg: 1, win: 'none', ww: 'right', mw: 'wood', fx: 'both', ppl: 0, sh: 0, rot: 0};
+const DEF = {w: 230, d: 210, h: 215, m: 'e', sw: 'left', sp: 25, ub: 1, ul: 0, ur: 0, lb: 1, ll: 0, lr: 0, dw: 'front', dp: 75, dg: 1, o1: 0, o1w: 'right', o1x: 50, o1s: 120, o1v: 80, o1p: 100, o2: 0, o2w: 'back', o2x: 50, o2s: 60, o2v: 60, o2p: 110, mw: 'wood', fx: 'both', ppl: 0, sh: 0, rot: 0};
 const S = {...DEF};
 function readHash() {
   const q = new URLSearchParams(location.hash.slice(1));
@@ -64,11 +64,18 @@ function readHash() {
   S.rot = ((Math.round(S.rot) % 4) + 4) % 4; S.sh = clamp(Math.round(S.sh), 0, 3);
   // odkaz je vstup zvenčí: neznámá hodnota (překlep, podvržený odkaz) = výchozí, jinak by konfigurátor spadl
   for (const k in HASH_ENUM) if (!HASH_ENUM[k].includes(S[k])) S[k] = DEF[k];
-  S.sp = clamp(Math.round(S.sp), 0, 100); S.dp = clamp(Math.round(S.dp), 0, 100);
-  for (const k of ['ub', 'ul', 'ur', 'lb', 'll', 'lr', 'dg', 'ppl']) S[k] = S[k] ? 1 : 0;
+  for (const k of ['sp', 'dp', 'o1x', 'o2x']) S[k] = clamp(Math.round(S[k]), 0, 100);
+  for (const k of ['ub', 'ul', 'ur', 'lb', 'll', 'lr', 'dg', 'ppl', 'o1', 'o2']) S[k] = S[k] ? 1 : 0;
+  for (const k in LIM) S[k] = clamp(Math.round(S[k]), LIM[k][0], LIM[k][1]);
+  // starší odkazy: win = none | small | big | wall (prosklená stěna), ww = stěna okna
+  if (q.has('win') || q.has('ww')) {
+    const win = q.get('win') || 'none', ww = WALLS4.includes(q.get('ww')) ? q.get('ww') : 'right';
+    const P = {small: [50, 50, 120], big: [120, 80, 100], wall: [wallLen(ww) - 40, S.h - 60, 30]};
+    if (P[win]) { S.o1 = 1; S.o1w = ww; S.o1x = 50; [S.o1s, S.o1v, S.o1p] = P[win]; } else S.o1 = 0;
+  }
 }
 const WALLS4 = ['left', 'back', 'right', 'front'];
-const HASH_ENUM = {sw: WALLS4, dw: WALLS4, ww: WALLS4, win: ['none', 'small', 'big', 'wall'], mw: ['wood', 'masonry'], fx: ['wood', 'el', 'both']};
+const HASH_ENUM = {sw: WALLS4, dw: WALLS4, o1w: WALLS4, o2w: WALLS4, mw: ['wood', 'masonry'], fx: ['wood', 'el', 'both']};
 let hashT = 0;
 function writeHash() {
   clearTimeout(hashT);
@@ -127,24 +134,37 @@ function layout() {
   // dveře a vstup
   const dLen = wallLen(S.dw), dW = 70, du = clamp(S.dp / 100 * dLen, dW / 2 + 5, dLen - dW / 2 - 5);
   L.door = {wall: S.dw, u0: du - dW / 2, u1: du + dW / 2, h: Math.min(190, S.h - 10), glass: !!S.dg, entry: wallRect(S.dw, du - dW / 2, du + dW / 2, 0, 55)};
-  // okno
-  const WIN = {none: null, small: {w: 50, h: 50, sill: 120}, big: {w: 120, h: 80, sill: 100}, wall: {w: 0, h: 0, sill: 30}};
-  const wn = WIN[S.win];
-  if (wn) {
-    const wl = wallLen(S.ww);
-    const ww = S.win === 'wall' ? wl - 40 : Math.min(wn.w, wl - 40), wh = S.win === 'wall' ? S.h - 60 : wn.h;
-    L.win = {wall: S.ww, u0: (wl - ww) / 2, u1: (wl + ww) / 2, sill: wn.sill, h: wh};
-    if (S.win === 'wall' && S.ww === S.dw) { L.win.u0 = 20; L.win.u1 = wl - 20; }
+  // okna (Říša 27. 11.): až dvě, každé se stěnou, posunem, šířkou, výškou a výškou od podlahy. Okno se nesmí krýt s dveřmi
+  // ani s druhým oknem (rámy 6 + 6 cm): posune se na nejbližší volné místo, a když se nevejde celé, zúží se (nebo vypadne).
+  L.wins = []; L.fixed = false;
+  for (const i of [1, 2]) {
+    if (!S['o' + i]) continue;
+    const k = n => `o${i}${n}`, wall = S[k('w')], len = wallLen(wall);
+    const h = clamp(S[k('v')], 20, S.h - 30), sill = clamp(S[k('p')], 8, S.h - 8 - h), w0 = clamp(S[k('s')], 30, len - 20);
+    if (h !== S[k('v')] || sill !== S[k('p')] || w0 !== S[k('s')]) { S[k('v')] = h; S[k('p')] = sill; S[k('s')] = w0; L.fixed = true; }
+    let w = w0;
+    const want = clamp(S[k('x')] / 100 * len, w / 2 + 10, len - w / 2 - 10), blocks = [];
+    if (L.door.wall === wall && sill < L.door.h + 12) blocks.push([L.door.u0 - 12, L.door.u1 + 12]);
+    for (const o of L.wins) if (!o.skip && o.wall === wall && sill < o.sill + o.h + 12 && o.sill < sill + h + 12) blocks.push([o.u0 - 12, o.u1 + 12]);
+    blocks.sort((a, b) => a[0] - b[0]);
+    const free = []; let a = 10;
+    for (const [b0, b1] of blocks) { if (b0 > a) free.push([a, b0]); a = Math.max(a, b1); }
+    if (len - 10 > a) free.push([a, len - 10]);
+    let at = null;
+    for (const [f0, f1] of free) { if (f1 - f0 < w) continue; const c = clamp(want, f0 + w / 2, f1 - w / 2); if (at === null || Math.abs(c - want) < Math.abs(at - want)) at = c; }
+    let trimmed = false;
+    if (at === null) {  // celé se nevejde: nejširší volný úsek
+      const f = free.sort((p, q) => (q[1] - q[0]) - (p[1] - p[0]))[0];
+      if (!f || f[1] - f[0] < 30) { L.wins.push({i, wall, skip: true, w, h, sill}); continue; }
+      w = f[1] - f[0]; at = (f[0] + f[1]) / 2; trimmed = true;
+    }
+    L.wins.push({i, wall, u0: at - w / 2, u1: at + w / 2, sill, h, w, trimmed, moved: !trimmed && Math.abs(at - want) > 2});
   }
   // objem
   const V = S.w * S.d * S.h / 1e6;
   let glass = 0;
   if (L.door.glass) glass += (L.door.u1 - L.door.u0) * L.door.h / 1e4;
-  if (L.win) {
-    let a = (L.win.u1 - L.win.u0) * L.win.h / 1e4;
-    if (S.win === 'wall' && S.ww === S.dw) a = Math.max(0, a - (L.door.u1 - L.door.u0) * L.door.h / 1e4);
-    glass += a;
-  }
+  for (const o of L.wins) if (!o.skip) glass += o.w * o.h / 1e4;
   let masonry = 0;
   if (S.mw === 'masonry') masonry = 2 * (S.w + S.d) * S.h / 1e4 - glass;  // neizolované zdivo: všechny stěny
   L.V = V; L.glass = glass; L.masonry = masonry; L.Veff = V + D_.glassAdd * (glass + masonry);
@@ -221,7 +241,7 @@ const OPP = {left: 'right', right: 'left', back: 'front', front: 'back'};
 function ventsFor(L) {
   const st = L.stove, opp = OPP[st.wall], oLen = wallLen(opp), d = L.door;
   const holes = w => [d.wall === w ? {u0: d.u0, u1: d.u1, z0: 0, z1: d.h} : null,
-    L.win && L.win.wall === w ? {u0: L.win.u0, u1: L.win.u1, z0: L.win.sill, z1: L.win.sill + L.win.h} : null].filter(Boolean);
+    ...L.wins.filter(o => !o.skip && o.wall === w).map(o => ({u0: o.u0, u1: o.u1, z0: o.sill, z1: o.sill + o.h}))].filter(Boolean);
   const free = (wall, u, z, w, h) => {  // posune otvor podél stěny mimo dveře a okno
     const len = wallLen(wall), lo = w / 2 + 8, hi = len - w / 2 - 8;
     const hit = x => holes(wall).some(o => x + w / 2 > o.u0 - 5 && x - w / 2 < o.u1 + 5 && z + h / 2 > o.z0 && z - h / 2 < o.z1);
@@ -288,6 +308,14 @@ function checks(L) {
     if (inter(ent, st.body) || inter(ent, st.zoneSide, 1)) add('warn', tr('Kamna hned u dveří', 'Heater right by the door'), tr('Při vstupu byste šli kolem horkých kamen. Dejte je dál od dveří.', 'You would walk past the hot heater when entering. Move it further from the door.'), 1);
     else if (L.benches.some(b => inter(b, ent, 1))) add('warn', tr('Lavice brání ve vstupu', 'A bench blocks the entrance'), tr('Za dveřmi zůstaňte aspoň 55 cm volného místa.', 'Keep at least 55 cm of free space behind the door.'));
     else add('ok', tr('Ke dveřím je volno', 'The way to the door is clear'), tr('Za dveřmi zůstává volný prostor na vstup.', 'There is free space to walk in behind the door.'));
+  // 3b) okna, která se musela posunout nebo zúžit (dveře, druhé okno)
+  const okCnt = L.wins.length > 1;
+  for (const o of L.wins) {
+    const nm = okCnt ? tr(`Okno ${o.i}`, `Window ${o.i}`) : tr('Okno', 'The window');
+    if (o.skip) add('warn', tr(`${nm} se na stěnu nevejde`, `${nm} does not fit on the wall`), tr(`Na stěně ${WALL_CZ[o.wall]} pro něj vedle dveří a druhého okna není místo. Dejte ho na jinou stěnu nebo ho zmenšete.`, `There is no room for it on the wall (${WALL_CZ[o.wall]}) next to the door and the other window. Put it on another wall or make it smaller.`));
+    else if (o.trimmed) add('info', tr(`${nm} jsme zúžili na ${fcm(o.w)}`, `${nm} was narrowed to ${fcm(o.w)}`), tr('Celé by zasahovalo do dveří nebo do druhého okna. Posuňte ho, nebo ho dejte na jinou stěnu.', 'At full width it would overlap the door or the other window. Move it or put it on another wall.'));
+    else if (o.moved) add('info', tr(`${nm} jsme posunuli`, `${nm} was moved`), tr('Na zvoleném místě by se krylo s dveřmi nebo s druhým oknem, je na nejbližším volném místě.', 'At the chosen spot it would overlap the door or the other window, so it is at the nearest free spot.'));
+  }
   // 4) přikládání: výrobci kamen na dřevo chtějí před dvířky volno asi 1 × 1 m (Harvia M3); šířka se může posunout podél stěny
   const service = st.service;
   L.service = service;
@@ -355,7 +383,7 @@ function renderPlan(L) {
     if (wall === 'left' || wall === 'right') svgEl('rect', {x: wall === 'left' ? -2 * T : W, y: Y(Math.max(a.y, b.y)), width: 2 * T, height: Math.abs(b.y - a.y), class: cls}, planSvg);
     else svgEl('rect', {x: Math.min(a.x, b.x), y: wall === 'front' ? Dd : -2 * T, width: Math.abs(b.x - a.x), height: 2 * T, class: cls}, planSvg);
   };
-  if (L.win) gap(L.win.wall, L.win.u0, L.win.u1, 'pl-win');
+  for (const o of L.wins) if (!o.skip) gap(o.wall, o.u0, o.u1, 'pl-win');
   gap(L.door.wall, L.door.u0, L.door.u1, 'pl-doorgap');
   // větrání: značka ve zdi (barva podle druhu, popis v legendě a v bublině)
   for (const v of L.vents || []) {
@@ -604,14 +632,7 @@ function build3d(L) {
   const holesOf = wall => {
     const hs = [];
     if (L.door.wall === wall) hs.push({u0: L.door.u0, u1: L.door.u1, v0: 0, v1: L.door.h, kind: 'door'});
-    if (L.win && L.win.wall === wall) {
-      const h = {u0: L.win.u0, u1: L.win.u1, v0: L.win.sill, v1: L.win.sill + L.win.h, kind: 'win'};
-      if (L.door.wall === wall && h.u0 < L.door.u1 + 6 && h.u1 > L.door.u0 - 6) {  // okno vedle dveří: zkrátit na delší stranu
-        const left = L.door.u0 - 6 - h.u0, right = h.u1 - (L.door.u1 + 6);
-        if (right >= left) h.u0 = L.door.u1 + 6; else h.u1 = L.door.u0 - 6;
-      }
-      if (h.u1 - h.u0 > 20) hs.push(h);
-    }
+    for (const o of L.wins) if (!o.skip && o.wall === wall) hs.push({u0: o.u0, u1: o.u1, v0: o.sill, v1: o.sill + o.h, kind: 'win'});
     return hs;
   };
   const FRAME = {front: [X(0), Z(0), 0, false], back: [X(W), Z(Dd), Math.PI, true], left: [X(0), Z(Dd), -Math.PI / 2, true], right: [X(W), Z(0), Math.PI / 2, false]};
@@ -1061,7 +1082,15 @@ function hideHint() { clearTimeout(hintT); const h = $('#wk-hint'); if (h) h.cla
 
 /* ---------- ovládání ---------- */
 const DOOR_CZ = EN ? {front: 'front', left: 'left', right: 'right', back: 'back'} : {front: 'vpředu', left: 'vlevo', right: 'vpravo', back: 'vzadu'},
-  WIN_CZ = EN ? {none: 'no window', small: 'small window', big: 'large window', wall: 'glass wall'} : {none: 'bez okna', small: 'malé okno', big: 'velké okno', wall: 'prosklená stěna'};
+  WIN_CZ = null;
+// okna slovy: krátce (shrnutí sekce) nebo s rozměry (poptávka, výkres)
+function winsCz(L, full = false) {
+  const ok = L.wins.filter(o => !o.skip);
+  if (!ok.length) return tr('bez okna', 'no window');
+  if (!full) return ok.length === 1 ? tr(`okno ${WALL_CZ[ok[0].wall]}`, `window ${WALL_CZ[ok[0].wall]}`) : tr(`${ok.length} okna`, `${ok.length} windows`);
+  return ok.map(o => tr(`okno ${WALL_CZ[o.wall]} ${Math.round(o.w)} × ${Math.round(o.h)} cm, ${Math.round(o.sill)} cm od podlahy, střed ${Math.round((o.u0 + o.u1) / 2)} cm od rohu`,
+    `window ${WALL_CZ[o.wall]} ${Math.round(o.w)} × ${Math.round(o.h)} cm, ${Math.round(o.sill)} cm above the floor, centre ${Math.round((o.u0 + o.u1) / 2)} cm from the corner`)).join('; ');
+}
 function benchCz(L) {
   const lv = l => L.benches.filter(b => b.level === l).map(b => WALL_CZ[b.wall]).join(' + ');
   const u = lv('upper'), d = lv('lower');
@@ -1073,7 +1102,8 @@ function renderSums(L) {
   set('#wk-sum-sauna', `${S.w} × ${S.d} × ${S.h} cm · ${fm3(L.V)}`);
     set('#wk-sum-kamna', [m.short, WALL_CZ[S.sw], S.rot ? S.rot * 90 + '°' : '', S.sh ? (S.sh === 1 ? tr('1 štít', '1 shield') : S.sh + tr(' štíty', ' shields')) : ''].filter(Boolean).join(' · '));
   set('#wk-sum-lavice', benchCz(L));
-    set('#wk-sum-dvere', `${tr('dveře', 'door')} ${DOOR_CZ[S.dw]}${S.dg ? tr(', sklo', ', glass') : ''} · ${WIN_CZ[S.win]}`);
+    set('#wk-sum-dvere', `${tr('dveře', 'door')} ${DOOR_CZ[S.dw]}${S.dg ? tr(', sklo', ', glass') : ''} · ${winsCz(L)}`);
+  for (const i of [1, 2]) { const o = L.wins.find(x => x.i === i && !x.skip); set(`#wk-o${i}xo`, o ? fcm((o.u0 + o.u1) / 2) : '—'); }
 }
 const ROT_CZ = EN ? ['back to the wall, door into the sauna', 'side to the wall', 'door to the wall', 'side to the wall'] : ['záda ke stěně, dvířka do sauny', 'bokem ke stěně', 'dvířka ke stěně', 'bokem ke stěně'];
 function syncInputs() {
@@ -1091,7 +1121,8 @@ function syncInputs() {
     t.classList.toggle('off', off); i.disabled = off;
         t.title = off ? tr('U této stěny stojí kamna', 'The heater stands at this wall') : '';
   });
-  const wr = $('#wk-ww-row'); if (wr) wr.hidden = S.win === 'none';
+  for (const i of [1, 2]) { const b = $('#wk-w' + i); if (b) b.hidden = !S['o' + i]; }
+  const w2a = $('#wk-w2add'); if (w2a) w2a.hidden = !!S.o2;
   const fx = $('.wk-fx'); if (fx) fx.hidden = !el;
   $$('[data-wk-fx]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.wkFx === (el ? S.fx : 'wood'))));
   $$('[data-toggle="zone"]').forEach(b => b.setAttribute('aria-pressed', String(VIEW.zone !== false)));
@@ -1113,13 +1144,14 @@ function track(ev, p = {}, once = false) {
 let upT = 0, firstUpdate = true;
 function update() {
   const L = layout(); LAST = L;
+  if (L.fixed) syncInputs();  // okno se nevešlo pod strop nebo na stěnu: rozměry se upravily
   renderPlan(L); renderMini(); renderResult(L); renderSums(L);
   clearTimeout(upT); upT = setTimeout(() => build3d(L), 30);
   writeHash();
   if (firstUpdate) { firstUpdate = false; track('configurator_open', {}, true); }
   else track('configurator_change', {}, true);
 }
-const LIM = {w: [120, 400], d: [120, 400], h: [180, 260]};
+const LIM = {w: [120, 400], d: [120, 400], h: [180, 260], o1s: [30, 400], o2s: [30, 400], o1v: [20, 240], o2v: [20, 240], o1p: [0, 230], o2p: [0, 230]};
 function setTab(t) {
   $$('[data-wk-tab]').forEach(x => x.setAttribute('aria-selected', String(x.dataset.wkTab === t)));
   $('#wk-3dwrap').hidden = t !== '3d'; $('#wk-planwrap').hidden = t !== 'plan';
@@ -1132,7 +1164,7 @@ function bindUI() {
       const k = e.dataset.k;
       if (e.type === 'checkbox') S[k] = e.checked ? 1 : 0;
       else S[k] = typeof DEF[k] === 'number' ? (Math.round(+e.value) || 0) : e.value;
-      if (LIM[k]) { S[k] = clamp(S[k], LIM[k][0], LIM[k][1]); VIEW.dist = 0; }
+      if (LIM[k]) { S[k] = clamp(S[k], LIM[k][0], LIM[k][1]); if ('wdh'.includes(k)) VIEW.dist = 0; }
       syncInputs(); update();
     });
   }
@@ -1144,6 +1176,14 @@ function bindUI() {
     syncInputs(); update();
   }));
   $$('[data-model]').forEach(b => b.addEventListener('click', () => { S.m = b.dataset.model; syncInputs(); update(); }));
+  // okno: předvolby rozměrů (malé, velké, prosklená stěna)
+  $$('[data-winp]').forEach(b => b.addEventListener('click', () => {
+    const [i, t] = b.dataset.winp.split(':'), k = n => `o${i}${n}`;
+    const P = {small: [50, 50, 120], big: [120, 80, 100], wall: [wallLen(S[k('w')]) - 40, S.h - 60, 30]}[t];
+    if (!P) return;
+    [S[k('s')], S[k('v')], S[k('p')]] = P; if (t === 'wall') S[k('x')] = 50;
+    syncInputs(); update();
+  }));
   $$('[data-wk-fx]').forEach(b => b.addEventListener('click', () => { S.fx = b.dataset.wkFx; syncInputs(); applyFx(); writeHash(); }));
   $$('[data-wk-view]').forEach(b => b.addEventListener('click', () => { setTab('3d'); setMode(b.dataset.wkView); }));
   $$('[data-toggle]').forEach(b => b.addEventListener('click', () => {
@@ -1197,10 +1237,10 @@ function bindUI() {
   hdr(); addEventListener('resize', hdr);
 }
 const PRESETS = {
-  mala: {w: 200, d: 200, h: 215, sw: 'left', sp: 30, ub: 1, lb: 0, dw: 'front', dp: 78, win: 'none'},
-  zahrada: {w: 220, d: 210, h: 215, sw: 'left', sp: 26, ub: 1, lb: 1, dw: 'front', dp: 75, win: 'big', ww: 'right'},
-  dolniL: {w: 230, d: 210, h: 215, sw: 'right', sp: 26, ub: 1, lb: 1, ll: 1, dw: 'front', dp: 45, win: 'none'},
-  penzion: {w: 250, d: 230, h: 220, sw: 'right', sp: 40, ub: 1, ul: 1, lb: 0, dw: 'front', dp: 45, dg: 0, win: 'none', ppl: 1},
+  mala: {w: 200, d: 200, h: 215, sw: 'left', sp: 30, ub: 1, lb: 0, dw: 'front', dp: 78},
+  zahrada: {w: 220, d: 210, h: 215, sw: 'left', sp: 26, ub: 1, lb: 1, dw: 'front', dp: 75, o1: 1, o1w: 'right', o1x: 50, o1s: 120, o1v: 80, o1p: 100},
+  dolniL: {w: 230, d: 210, h: 215, sw: 'right', sp: 26, ub: 1, lb: 1, ll: 1, dw: 'front', dp: 45},
+  penzion: {w: 250, d: 230, h: 220, sw: 'right', sp: 40, ub: 1, ul: 1, lb: 0, dw: 'front', dp: 45, dg: 0, ppl: 1},
   reset: {},
 };
 function toast(t) {
@@ -1217,8 +1257,8 @@ const designUrl = view => location.origin + location.pathname + '#' + [hashStr()
 const escH = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
 function designText(L) {
   const m = D_.models[S.m];
-  return tr(`Moje sauna z konfigurátoru: ${S.w} × ${S.d} × ${S.h} cm (${nf1.format(L.V)} m³), ${m.name} ${WALL_CZ[S.sw]}, lavice: ${benchCz(L)}, ${L.door.glass ? 'skleněné' : 'dřevěné'} dveře${L.win ? ', okno' : ''}${S.rot ? `, kamna otočená o ${S.rot * 90}°` : ''}${S.sh ? `, ${S.sh === 1 ? '1 tepelný štít' : S.sh + ' tepelné štíty'} (${S.sh} × 1 000 Kč)` : ''}.`,
-    `My sauna from the configurator: ${S.w} × ${S.d} × ${S.h} cm (${nf1.format(L.V)} m³), ${m.name} ${WALL_CZ[S.sw]}, benches: ${benchCz(L)}, ${L.door.glass ? 'glass' : 'wooden'} door${L.win ? ', window' : ''}${S.rot ? `, heater rotated by ${S.rot * 90}°` : ''}${S.sh ? `, ${S.sh} heat shield${S.sh > 1 ? 's' : ''} (${S.sh} × CZK 1,000)` : ''}.`);
+  return tr(`Moje sauna z konfigurátoru: ${S.w} × ${S.d} × ${S.h} cm (${nf1.format(L.V)} m³), ${m.name} ${WALL_CZ[S.sw]}, lavice: ${benchCz(L)}, ${L.door.glass ? 'skleněné' : 'dřevěné'} dveře${L.wins.some(o => !o.skip) ? ', ' + winsCz(L, true) : ''}${S.rot ? `, kamna otočená o ${S.rot * 90}°` : ''}${S.sh ? `, ${S.sh === 1 ? '1 tepelný štít' : S.sh + ' tepelné štíty'} (${S.sh} × 1 000 Kč)` : ''}.`,
+    `My sauna from the configurator: ${S.w} × ${S.d} × ${S.h} cm (${nf1.format(L.V)} m³), ${m.name} ${WALL_CZ[S.sw]}, benches: ${benchCz(L)}, ${L.door.glass ? 'glass' : 'wooden'} door${L.wins.some(o => !o.skip) ? ', ' + winsCz(L, true) : ''}${S.rot ? `, heater rotated by ${S.rot * 90}°` : ''}${S.sh ? `, ${S.sh} heat shield${S.sh > 1 ? 's' : ''} (${S.sh} × CZK 1,000)` : ''}.`);
 }
 const statusHead = L => L.bad ? tr('Takhle to nepůjde', 'This won’t work') : L.warn ? tr(`Jde to, ${L.warn === 1 ? 'jedna věc' : L.warn + ' věci'} k doladění`, `It works, ${L.warn === 1 ? 'one thing' : L.warn + ' things'} to fine-tune`) : tr('Kamna se vejdou', 'The heater fits');
 const VENT_SHORT = () => ({supply: tr('přívod vzduchu k hoření ⌀ 100 mm', 'combustion air inlet ⌀ 100 mm'), circ: tr('cirkulace', 'circulation'), air: tr('větrání (uzavíratelné)', 'ventilation (closable)')});
@@ -1246,7 +1286,7 @@ function sheetPlan(L, compact = false) {
     if (wall === 'left' || wall === 'right') o.push(`<rect class="${cls}" x="${wall === 'left' ? -T : W}" y="${Y(Math.max(a.y, b.y))}" width="${T}" height="${Math.abs(b.y - a.y)}"/>`);
     else o.push(`<rect class="${cls}" x="${Math.min(a.x, b.x)}" y="${wall === 'front' ? D : -T}" width="${Math.abs(b.x - a.x)}" height="${T}"/>`);
   };
-  if (L.win) gap(L.win.wall, L.win.u0, L.win.u1, 'wn');
+  for (const o of L.wins) if (!o.skip) gap(o.wall, o.u0, o.u1, 'wn');
   gap(L.door.wall, L.door.u0, L.door.u1, 'dg');
   { // dveře se otvírají ven
     const d = L.door, w = d.u1 - d.u0, h = wallPt(d.wall, d.u0, 0), tp = wallPt(d.wall, d.u1, 0), op = wallPt(d.wall, d.u0, -w);
@@ -1303,7 +1343,7 @@ function sheetRows(L) {
     [tr('Odstupy', 'Clearances'), tr(`boky ${st.cA} / ${st.cB} cm, záda ${st.cK} cm, před dvířky ${D_.clear.front} cm (${D_.clear.status})`, `sides ${st.cA} / ${st.cB} cm, back ${st.cK} cm, front ${D_.clear.front} cm (${D_.clear.status})`)],
     [tr('Tepelné štíty', 'Heat shields'), S.sh ? tr(`${S.sh} × 1 000 Kč (${sh.join(', ')})`, `${S.sh} × CZK 1,000 (${sh.join(', ')})`) : tr('bez štítů', 'none')],
     [tr('Lavice', 'Benches'), `${benchCz(L)}${L.seats ? ' · ' + tr(`${lidi(L.seats)} vsedě`, `${lidi(L.seats)} seated`) : ''}`],
-    [tr('Dveře a okno', 'Door and window'), `${tr('dveře', 'door')} ${DOOR_CZ[S.dw]} (${L.door.glass ? tr('sklo', 'glass') : tr('dřevo', 'wood')}) · ${WIN_CZ[S.win]}${L.win ? ' ' + WALL_CZ[S.ww] : ''}`],
+    [tr('Dveře a okno', 'Door and window'), `${tr('dveře', 'door')} ${DOOR_CZ[S.dw]} (${L.door.glass ? tr('sklo', 'glass') : tr('dřevo', 'wood')}) · ${winsCz(L, true)}`],
     [tr('Větrání', 'Ventilation'), (L.vents || []).map((v, i) => `${i + 1} ${VENT_SHORT()[v.kind]} (${v.z} cm)`).join(', ')],
   ];
 }
